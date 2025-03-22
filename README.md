@@ -1,4 +1,4 @@
-# legacy-vote-dapp
+# market place and supply chain for integrated farming
 
 ## Getting Started
 
