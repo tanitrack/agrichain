@@ -12,7 +12,7 @@
 # next.js
 /.next/
 /out/
-/.github
+/.github/workflows/*
 # production
 /build
 
