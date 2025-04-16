@@ -1,0 +1,5 @@
+onlyBuiltDependencies:
+  - bigint-buffer
+  - bufferutil
+  - sharp
+  - utf-8-validate
