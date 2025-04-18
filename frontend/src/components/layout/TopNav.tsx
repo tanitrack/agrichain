@@ -19,6 +19,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { DynamicWidget } from "@dynamic-labs/sdk-react-core";
+import { DynamicWidgetButton } from "@/components/layout/DynamicWidgetButton";
 
 interface TopNavProps {
   onMenuButtonClick: () => void;
@@ -120,21 +122,7 @@ export function TopNav({ onMenuButtonClick }: TopNavProps) {
             </Tooltip>
           </TooltipProvider>
           
-          {/* User Profile Button */}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 hidden md:flex">
-                  <User className="h-4 w-4 text-earth-medium-green" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>
-                  {t("language") === "id" ? "Profil" : "Profile"}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+       
           
           {/* Notifications */}
           <DropdownMenu>
@@ -184,8 +172,10 @@ export function TopNav({ onMenuButtonClick }: TopNavProps) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          <DynamicWidgetButton />
         </div>
       </div>
+
     </header>
   );
 }

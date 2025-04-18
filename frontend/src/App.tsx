@@ -1,6 +1,5 @@
 import {
   DynamicContextProvider,
-  DynamicWidget,
 } from "@dynamic-labs/sdk-react-core";
 import { SolanaWalletConnectors } from "@dynamic-labs/solana";
 
@@ -111,7 +110,6 @@ const App = () => (
       </TooltipProvider>
     </LanguageProvider>
   </QueryClientProvider>
-  <DynamicWidget />
   </DynamicContextProvider>
 );
 
