@@ -1,0 +1,257 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 180 100% 13%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 180 100% 13%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 180 100% 13%;
+
+    --primary: 180 100% 13%; /* TaniTrack blue-green */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 48 89% 60%; /* TaniTrack yellow */
+    --secondary-foreground: 180 100% 13%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 142 67% 59%; /* TaniTrack light green */
+    --accent-foreground: 180 100% 13%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 180 100% 16%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 180 100% 13%;
+    --sidebar-primary: 180 100% 16%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 142 67% 95%;
+    --sidebar-accent-foreground: 180 100% 13%;
+    --sidebar-border: 214.3 31.8% 91.4%;
+    --sidebar-ring: 180 100% 16%;
+    
+    /* Earth/Agriculture Theme Colors - Enhanced for better contrast */
+    --earth-dark-green: 106 40% 25%; /* Darker version of #3a5a40 */
+    --earth-medium-green: 101 25% 45%; /* Slightly darker #588157 */
+    --earth-light-green: 83 30% 55%; /* Slightly darker #a3b18a */
+    --earth-pale-green: 83 25% 90%; /* #e9f0e1 */
+    --earth-brown: 33 40% 35%; /* Darker #866a45 */
+    --earth-light-brown: 33 43% 85%; /* #ead7bb */
+    --earth-clay: 27 60% 75%; /* Richer #f2cca0 */
+    --earth-wheat: 39 80% 80%; /* Richer #f8e4a8 */
+  }
+
+  .dark {
+    --background: 180 100% 10%;
+    --foreground: 210 40% 98%;
+
+    --card: 180 100% 12%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 180 100% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 142 67% 59%;
+    --primary-foreground: 180 100% 10%;
+
+    --secondary: 48 89% 60%;
+    --secondary-foreground: 180 100% 10%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 142 67% 59%;
+    --accent-foreground: 180 100% 10%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 142 67% 59%;
+    
+    --sidebar-background: 180 100% 12%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 142 67% 59%;
+    --sidebar-primary-foreground: 180 100% 10%;
+    --sidebar-accent: 180 100% 15%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 180 100% 15%;
+    --sidebar-ring: 142 67% 59%;
+  }
+  
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-semibold text-earth-dark-green;
+  }
+}
+
+@layer components {
+  .tani-gradient {
+    @apply bg-gradient-to-br from-tani-green-light to-tani-green-dark;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-md hover:-translate-y-1;
+  }
+  
+  .dashboard-stats {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8;
+  }
+  
+  .stats-card {
+    @apply bg-white rounded-lg shadow-sm p-6 card-hover border border-earth-light-brown/50;
+  }
+  
+  .table-container {
+    @apply bg-white rounded-lg shadow-sm overflow-hidden border border-earth-light-brown/50 mb-6;
+  }
+  
+  .form-container {
+    @apply bg-white rounded-lg shadow-sm p-6 border border-earth-light-brown/50;
+  }
+  
+  .input-label {
+    @apply block text-sm font-medium text-earth-dark-green mb-2;
+  }
+  
+  .sidebar-link {
+    @apply flex items-center gap-3 px-3.5 py-2.5 rounded-md text-sm font-medium transition-colors;
+  }
+  
+  .sidebar-link.active {
+    @apply bg-[#588157]/25 text-[#3a5a40] font-bold;
+  }
+  
+  .sidebar-link:hover {
+    @apply bg-[#e9f0e1];
+  }
+  
+  /* Earth/agriculture themed cards with improved contrast and spacing */
+  .earth-card-green {
+    @apply bg-white border-2 border-earth-light-green/70 shadow-sm rounded-lg overflow-hidden p-5;
+  }
+  
+  .earth-card-brown {
+    @apply bg-white border-2 border-earth-light-brown/70 shadow-sm rounded-lg overflow-hidden p-5;
+  }
+  
+  .earth-card-clay {
+    @apply bg-white border-2 border-earth-clay/70 shadow-sm rounded-lg overflow-hidden p-5;
+  }
+  
+  .earth-card-wheat {
+    @apply bg-white border-2 border-earth-wheat/70 shadow-sm rounded-lg overflow-hidden p-5;
+  }
+  
+  .earth-card-moss {
+    @apply bg-white border-2 border-earth-light-green/70 shadow-sm rounded-lg overflow-hidden p-5;
+  }
+  
+  .earth-card-forest {
+    @apply bg-white border-2 border-earth-medium-green/70 shadow-sm rounded-lg overflow-hidden p-5;
+  }
+  
+  /* Enhanced headers with better contrast and spacing */
+  .earth-header-green {
+    @apply bg-earth-medium-green text-white rounded-t-lg border-b border-earth-light-green/50 py-4 px-6;
+  }
+  
+  .earth-header-brown {
+    @apply bg-earth-brown text-white rounded-t-lg border-b border-earth-light-brown/50 py-4 px-6;
+  }
+  
+  .earth-header-clay {
+    @apply bg-[#e69b55] text-white rounded-t-lg border-b border-earth-clay/50 py-4 px-6;
+  }
+  
+  .earth-header-wheat {
+    @apply bg-[#d4b145] text-white rounded-t-lg border-b border-earth-wheat/50 py-4 px-6;
+  }
+  
+  .earth-header-moss {
+    @apply bg-earth-medium-green text-white rounded-t-lg border-b border-earth-light-green/50 py-4 px-6;
+  }
+  
+  .earth-header-forest {
+    @apply bg-earth-dark-green text-white rounded-t-lg border-b border-earth-medium-green/50 py-4 px-6;
+  }
+  
+  /* Standard table styling for consistency with better spacing */
+  .table-header {
+    @apply bg-earth-medium-green/20 text-earth-dark-green font-bold py-3 px-4;
+  }
+  
+  .table-body {
+    @apply bg-white text-earth-dark-green;
+  }
+  
+  .table-row-hover {
+    @apply hover:bg-earth-pale-green transition-colors duration-150;
+  }
+  
+  /* UI Improvement Classes with better spacing and contrast */
+  .data-card {
+    @apply p-6 bg-white border-2 border-earth-light-brown/50 rounded-lg shadow-sm;
+  }
+  
+  .section-title {
+    @apply text-2xl font-bold text-earth-dark-green mb-6;
+  }
+  
+  .section-container {
+    @apply bg-white p-6 rounded-lg shadow-sm border-2 border-earth-light-brown/50 mb-8;
+  }
+  
+  /* Status indicators with better contrast and spacing */
+  .status-completed {
+    @apply bg-green-600 text-white px-2.5 py-1 text-xs font-medium rounded-full;
+  }
+  
+  .status-pending {
+    @apply bg-yellow-600 text-white px-2.5 py-1 text-xs font-medium rounded-full;
+  }
+  
+  .status-canceled {
+    @apply bg-red-600 text-white px-2.5 py-1 text-xs font-medium rounded-full;
+  }
+  
+  .status-processing {
+    @apply bg-blue-600 text-white px-2.5 py-1 text-xs font-medium rounded-full;
+  }
+  
+  /* Adding consistent form spacing */
+  .form-group {
+    @apply mb-4;
+  }
+  
+  .form-row {
+    @apply flex flex-col md:flex-row gap-4 mb-4;
+  }
+  
+  .form-field {
+    @apply flex-1 min-w-0;
+  }
+}
