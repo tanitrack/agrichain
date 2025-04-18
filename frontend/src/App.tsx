@@ -1,3 +1,10 @@
+import {
+  DynamicContextProvider,
+  DynamicWidget,
+} from "@dynamic-labs/sdk-react-core";
+import { SolanaWalletConnectors } from "@dynamic-labs/solana";
+
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -49,6 +56,12 @@ const isAuthenticated = () => {
 };
 
 const App = () => (
+  <DynamicContextProvider
+  settings={{
+    environmentId: "8becfdc4-eadf-4f17-9d46-4dfff0abf098",
+    walletConnectors: [SolanaWalletConnectors],
+  }}
+>
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
       <TooltipProvider>
@@ -98,6 +111,8 @@ const App = () => (
       </TooltipProvider>
     </LanguageProvider>
   </QueryClientProvider>
+  <DynamicWidget />
+  </DynamicContextProvider>
 );
 
 export default App;
