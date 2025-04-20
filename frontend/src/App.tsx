@@ -7,6 +7,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
@@ -44,13 +45,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// Simplistic auth check for demo purposes
-const isAuthenticated = () => {
-  // In a real app, this would check for a token, session, etc.
-  // For demo, we'll assume user is authenticated unless explicitly directed to login
-  return true;
-};
-
 const App = () => (
   <DynamicContextProvider
     settings={{
@@ -65,52 +59,203 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              {/* Redirect root path to dashboard if authenticated, otherwise to login */}
+              {/* Public routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+
+              {/* Protected routes */}
               <Route
                 path="/"
                 element={
-                  isAuthenticated() ? (
+                  <ProtectedRoute>
                     <Navigate to="/dashboard" replace />
-                  ) : (
-                    <Navigate to="/login" replace />
-                  )
+                  </ProtectedRoute>
                 }
               />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Farmer routes */}
-              <Route path="/komoditas" element={<Komoditas />} />
-              <Route path="/komoditas/:id" element={<KomoditasDetail />} />
-              <Route path="/saldo" element={<Saldo />} />
-              <Route path="/transaksi" element={<Transaksi />} />
-              <Route path="/transaksi/:id" element={<TransaksiDetail />} />
-              <Route path="/order-book" element={<OrderBookList />} />
-              <Route path="/order-book/:id" element={<OrderBookDetail />} />
-              <Route path="/harga" element={<Harga />} />
-              <Route path="/pengiriman" element={<Pengiriman />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/blockchain/:type/:id" element={<BlockchainVerification />} />
-              <Route path="/transaction/:id" element={<TransactionDetail />} />
+              <Route
+                path="/komoditas"
+                element={
+                  <ProtectedRoute>
+                    <Komoditas />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/komoditas/:id"
+                element={
+                  <ProtectedRoute>
+                    <KomoditasDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/saldo"
+                element={
+                  <ProtectedRoute>
+                    <Saldo />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/transaksi"
+                element={
+                  <ProtectedRoute>
+                    <Transaksi />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/transaksi/:id"
+                element={
+                  <ProtectedRoute>
+                    <TransaksiDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/order-book"
+                element={
+                  <ProtectedRoute>
+                    <OrderBookList />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/order-book/:id"
+                element={
+                  <ProtectedRoute>
+                    <OrderBookDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/harga"
+                element={
+                  <ProtectedRoute>
+                    <Harga />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/pengiriman"
+                element={
+                  <ProtectedRoute>
+                    <Pengiriman />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/blockchain/:type/:id"
+                element={
+                  <ProtectedRoute>
+                    <BlockchainVerification />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/transaction/:id"
+                element={
+                  <ProtectedRoute>
+                    <TransactionDetail />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* New farmer transaction management routes */}
-              <Route path="/farmer/transaction/:id" element={<TransactionManagement />} />
+              <Route
+                path="/farmer/transaction/:id"
+                element={
+                  <ProtectedRoute>
+                    <TransactionManagement />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/farmer/transaction-price-submitted/:id"
-                element={<TransactionPriceSubmitted />}
+                element={
+                  <ProtectedRoute>
+                    <TransactionPriceSubmitted />
+                  </ProtectedRoute>
+                }
               />
-              <Route path="/farmer/order-book/:id" element={<OrderBookApproval />} />
+              <Route
+                path="/farmer/order-book/:id"
+                element={
+                  <ProtectedRoute>
+                    <OrderBookApproval />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Buyer-specific routes */}
-              <Route path="/market" element={<Market />} />
-              <Route path="/market/:id" element={<MarketDetail />} />
-              <Route path="/buy/:id" element={<BuyTransaction />} />
-              <Route path="/transaction-nego/:id" element={<TransactionNegotiation />} />
-              <Route path="/buyer/order-book" element={<OrderBookList />} />
-              <Route path="/buyer/order-book/:id" element={<OrderBookDetail />} />
+              <Route
+                path="/market"
+                element={
+                  <ProtectedRoute>
+                    <Market />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/market/:id"
+                element={
+                  <ProtectedRoute>
+                    <MarketDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/buy/:id"
+                element={
+                  <ProtectedRoute>
+                    <BuyTransaction />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/transaction-nego/:id"
+                element={
+                  <ProtectedRoute>
+                    <TransactionNegotiation />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/buyer/order-book"
+                element={
+                  <ProtectedRoute>
+                    <OrderBookList />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/buyer/order-book/:id"
+                element={
+                  <ProtectedRoute>
+                    <OrderBookDetail />
+                  </ProtectedRoute>
+                }
+              />
 
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              {/* Catch-all route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
