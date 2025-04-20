@@ -1,80 +1,82 @@
-
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { MainLayout } from "@/components/layout/MainLayout";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { 
-  Form, 
-  FormControl, 
-  FormDescription, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
-} from "@/components/ui/form";
-import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { FileText, QrCode, Calendar, Save, ArrowRight } from "lucide-react";
-import { CommodityType, CommodityUnit, CommodityGrade } from "@/lib/data/types";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { FileText, QrCode, Calendar, Save, ArrowRight } from 'lucide-react';
+import { CommodityType, CommodityUnit, CommodityGrade } from '@/lib/data/types';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { TransactionFlowExplorerDialog } from "@/components/transaction/TransactionFlowExplorerDialog";
+} from '@/components/ui/select';
+import { TransactionFlowExplorerDialog } from '@/components/transaction/TransactionFlowExplorerDialog';
 
 // Sample commodity types and units that would come from API
 const commodityTypes: CommodityType[] = [
-  "Padi", "Jagung", "Kedelai", "Kopi", "Kakao", "Gula", "Sayuran", "Buah"
+  'Padi',
+  'Jagung',
+  'Kedelai',
+  'Kopi',
+  'Kakao',
+  'Gula',
+  'Sayuran',
+  'Buah',
 ];
 
-const commodityUnits: CommodityUnit[] = [
-  "kg", "ton", "karung", "kuintal", "gram", "ikat"
-];
+const commodityUnits: CommodityUnit[] = ['kg', 'ton', 'karung', 'kuintal', 'gram', 'ikat'];
 
-const commodityGrades: CommodityGrade[] = [
-  "A", "B", "C", "Premium", "Standar", "Ekonomi"
-];
+const commodityGrades: CommodityGrade[] = ['A', 'B', 'C', 'Premium', 'Standar', 'Ekonomi'];
 
 // Mock profile data (would come from API)
 const userProfile = {
-  id: "buyer-123",
-  name: "PT Agrimax",
-  role: "consumer",
+  id: 'buyer-123',
+  name: 'PT Agrimax',
+  role: 'consumer',
   balance: 5000000,
-  location: "Jakarta Selatan",
-  email: "info@agrimax.co.id",
-  phoneNumber: "02112345678"
+  location: 'Jakarta Selatan',
+  email: 'info@agrimax.co.id',
+  phoneNumber: '02112345678',
 };
 
 // Form validation schema
 const formSchema = z.object({
   commodityType: z.string({
-    required_error: "Please select a commodity type",
+    required_error: 'Please select a commodity type',
   }),
   unit: z.string({
-    required_error: "Please select a unit",
+    required_error: 'Please select a unit',
   }),
   quantity: z.coerce.number().positive({
-    message: "Quantity must be a positive number",
+    message: 'Quantity must be a positive number',
   }),
   requestedGrade: z.string({
-    required_error: "Please select a grade",
+    required_error: 'Please select a grade',
   }),
   requestedDeliveryDate: z.date({
-    required_error: "Please select a delivery date",
+    required_error: 'Please select a delivery date',
   }),
-  termsConditions: z.string().refine(val => val.length > 0, {
-    message: "Terms and conditions are required",
+  termsConditions: z.string().refine((val) => val.length > 0, {
+    message: 'Terms and conditions are required',
   }),
 });
 
@@ -93,12 +95,12 @@ const CreateOrderBook = () => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      commodityType: "",
-      unit: "kg",
+      commodityType: '',
+      unit: 'kg',
       quantity: 0,
-      requestedGrade: "",
+      requestedGrade: '',
       requestedDeliveryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-      termsConditions: "",
+      termsConditions: '',
     },
   });
 
@@ -108,37 +110,39 @@ const CreateOrderBook = () => {
     if (file) {
       setTermsFileName(file.name);
       // In a real app, you would upload the file to a server and get a URL
-      form.setValue("termsConditions", file.name);
+      form.setValue('termsConditions', file.name);
     }
   };
 
   // Handle form submission
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
-    
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
       // Generate a fake QR code URL for demo purposes
       // In a real app, this would be generated by the server
-      setQrCodeUrl("/placeholder.svg");
-      
+      setQrCodeUrl('/placeholder.svg');
+
       setFormSubmitted(true);
-      
+
       toast({
-        title: language === "id" ? "Order Book Berhasil Dibuat" : "Order Book Created Successfully",
-        description: language === "id" 
-          ? "Order Book telah berhasil dibuat dan QR code telah digenerate" 
-          : "Order Book has been created and QR code has been generated",
+        title: language === 'id' ? 'Order Book Berhasil Dibuat' : 'Order Book Created Successfully',
+        description:
+          language === 'id'
+            ? 'Order Book telah berhasil dibuat dan QR code telah digenerate'
+            : 'Order Book has been created and QR code has been generated',
       });
     } catch (error) {
       toast({
-        title: language === "id" ? "Gagal Membuat Order Book" : "Failed to Create Order Book",
-        description: language === "id" 
-          ? "Terjadi kesalahan saat membuat Order Book" 
-          : "An error occurred while creating the Order Book",
-        variant: "destructive",
+        title: language === 'id' ? 'Gagal Membuat Order Book' : 'Failed to Create Order Book',
+        description:
+          language === 'id'
+            ? 'Terjadi kesalahan saat membuat Order Book'
+            : 'An error occurred while creating the Order Book',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -147,7 +151,7 @@ const CreateOrderBook = () => {
 
   // Redirect to order book list after showing QR code
   const handleFinish = () => {
-    navigate("/buyer/order-book");
+    navigate('/buyer/order-book');
   };
 
   // Format date for input
@@ -160,15 +164,15 @@ const CreateOrderBook = () => {
 
   return (
     <MainLayout>
-      <div className="mb-8 flex justify-between items-start">
+      <div className="mb-8 flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold mb-2">
-            {language === "id" ? "Buat Order Book Baru" : "Create New Order Book"}
+          <h1 className="mb-2 text-2xl font-bold">
+            {language === 'id' ? 'Buat Order Book Baru' : 'Create New Order Book'}
           </h1>
           <p className="text-gray-600">
-            {language === "id" 
-              ? "Buat permintaan pembelian komoditas baru" 
-              : "Create a new commodity purchase request"}
+            {language === 'id'
+              ? 'Buat permintaan pembelian komoditas baru'
+              : 'Create a new commodity purchase request'}
           </p>
         </div>
         <TransactionFlowExplorerDialog />
@@ -177,30 +181,35 @@ const CreateOrderBook = () => {
       {!formSubmitted ? (
         <Card>
           <CardHeader>
-            <CardTitle>{language === "id" ? "Form Order Book" : "Order Book Form"}</CardTitle>
+            <CardTitle>{language === 'id' ? 'Form Order Book' : 'Order Book Form'}</CardTitle>
             <CardDescription>
-              {language === "id" 
-                ? "Lengkapi detail untuk membuat Order Book baru" 
-                : "Fill in the details to create a new Order Book"}
+              {language === 'id'
+                ? 'Lengkapi detail untuk membuat Order Book baru'
+                : 'Fill in the details to create a new Order Book'}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="commodityType"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{language === "id" ? "Jenis Komoditas" : "Commodity Type"}</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                        >
+                        <FormLabel>
+                          {language === 'id' ? 'Jenis Komoditas' : 'Commodity Type'}
+                        </FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder={language === "id" ? "Pilih jenis komoditas" : "Select commodity type"} />
+                              <SelectValue
+                                placeholder={
+                                  language === 'id'
+                                    ? 'Pilih jenis komoditas'
+                                    : 'Select commodity type'
+                                }
+                              />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -212,7 +221,9 @@ const CreateOrderBook = () => {
                           </SelectContent>
                         </Select>
                         <FormDescription>
-                          {language === "id" ? "Pilih jenis komoditas yang ingin dibeli" : "Select the type of commodity you want to purchase"}
+                          {language === 'id'
+                            ? 'Pilih jenis komoditas yang ingin dibeli'
+                            : 'Select the type of commodity you want to purchase'}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -220,14 +231,14 @@ const CreateOrderBook = () => {
                   />
 
                   <div>
-                    <Label>{language === "id" ? "Nama Perusahaan/Konsumen" : "Company/Consumer Name"}</Label>
-                    <Input 
-                      value={userProfile.name} 
-                      disabled 
-                      className="mt-2"
-                    />
-                    <p className="text-sm text-gray-500 mt-1">
-                      {language === "id" ? "Informasi diambil dari profil Anda" : "Information taken from your profile"}
+                    <Label>
+                      {language === 'id' ? 'Nama Perusahaan/Konsumen' : 'Company/Consumer Name'}
+                    </Label>
+                    <Input value={userProfile.name} disabled className="mt-2" />
+                    <p className="mt-1 text-sm text-gray-500">
+                      {language === 'id'
+                        ? 'Informasi diambil dari profil Anda'
+                        : 'Information taken from your profile'}
                     </p>
                   </div>
 
@@ -236,14 +247,13 @@ const CreateOrderBook = () => {
                     name="unit"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{language === "id" ? "Satuan" : "Unit"}</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                        >
+                        <FormLabel>{language === 'id' ? 'Satuan' : 'Unit'}</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder={language === "id" ? "Pilih satuan" : "Select unit"} />
+                              <SelectValue
+                                placeholder={language === 'id' ? 'Pilih satuan' : 'Select unit'}
+                              />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -255,7 +265,9 @@ const CreateOrderBook = () => {
                           </SelectContent>
                         </Select>
                         <FormDescription>
-                          {language === "id" ? "Pilih satuan untuk komoditas" : "Select the unit for the commodity"}
+                          {language === 'id'
+                            ? 'Pilih satuan untuk komoditas'
+                            : 'Select the unit for the commodity'}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -267,16 +279,18 @@ const CreateOrderBook = () => {
                     name="quantity"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{language === "id" ? "Jumlah" : "Quantity"}</FormLabel>
+                        <FormLabel>{language === 'id' ? 'Jumlah' : 'Quantity'}</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="number" 
-                            placeholder={language === "id" ? "Masukkan jumlah" : "Enter quantity"}
+                          <Input
+                            type="number"
+                            placeholder={language === 'id' ? 'Masukkan jumlah' : 'Enter quantity'}
                             {...field}
                           />
                         </FormControl>
                         <FormDescription>
-                          {language === "id" ? "Masukkan jumlah komoditas yang ingin dibeli" : "Enter the quantity of commodity you want to purchase"}
+                          {language === 'id'
+                            ? 'Masukkan jumlah komoditas yang ingin dibeli'
+                            : 'Enter the quantity of commodity you want to purchase'}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -288,14 +302,15 @@ const CreateOrderBook = () => {
                     name="requestedGrade"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{language === "id" ? "Grade yang Diminta" : "Requested Grade"}</FormLabel>
-                        <Select 
-                          onValueChange={field.onChange} 
-                          defaultValue={field.value}
-                        >
+                        <FormLabel>
+                          {language === 'id' ? 'Grade yang Diminta' : 'Requested Grade'}
+                        </FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder={language === "id" ? "Pilih grade" : "Select grade"} />
+                              <SelectValue
+                                placeholder={language === 'id' ? 'Pilih grade' : 'Select grade'}
+                              />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -307,7 +322,9 @@ const CreateOrderBook = () => {
                           </SelectContent>
                         </Select>
                         <FormDescription>
-                          {language === "id" ? "Pilih grade kualitas yang diinginkan" : "Select the desired quality grade"}
+                          {language === 'id'
+                            ? 'Pilih grade kualitas yang diinginkan'
+                            : 'Select the desired quality grade'}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -319,12 +336,16 @@ const CreateOrderBook = () => {
                     name="requestedDeliveryDate"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{language === "id" ? "Tanggal Pengiriman yang Diminta" : "Requested Delivery Date"}</FormLabel>
+                        <FormLabel>
+                          {language === 'id'
+                            ? 'Tanggal Pengiriman yang Diminta'
+                            : 'Requested Delivery Date'}
+                        </FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
-                            <Input 
-                              type="date" 
+                            <Input
+                              type="date"
                               className="pl-10"
                               value={formatDateForInput(field.value)}
                               onChange={(e) => {
@@ -334,7 +355,9 @@ const CreateOrderBook = () => {
                           </div>
                         </FormControl>
                         <FormDescription>
-                          {language === "id" ? "Pilih tanggal pengiriman yang diinginkan" : "Select the desired delivery date"}
+                          {language === 'id'
+                            ? 'Pilih tanggal pengiriman yang diinginkan'
+                            : 'Select the desired delivery date'}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -346,34 +369,43 @@ const CreateOrderBook = () => {
                     name="termsConditions"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{language === "id" ? "File Terms and Condition" : "Terms and Conditions File"}</FormLabel>
+                        <FormLabel>
+                          {language === 'id'
+                            ? 'File Terms and Condition'
+                            : 'Terms and Conditions File'}
+                        </FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <Input 
-                              type="file" 
+                            <Input
+                              type="file"
                               id="termsFile"
                               accept=".pdf,.doc,.docx"
                               onChange={handleFileChange}
                               className="hidden"
                             />
-                            <div className="flex gap-2 items-center">
-                              <Button 
-                                type="button" 
+                            <div className="flex items-center gap-2">
+                              <Button
+                                type="button"
                                 variant="outline"
-                                onClick={() => document.getElementById("termsFile")?.click()}
+                                onClick={() => document.getElementById('termsFile')?.click()}
                                 className="flex gap-2"
                               >
                                 <FileText className="h-4 w-4" />
-                                {language === "id" ? "Pilih File" : "Choose File"}
+                                {language === 'id' ? 'Pilih File' : 'Choose File'}
                               </Button>
                               <span className="text-sm">
-                                {termsFileName || (language === "id" ? "Belum ada file yang dipilih" : "No file chosen")}
+                                {termsFileName ||
+                                  (language === 'id'
+                                    ? 'Belum ada file yang dipilih'
+                                    : 'No file chosen')}
                               </span>
                             </div>
                           </div>
                         </FormControl>
                         <FormDescription>
-                          {language === "id" ? "Unggah dokumen syarat dan ketentuan (PDF, DOC, DOCX)" : "Upload terms and conditions document (PDF, DOC, DOCX)"}
+                          {language === 'id'
+                            ? 'Unggah dokumen syarat dan ketentuan (PDF, DOC, DOCX)'
+                            : 'Upload terms and conditions document (PDF, DOC, DOCX)'}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -387,24 +419,24 @@ const CreateOrderBook = () => {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => navigate("/buyer/order-book")}
+                    onClick={() => navigate('/buyer/order-book')}
                   >
-                    {language === "id" ? "Batal" : "Cancel"}
+                    {language === 'id' ? 'Batal' : 'Cancel'}
                   </Button>
-                  <Button 
+                  <Button
                     type="submit"
-                    className="gap-2 bg-gradient-to-r from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green"
+                    className="from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green gap-2 bg-gradient-to-r"
                     disabled={isLoading}
                   >
                     {isLoading ? (
                       <div className="flex items-center gap-2">
                         <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                        {language === "id" ? "Menyimpan..." : "Saving..."}
+                        {language === 'id' ? 'Menyimpan...' : 'Saving...'}
                       </div>
                     ) : (
                       <>
                         <Save className="h-4 w-4" />
-                        {language === "id" ? "Simpan & Generate QR" : "Save & Generate QR"}
+                        {language === 'id' ? 'Simpan & Generate QR' : 'Save & Generate QR'}
                       </>
                     )}
                   </Button>
@@ -416,42 +448,44 @@ const CreateOrderBook = () => {
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle>{language === "id" ? "Order Book Berhasil Dibuat" : "Order Book Created Successfully"}</CardTitle>
+            <CardTitle>
+              {language === 'id' ? 'Order Book Berhasil Dibuat' : 'Order Book Created Successfully'}
+            </CardTitle>
             <CardDescription>
-              {language === "id" 
-                ? "QR Code telah digenerate untuk Order Book Anda" 
-                : "QR Code has been generated for your Order Book"}
+              {language === 'id'
+                ? 'QR Code telah digenerate untuk Order Book Anda'
+                : 'QR Code has been generated for your Order Book'}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col items-center space-y-8">
-            <div className="bg-white p-4 rounded-lg shadow-md border">
-              <div className="flex justify-center items-center mb-4">
-                <QrCode className="h-8 w-8 text-earth-dark-green" />
+            <div className="rounded-lg border bg-white p-4 shadow-md">
+              <div className="mb-4 flex items-center justify-center">
+                <QrCode className="text-earth-dark-green h-8 w-8" />
               </div>
-              <img 
-                src={qrCodeUrl || "/placeholder.svg"} 
-                alt="QR Code" 
-                className="w-64 h-64 mx-auto"
+              <img
+                src={qrCodeUrl || '/placeholder.svg'}
+                alt="QR Code"
+                className="mx-auto h-64 w-64"
               />
-              <p className="text-center mt-4 text-sm text-gray-500">
-                {language === "id" 
-                  ? "Scan QR code ini untuk melihat detail Order Book" 
-                  : "Scan this QR code to view the Order Book details"}
+              <p className="mt-4 text-center text-sm text-gray-500">
+                {language === 'id'
+                  ? 'Scan QR code ini untuk melihat detail Order Book'
+                  : 'Scan this QR code to view the Order Book details'}
               </p>
             </div>
-            
+
             <div className="text-center">
-              <p className="mb-6 text-earth-medium-green">
-                {language === "id" 
-                  ? "QR Code ini dapat digunakan oleh petani untuk melihat dan menerima Order Book Anda" 
-                  : "This QR Code can be used by farmers to view and accept your Order Book"}
+              <p className="text-earth-medium-green mb-6">
+                {language === 'id'
+                  ? 'QR Code ini dapat digunakan oleh petani untuk melihat dan menerima Order Book Anda'
+                  : 'This QR Code can be used by farmers to view and accept your Order Book'}
               </p>
-              <Button 
+              <Button
                 onClick={handleFinish}
-                className="gap-2 bg-gradient-to-r from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green"
+                className="from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green gap-2 bg-gradient-to-r"
               >
                 <ArrowRight className="h-4 w-4" />
-                {language === "id" ? "Kembali ke Daftar Order Book" : "Back to Order Book List"}
+                {language === 'id' ? 'Kembali ke Daftar Order Book' : 'Back to Order Book List'}
               </Button>
             </div>
           </CardContent>

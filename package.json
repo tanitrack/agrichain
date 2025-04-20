@@ -1,14 +1,19 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "tanitrack",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "cd frontend && vite",
     "build": "cd frontend && vite build",
     "build:dev": "cd frontend && vite build --mode development",
     "lint:frontend": "cd frontend && eslint .",
-    "preview": "cd frontend && vite preview"
+    "preview": "cd frontend && vite preview",
+    "prepare": "husky install",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "pre-commit": "lint-staged"
   },
   "dependencies": {
     "@dynamic-labs/sdk-react-core": "^4.12.3",
@@ -80,6 +85,15 @@
     "tailwindcss": "^3.4.11",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.1"
+    "vite": "^5.4.1",
+    "prettier": "^3.2.0",
+    "prettier-plugin-tailwindcss": "^0.5.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.0.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write"
+    ]
   }
 }

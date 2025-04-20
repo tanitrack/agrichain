@@ -1,22 +1,29 @@
-
 // Type definitions for our application
 
 export type CommodityUnit = 'kg' | 'ton' | 'karung' | 'kuintal' | 'gram' | 'ikat';
 
-export type CommodityType = 'Padi' | 'Jagung' | 'Kedelai' | 'Kopi' | 'Kakao' | 'Gula' | 'Sayuran' | 'Buah';
+export type CommodityType =
+  | 'Padi'
+  | 'Jagung'
+  | 'Kedelai'
+  | 'Kopi'
+  | 'Kakao'
+  | 'Gula'
+  | 'Sayuran'
+  | 'Buah';
 
 export type CommodityGrade = 'A' | 'B' | 'C' | 'Premium' | 'Standar' | 'Ekonomi';
 
-export type TransactionStatus = 
-  | 'menunggu_konfirmasi' 
-  | 'dikonfirmasi' 
-  | 'negosiasi' 
-  | 'dibayar' 
-  | 'persiapan_pengiriman' 
-  | 'sedang_dikirim' 
-  | 'sudah_dikirim' 
-  | 'diterima' 
-  | 'selesai' 
+export type TransactionStatus =
+  | 'menunggu_konfirmasi'
+  | 'dikonfirmasi'
+  | 'negosiasi'
+  | 'dibayar'
+  | 'persiapan_pengiriman'
+  | 'sedang_dikirim'
+  | 'sudah_dikirim'
+  | 'diterima'
+  | 'selesai'
   | 'dibatalkan';
 
 export type TransactionType = 'regular' | 'order_book';
@@ -73,7 +80,7 @@ export interface Transaction {
   buyerPhone?: string;
   notes?: string;
   // Transaction history
-  history?: Array<{date: Date, status: TransactionStatus, description: string}>;
+  history?: Array<{ date: Date; status: TransactionStatus; description: string }>;
   // Shipping information
   deliveryStartedAt?: Date;
   estimatedDeliveryDate?: Date;

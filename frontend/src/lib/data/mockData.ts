@@ -12,7 +12,7 @@ export const currentUser: User = {
   balance: 5000000,
   location: 'Kabupaten Malang, Jawa Timur',
   phoneNumber: '081234567890',
-  profileImageUrl: '/placeholder.svg'
+  profileImageUrl: '/placeholder.svg',
 };
 
 // Mock locations
@@ -22,14 +22,23 @@ export const farmerLocations = [
   'Kabupaten Banyuwangi, Jawa Timur',
   'Kabupaten Sleman, DIY',
   'Kabupaten Karanganyar, Jawa Tengah',
-  'Kabupaten Tabanan, Bali'
+  'Kabupaten Tabanan, Bali',
 ];
 
 // Mock commodity units
 export const commodityUnits = ['kg', 'ton', 'karung', 'kuintal', 'gram', 'ikat'];
 
 // Mock commodity types
-export const commodityTypes = ['Padi', 'Jagung', 'Kedelai', 'Kopi', 'Kakao', 'Gula', 'Sayuran', 'Buah'];
+export const commodityTypes = [
+  'Padi',
+  'Jagung',
+  'Kedelai',
+  'Kopi',
+  'Kakao',
+  'Gula',
+  'Sayuran',
+  'Buah',
+];
 
 // Mock commodity grades
 export const commodityGrades = ['A', 'B', 'C', 'Premium', 'Standar', 'Ekonomi'];
@@ -48,7 +57,7 @@ export const commodities: Commodity[] = [
     grade: 'Premium',
     createdAt: new Date('2025-03-10'),
     qrCodeHash: 'qr-hash-c1',
-    farmerId: currentUser.id
+    farmerId: currentUser.id,
   },
   {
     id: 'c2',
@@ -62,7 +71,7 @@ export const commodities: Commodity[] = [
     grade: 'A',
     createdAt: new Date('2025-03-15'),
     qrCodeHash: 'qr-hash-c2',
-    farmerId: currentUser.id
+    farmerId: currentUser.id,
   },
   {
     id: 'c3',
@@ -76,8 +85,8 @@ export const commodities: Commodity[] = [
     grade: 'B',
     createdAt: new Date('2025-03-20'),
     qrCodeHash: 'qr-hash-c3',
-    farmerId: currentUser.id
-  }
+    farmerId: currentUser.id,
+  },
 ];
 
 // Mock commodity prices
@@ -90,7 +99,7 @@ export const commodityPrices: CommodityPrice[] = [
     predictedChange: 5.2,
     region: 'Jawa Timur',
     grade: 'Premium',
-    updatedAt: new Date('2025-04-01')
+    updatedAt: new Date('2025-04-01'),
   },
   {
     id: 'p2',
@@ -100,7 +109,7 @@ export const commodityPrices: CommodityPrice[] = [
     predictedChange: 3.5,
     region: 'Jawa Barat',
     grade: 'A',
-    updatedAt: new Date('2025-04-01')
+    updatedAt: new Date('2025-04-01'),
   },
   {
     id: 'p3',
@@ -110,7 +119,7 @@ export const commodityPrices: CommodityPrice[] = [
     predictedChange: -2.1,
     region: 'Jawa Timur',
     grade: 'A',
-    updatedAt: new Date('2025-04-01')
+    updatedAt: new Date('2025-04-01'),
   },
   {
     id: 'p4',
@@ -120,7 +129,7 @@ export const commodityPrices: CommodityPrice[] = [
     predictedChange: 1.8,
     region: 'Jawa Tengah',
     grade: 'B',
-    updatedAt: new Date('2025-04-01')
+    updatedAt: new Date('2025-04-01'),
   },
   {
     id: 'p5',
@@ -130,7 +139,7 @@ export const commodityPrices: CommodityPrice[] = [
     predictedChange: 8.3,
     region: 'Aceh',
     grade: 'Premium',
-    updatedAt: new Date('2025-04-01')
+    updatedAt: new Date('2025-04-01'),
   },
   {
     id: 'p6',
@@ -140,8 +149,8 @@ export const commodityPrices: CommodityPrice[] = [
     predictedChange: 4.0,
     region: 'Jawa Timur',
     grade: 'Standar',
-    updatedAt: new Date('2025-04-01')
-  }
+    updatedAt: new Date('2025-04-01'),
+  },
 ];
 
 // Mock transactions
@@ -164,7 +173,7 @@ export const transactions: Transaction[] = [
     updatedAt: new Date('2025-03-18'),
     termsDocUrl: '/placeholder.svg',
     signatureUrl: '/placeholder.svg',
-    shippingStatus: 'sudah_dikirim'
+    shippingStatus: 'sudah_dikirim',
   },
   {
     id: 't2',
@@ -184,7 +193,7 @@ export const transactions: Transaction[] = [
     updatedAt: new Date('2025-04-01'),
     termsDocUrl: '/placeholder.svg',
     signatureUrl: '/placeholder.svg',
-    shippingStatus: 'belum_dikirim'
+    shippingStatus: 'belum_dikirim',
   },
   {
     id: 't3',
@@ -202,7 +211,7 @@ export const transactions: Transaction[] = [
     sellerName: currentUser.name,
     createdAt: new Date('2025-04-02'),
     updatedAt: new Date('2025-04-02'),
-    shippingStatus: 'belum_dikirim'
+    shippingStatus: 'belum_dikirim',
   },
   // Add TRX-2023-005 to the transactions array for completeness
   {
@@ -224,13 +233,17 @@ export const transactions: Transaction[] = [
     termsDocUrl: null,
     signatureUrl: null,
     shippingStatus: 'belum_dikirim',
-    buyerLocation: "Surabaya, Jawa Timur",
-    buyerPhone: "+628123456789",
-    notes: "Membutuhkan padi organik untuk produksi beras premium.",
+    buyerLocation: 'Surabaya, Jawa Timur',
+    buyerPhone: '+628123456789',
+    notes: 'Membutuhkan padi organik untuk produksi beras premium.',
     history: [
-      { date: new Date('2025-04-05'), status: 'menunggu_konfirmasi', description: "Pesanan dibuat oleh pembeli" }
-    ]
-  }
+      {
+        date: new Date('2025-04-05'),
+        status: 'menunggu_konfirmasi',
+        description: 'Pesanan dibuat oleh pembeli',
+      },
+    ],
+  },
 ];
 
 // Mock order books
@@ -246,8 +259,9 @@ export const orderBooks: OrderBook[] = [
     requestedDeliveryDate: new Date('2025-04-30'),
     offerExpiryDate: new Date('2025-04-10'),
     status: 'open',
-    termsConditions: 'Pengiriman ke gudang PT Agrimax di Surabaya. Pembayaran 50% di muka, 50% setelah barang diterima.',
-    createdAt: new Date('2025-04-01')
+    termsConditions:
+      'Pengiriman ke gudang PT Agrimax di Surabaya. Pembayaran 50% di muka, 50% setelah barang diterima.',
+    createdAt: new Date('2025-04-01'),
   },
   {
     id: 'ob2',
@@ -260,9 +274,10 @@ export const orderBooks: OrderBook[] = [
     requestedDeliveryDate: new Date('2025-05-15'),
     offerExpiryDate: new Date('2025-04-20'),
     status: 'open',
-    termsConditions: 'Harga pasar per tanggal pengiriman. Pengiriman ke pabrik PT Indofood di Pasuruan.',
-    createdAt: new Date('2025-04-02')
-  }
+    termsConditions:
+      'Harga pasar per tanggal pengiriman. Pengiriman ke pabrik PT Indofood di Pasuruan.',
+    createdAt: new Date('2025-04-02'),
+  },
 ];
 
 // Function to add a new commodity
@@ -271,22 +286,25 @@ export const addCommodity = (commodity: Omit<Commodity, 'id' | 'createdAt' | 'qr
     ...commodity,
     id: generateId(),
     createdAt: new Date(),
-    qrCodeHash: `qr-hash-${generateId()}`
+    qrCodeHash: `qr-hash-${generateId()}`,
   };
-  
+
   // In a real app, this would make an API call
   console.log('Adding new commodity:', newCommodity);
   return newCommodity;
 };
 
 // Function to update transaction shipping status
-export const updateShippingStatus = (transactionId: string, newStatus: 'belum_dikirim' | 'sedang_dikirim' | 'sudah_dikirim') => {
+export const updateShippingStatus = (
+  transactionId: string,
+  newStatus: 'belum_dikirim' | 'sedang_dikirim' | 'sudah_dikirim'
+) => {
   // In a real app, this would make an API call
   console.log(`Updating shipping status for transaction ${transactionId} to ${newStatus}`);
   return {
     success: true,
     transactionId,
-    newStatus
+    newStatus,
   };
 };
 
@@ -295,16 +313,16 @@ export const withdrawBalance = (amount: number) => {
   if (amount > currentUser.balance) {
     return {
       success: false,
-      message: 'Saldo tidak mencukupi'
+      message: 'Saldo tidak mencukupi',
     };
   }
-  
+
   // In a real app, this would make an API call
   console.log(`Withdrawing ${amount} from balance`);
   return {
     success: true,
     amount,
-    newBalance: currentUser.balance - amount
+    newBalance: currentUser.balance - amount,
   };
 };
 
@@ -315,6 +333,6 @@ export const acceptOrderBook = (orderBookId: string, commodityId: string) => {
   return {
     success: true,
     orderBookId,
-    commodityId
+    commodityId,
   };
 };

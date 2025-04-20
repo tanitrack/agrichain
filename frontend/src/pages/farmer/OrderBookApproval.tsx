@@ -1,104 +1,112 @@
-
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { MainLayout } from "@/components/layout/MainLayout";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  ArrowLeft, 
-  FileText, 
-  Clock, 
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  ArrowLeft,
+  FileText,
+  Clock,
   Package,
   Calendar,
-  User, 
+  User,
   Check,
   X,
   FileCheck,
   Info,
   AlertCircle,
-  CheckCircle2
-} from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { formatDate, formatCurrency } from "@/lib/utils";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useToast } from "@/hooks/use-toast";
-import { CommodityType, CommodityGrade } from "@/lib/data/types";
+  CheckCircle2,
+} from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { formatDate, formatCurrency } from '@/lib/utils';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { useToast } from '@/hooks/use-toast';
+import { CommodityType, CommodityGrade } from '@/lib/data/types';
 
 // Mock order book data
 const orderBookData = [
   {
-    id: "OB-2023-001",
-    buyerId: "BUY-001",
-    buyerName: "PT Agrimax Food",
-    commodityType: "Padi" as CommodityType,
+    id: 'OB-2023-001',
+    buyerId: 'BUY-001',
+    buyerName: 'PT Agrimax Food',
+    commodityType: 'Padi' as CommodityType,
     quantity: 1000,
-    unit: "kg",
-    requestedGrade: "A" as CommodityGrade,
-    requestedDeliveryDate: "2024-01-15T00:00:00Z",
-    offerExpiryDate: "2023-12-25T00:00:00Z",
-    status: "open",
-    termsConditions: "Membutuhkan beras kualitas premium untuk restoran kami. Pengiriman harus tepat waktu dan kualitas harus konsisten.",
-    createdAt: "2023-12-10T08:30:00Z",
-    buyerLocation: "Jakarta Timur",
-    buyerPhone: "+6281234567890"
+    unit: 'kg',
+    requestedGrade: 'A' as CommodityGrade,
+    requestedDeliveryDate: '2024-01-15T00:00:00Z',
+    offerExpiryDate: '2023-12-25T00:00:00Z',
+    status: 'open',
+    termsConditions:
+      'Membutuhkan beras kualitas premium untuk restoran kami. Pengiriman harus tepat waktu dan kualitas harus konsisten.',
+    createdAt: '2023-12-10T08:30:00Z',
+    buyerLocation: 'Jakarta Timur',
+    buyerPhone: '+6281234567890',
   },
   {
-    id: "OB-2023-002",
-    buyerId: "BUY-002",
-    buyerName: "Restoran Padang Jaya",
-    commodityType: "Jagung" as CommodityType,
+    id: 'OB-2023-002',
+    buyerId: 'BUY-002',
+    buyerName: 'Restoran Padang Jaya',
+    commodityType: 'Jagung' as CommodityType,
     quantity: 500,
-    unit: "kg",
-    requestedGrade: "A" as CommodityGrade,
-    requestedDeliveryDate: "2024-01-20T00:00:00Z",
-    offerExpiryDate: "2023-12-30T00:00:00Z",
-    status: "open",
-    termsConditions: "Jagung manis segar untuk kebutuhan restoran. Kualitas harus baik dan pengiriman dapat dilakukan secara bertahap.",
-    createdAt: "2023-12-08T10:45:00Z",
-    buyerLocation: "Jakarta Selatan",
-    buyerPhone: "+6287654321098"
-  }
+    unit: 'kg',
+    requestedGrade: 'A' as CommodityGrade,
+    requestedDeliveryDate: '2024-01-20T00:00:00Z',
+    offerExpiryDate: '2023-12-30T00:00:00Z',
+    status: 'open',
+    termsConditions:
+      'Jagung manis segar untuk kebutuhan restoran. Kualitas harus baik dan pengiriman dapat dilakukan secara bertahap.',
+    createdAt: '2023-12-08T10:45:00Z',
+    buyerLocation: 'Jakarta Selatan',
+    buyerPhone: '+6287654321098',
+  },
 ];
 
 // Mock commodity data that farmer can offer
 const farmerCommodities = [
   {
-    id: "KM001",
-    name: "Beras Putih Premium",
-    type: "Padi" as CommodityType,
+    id: 'KM001',
+    name: 'Beras Putih Premium',
+    type: 'Padi' as CommodityType,
     quantity: 2000,
-    unit: "kg",
-    grade: "A" as CommodityGrade,
-    location: "Subang, Jawa Barat",
-    imageUrl: "/placeholder.svg",
-    available: true
+    unit: 'kg',
+    grade: 'A' as CommodityGrade,
+    location: 'Subang, Jawa Barat',
+    imageUrl: '/placeholder.svg',
+    available: true,
   },
   {
-    id: "KM005",
-    name: "Beras Merah Organik",
-    type: "Padi" as CommodityType,
+    id: 'KM005',
+    name: 'Beras Merah Organik',
+    type: 'Padi' as CommodityType,
     quantity: 500,
-    unit: "kg",
-    grade: "A" as CommodityGrade,
-    location: "Subang, Jawa Barat",
-    imageUrl: "/placeholder.svg",
-    available: true
+    unit: 'kg',
+    grade: 'A' as CommodityGrade,
+    location: 'Subang, Jawa Barat',
+    imageUrl: '/placeholder.svg',
+    available: true,
   },
   {
-    id: "KM002",
-    name: "Jagung Manis",
-    type: "Jagung" as CommodityType,
+    id: 'KM002',
+    name: 'Jagung Manis',
+    type: 'Jagung' as CommodityType,
     quantity: 1500,
-    unit: "kg",
-    grade: "B" as CommodityGrade,
-    location: "Malang, Jawa Timur",
-    imageUrl: "/placeholder.svg",
-    available: true
-  }
+    unit: 'kg',
+    grade: 'B' as CommodityGrade,
+    location: 'Malang, Jawa Timur',
+    imageUrl: '/placeholder.svg',
+    available: true,
+  },
 ];
 
 const OrderBookApproval = () => {
@@ -116,20 +124,20 @@ const OrderBookApproval = () => {
   useEffect(() => {
     // Simulate API call with setTimeout
     const timer = setTimeout(() => {
-      const found = orderBookData.find(item => item.id === id);
+      const found = orderBookData.find((item) => item.id === id);
       setOrderBook(found || null);
-      
+
       // Find matching commodities if order book is found
       if (found) {
         const matching = farmerCommodities.filter(
-          commodity => 
-            commodity.type === found.commodityType && 
+          (commodity) =>
+            commodity.type === found.commodityType &&
             commodity.quantity >= found.quantity &&
             commodity.available
         );
         setMatchingCommodities(matching);
       }
-      
+
       setLoading(false);
     }, 500);
 
@@ -146,9 +154,9 @@ const OrderBookApproval = () => {
 
   const handleRejectOrderBook = () => {
     toast({
-      title: "Order book rejected",
-      description: "The order book has been rejected",
-      variant: "destructive",
+      title: 'Order book rejected',
+      description: 'The order book has been rejected',
+      variant: 'destructive',
     });
     navigate('/order-book');
   };
@@ -156,32 +164,32 @@ const OrderBookApproval = () => {
   const handleProceedToConfirmation = () => {
     if (!selectedCommodity) {
       toast({
-        title: "Select a commodity",
-        description: "Please select a commodity to proceed",
-        variant: "destructive",
+        title: 'Select a commodity',
+        description: 'Please select a commodity to proceed',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     setStep('confirm');
   };
 
   const handleConfirmOffer = () => {
     if (!termsAccepted) {
       toast({
-        title: "Accept terms required",
-        description: "Please accept the terms and conditions to proceed",
-        variant: "destructive",
+        title: 'Accept terms required',
+        description: 'Please accept the terms and conditions to proceed',
+        variant: 'destructive',
       });
       return;
     }
-    
+
     // In a real app, this would be an API call
     toast({
-      title: "Offer confirmed",
-      description: "Your offer has been submitted to the buyer for approval",
+      title: 'Offer confirmed',
+      description: 'Your offer has been submitted to the buyer for approval',
     });
-    
+
     // Redirect to transactions
     navigate('/transaksi');
   };
@@ -199,10 +207,10 @@ const OrderBookApproval = () => {
   if (loading) {
     return (
       <MainLayout>
-        <div className="flex items-center justify-center h-full">
+        <div className="flex h-full items-center justify-center">
           <div className="animate-pulse text-center">
-            <div className="h-8 w-32 bg-gray-200 rounded mb-4 mx-auto"></div>
-            <div className="h-4 w-64 bg-gray-200 rounded mx-auto"></div>
+            <div className="mx-auto mb-4 h-8 w-32 rounded bg-gray-200"></div>
+            <div className="mx-auto h-4 w-64 rounded bg-gray-200"></div>
           </div>
         </div>
       </MainLayout>
@@ -212,12 +220,12 @@ const OrderBookApproval = () => {
   if (!orderBook) {
     return (
       <MainLayout>
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-bold mb-2">{t("orderbook.notfound")}</h2>
-          <p className="text-gray-600 mb-6">The requested order book could not be found.</p>
+        <div className="py-12 text-center">
+          <h2 className="mb-2 text-2xl font-bold">{t('orderbook.notfound')}</h2>
+          <p className="mb-6 text-gray-600">The requested order book could not be found.</p>
           <Button onClick={() => navigate('/order-book')}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("action.back")}
+            {t('action.back')}
           </Button>
         </div>
       </MainLayout>
@@ -228,24 +236,21 @@ const OrderBookApproval = () => {
     <MainLayout>
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="mb-4" 
-            onClick={handleGoBack}
-          >
+          <Button variant="outline" size="sm" className="mb-4" onClick={handleGoBack}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            {step === 'review' ? t("action.back") : "Previous Step"}
+            {step === 'review' ? t('action.back') : 'Previous Step'}
           </Button>
-          <h1 className="text-2xl font-bold text-earth-dark-green">
-            {step === 'review' ? 'Order Book Review' : 
-             step === 'select-commodity' ? 'Select Commodity' : 
-             'Confirm Offer'}
+          <h1 className="text-earth-dark-green text-2xl font-bold">
+            {step === 'review'
+              ? 'Order Book Review'
+              : step === 'select-commodity'
+                ? 'Select Commodity'
+                : 'Confirm Offer'}
           </h1>
           <p className="text-earth-medium-green font-medium">{orderBook.id}</p>
         </div>
         {step === 'review' && (
-          <div className="flex space-x-2 mt-4 md:mt-0">
+          <div className="mt-4 flex space-x-2 md:mt-0">
             <Button
               variant="outline"
               className="border-red-400 text-red-600 hover:bg-red-50"
@@ -254,10 +259,7 @@ const OrderBookApproval = () => {
               <X className="mr-2 h-4 w-4" />
               Reject
             </Button>
-            <Button
-              variant="farmer"
-              onClick={handleAcceptOrderBook}
-            >
+            <Button variant="farmer" onClick={handleAcceptOrderBook}>
               <Check className="mr-2 h-4 w-4" />
               Accept Order Book
             </Button>
@@ -266,40 +268,50 @@ const OrderBookApproval = () => {
       </div>
 
       {step === 'review' && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           <div className="md:col-span-2">
             <Card className="earth-card-forest overflow-hidden">
               <CardHeader className="earth-header-forest pb-3">
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between">
                   <CardTitle className="text-white">Order Book Details</CardTitle>
-                  <Badge className="bg-blue-100 text-blue-800 font-medium px-3 py-1 rounded-full">
+                  <Badge className="rounded-full bg-blue-100 px-3 py-1 font-medium text-blue-800">
                     {orderBook.status.toUpperCase()}
                   </Badge>
                 </div>
               </CardHeader>
               <CardContent className="mt-4">
                 <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="p-4 rounded-lg bg-earth-pale-green/50">
-                      <h3 className="text-sm font-medium text-earth-medium-green mb-1">Commodity Requested</h3>
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div className="bg-earth-pale-green/50 rounded-lg p-4">
+                      <h3 className="text-earth-medium-green mb-1 text-sm font-medium">
+                        Commodity Requested
+                      </h3>
                       <div className="flex items-center">
-                        <div className="h-12 w-12 rounded-full overflow-hidden bg-earth-medium-green/20 flex items-center justify-center mr-3">
-                          <Package className="h-6 w-6 text-earth-medium-green" />
+                        <div className="bg-earth-medium-green/20 mr-3 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full">
+                          <Package className="text-earth-medium-green h-6 w-6" />
                         </div>
                         <div>
-                          <p className="font-bold text-earth-dark-green">{orderBook.commodityType}</p>
-                          <p className="text-sm text-earth-medium-green">{orderBook.quantity.toLocaleString()} {orderBook.unit}</p>
-                          <p className="text-sm text-earth-medium-green">Grade: {orderBook.requestedGrade}</p>
+                          <p className="text-earth-dark-green font-bold">
+                            {orderBook.commodityType}
+                          </p>
+                          <p className="text-earth-medium-green text-sm">
+                            {orderBook.quantity.toLocaleString()} {orderBook.unit}
+                          </p>
+                          <p className="text-earth-medium-green text-sm">
+                            Grade: {orderBook.requestedGrade}
+                          </p>
                         </div>
                       </div>
                     </div>
-                    <div className="p-4 rounded-lg bg-earth-wheat/30">
-                      <h3 className="text-sm font-medium text-earth-brown mb-1">Delivery Information</h3>
-                      <p className="flex items-center gap-2 text-earth-dark-green font-medium">
-                        <Calendar className="h-4 w-4 text-earth-medium-green" />
+                    <div className="bg-earth-wheat/30 rounded-lg p-4">
+                      <h3 className="text-earth-brown mb-1 text-sm font-medium">
+                        Delivery Information
+                      </h3>
+                      <p className="text-earth-dark-green flex items-center gap-2 font-medium">
+                        <Calendar className="text-earth-medium-green h-4 w-4" />
                         Requested by: {formatDate(new Date(orderBook.requestedDeliveryDate))}
                       </p>
-                      <p className="flex items-center gap-2 text-earth-medium-green mt-2">
+                      <p className="text-earth-medium-green mt-2 flex items-center gap-2">
                         <Clock className="h-4 w-4" />
                         Offer expires: {formatDate(new Date(orderBook.offerExpiryDate))}
                       </p>
@@ -308,26 +320,32 @@ const OrderBookApproval = () => {
 
                   <Separator className="bg-earth-light-brown/30" />
 
-                  <div className="p-4 rounded-lg bg-earth-clay/20">
-                    <h3 className="text-sm font-medium text-earth-brown mb-2">Buyer Information</h3>
+                  <div className="bg-earth-clay/20 rounded-lg p-4">
+                    <h3 className="text-earth-brown mb-2 text-sm font-medium">Buyer Information</h3>
                     <div className="flex items-start">
-                      <div className="h-12 w-12 rounded-full overflow-hidden bg-earth-clay/30 flex items-center justify-center mr-3">
-                        <User className="h-6 w-6 text-earth-brown" />
+                      <div className="bg-earth-clay/30 mr-3 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full">
+                        <User className="text-earth-brown h-6 w-6" />
                       </div>
                       <div>
-                        <p className="font-bold text-earth-dark-green">{orderBook.buyerName}</p>
-                        <p className="text-sm text-earth-medium-green">{orderBook.buyerId}</p>
-                        <p className="text-sm text-earth-medium-green mt-1">{orderBook.buyerLocation}</p>
-                        <p className="text-sm text-earth-medium-green">{orderBook.buyerPhone}</p>
+                        <p className="text-earth-dark-green font-bold">{orderBook.buyerName}</p>
+                        <p className="text-earth-medium-green text-sm">{orderBook.buyerId}</p>
+                        <p className="text-earth-medium-green mt-1 text-sm">
+                          {orderBook.buyerLocation}
+                        </p>
+                        <p className="text-earth-medium-green text-sm">{orderBook.buyerPhone}</p>
                       </div>
                     </div>
                   </div>
 
                   <Separator className="bg-earth-light-brown/30" />
 
-                  <div className="p-4 rounded-lg bg-earth-light-brown/20">
-                    <h3 className="text-sm font-medium text-earth-brown mb-2">Terms & Conditions</h3>
-                    <p className="text-earth-dark-green whitespace-pre-line">{orderBook.termsConditions}</p>
+                  <div className="bg-earth-light-brown/20 rounded-lg p-4">
+                    <h3 className="text-earth-brown mb-2 text-sm font-medium">
+                      Terms & Conditions
+                    </h3>
+                    <p className="text-earth-dark-green whitespace-pre-line">
+                      {orderBook.termsConditions}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -341,23 +359,27 @@ const OrderBookApproval = () => {
               </CardHeader>
               <CardContent className="mt-4">
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center p-2 rounded bg-earth-light-brown/20">
+                  <div className="bg-earth-light-brown/20 flex items-center justify-between rounded p-2">
                     <span className="text-earth-brown">Order ID</span>
                     <span className="text-earth-dark-green font-mono">{orderBook.id}</span>
                   </div>
-                  <div className="flex justify-between items-center p-2 rounded bg-earth-light-brown/10">
+                  <div className="bg-earth-light-brown/10 flex items-center justify-between rounded p-2">
                     <span className="text-earth-brown">Created On</span>
-                    <span className="text-earth-dark-green">{formatDate(new Date(orderBook.createdAt))}</span>
+                    <span className="text-earth-dark-green">
+                      {formatDate(new Date(orderBook.createdAt))}
+                    </span>
                   </div>
-                  <div className="flex justify-between items-center p-2 rounded bg-earth-light-brown/20">
+                  <div className="bg-earth-light-brown/20 flex items-center justify-between rounded p-2">
                     <span className="text-earth-brown">Commodity</span>
                     <span className="text-earth-dark-green">{orderBook.commodityType}</span>
                   </div>
-                  <div className="flex justify-between items-center p-2 rounded bg-earth-light-brown/10">
+                  <div className="bg-earth-light-brown/10 flex items-center justify-between rounded p-2">
                     <span className="text-earth-brown">Quantity</span>
-                    <span className="text-earth-dark-green">{orderBook.quantity.toLocaleString()} {orderBook.unit}</span>
+                    <span className="text-earth-dark-green">
+                      {orderBook.quantity.toLocaleString()} {orderBook.unit}
+                    </span>
                   </div>
-                  <div className="flex justify-between items-center p-2 rounded bg-earth-light-brown/20">
+                  <div className="bg-earth-light-brown/20 flex items-center justify-between rounded p-2">
                     <span className="text-earth-brown">Grade</span>
                     <span className="text-earth-dark-green">{orderBook.requestedGrade}</span>
                   </div>
@@ -367,20 +389,22 @@ const OrderBookApproval = () => {
 
             <div className="mt-6">
               <Alert className="bg-earth-pale-green border-earth-medium-green">
-                <Info className="h-4 w-4 text-earth-dark-green" />
+                <Info className="text-earth-dark-green h-4 w-4" />
                 <AlertTitle className="text-earth-dark-green">Information</AlertTitle>
                 <AlertDescription className="text-earth-medium-green">
-                  If you accept this order book, you'll need to select a suitable commodity from your inventory to fulfill the request.
+                  If you accept this order book, you'll need to select a suitable commodity from
+                  your inventory to fulfill the request.
                 </AlertDescription>
               </Alert>
             </div>
 
             <div className="mt-4">
-              <Alert className="bg-amber-50 border-amber-200">
+              <Alert className="border-amber-200 bg-amber-50">
                 <Clock className="h-4 w-4 text-amber-500" />
                 <AlertTitle className="text-amber-700">Offer Expiry</AlertTitle>
                 <AlertDescription className="text-amber-600">
-                  This order book will expire on {formatDate(new Date(orderBook.offerExpiryDate))}. Make sure to respond before then.
+                  This order book will expire on {formatDate(new Date(orderBook.offerExpiryDate))}.
+                  Make sure to respond before then.
                 </AlertDescription>
               </Alert>
             </div>
@@ -413,14 +437,18 @@ const OrderBookApproval = () => {
                     </TableHeader>
                     <TableBody>
                       {matchingCommodities.map((commodity) => (
-                        <TableRow 
+                        <TableRow
                           key={commodity.id}
-                          className={selectedCommodity === commodity.id ? "bg-earth-pale-green" : ""}
+                          className={
+                            selectedCommodity === commodity.id ? 'bg-earth-pale-green' : ''
+                          }
                           onClick={() => handleCommoditySelection(commodity.id)}
                         >
                           <TableCell>
                             <div className="flex justify-center">
-                              <div className={`w-5 h-5 rounded-full border ${selectedCommodity === commodity.id ? 'bg-earth-medium-green border-earth-dark-green' : 'border-earth-medium-green'} flex items-center justify-center`}>
+                              <div
+                                className={`h-5 w-5 rounded-full border ${selectedCommodity === commodity.id ? 'bg-earth-medium-green border-earth-dark-green' : 'border-earth-medium-green'} flex items-center justify-center`}
+                              >
                                 {selectedCommodity === commodity.id && (
                                   <Check className="h-3 w-3 text-white" />
                                 )}
@@ -430,7 +458,9 @@ const OrderBookApproval = () => {
                           <TableCell className="font-medium">{commodity.name}</TableCell>
                           <TableCell>{commodity.type}</TableCell>
                           <TableCell>{commodity.grade}</TableCell>
-                          <TableCell>{commodity.quantity.toLocaleString()} {commodity.unit}</TableCell>
+                          <TableCell>
+                            {commodity.quantity.toLocaleString()} {commodity.unit}
+                          </TableCell>
                           <TableCell>{commodity.location}</TableCell>
                         </TableRow>
                       ))}
@@ -438,16 +468,19 @@ const OrderBookApproval = () => {
                   </Table>
                 </>
               ) : (
-                <div className="text-center py-8 bg-earth-pale-green/30 rounded-lg">
-                  <AlertCircle className="h-12 w-12 mx-auto mb-2 text-amber-500" />
-                  <p className="mb-4 text-earth-medium-green font-medium">No matching commodities found</p>
-                  <p className="text-sm text-earth-medium-green mb-4">
-                    You don't have any commodities in your inventory that match the requirements of this order book.
+                <div className="bg-earth-pale-green/30 rounded-lg py-8 text-center">
+                  <AlertCircle className="mx-auto mb-2 h-12 w-12 text-amber-500" />
+                  <p className="text-earth-medium-green mb-4 font-medium">
+                    No matching commodities found
                   </p>
-                  <Button 
-                    variant="outline" 
+                  <p className="text-earth-medium-green mb-4 text-sm">
+                    You don't have any commodities in your inventory that match the requirements of
+                    this order book.
+                  </p>
+                  <Button
+                    variant="outline"
                     onClick={() => navigate('/komoditas')}
-                    className="gap-2 border-earth-medium-green text-earth-dark-green"
+                    className="border-earth-medium-green text-earth-dark-green gap-2"
                   >
                     <Package className="h-4 w-4" />
                     Add New Commodity
@@ -458,17 +491,17 @@ const OrderBookApproval = () => {
           </Card>
 
           <div className="flex justify-between">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleGoBack}
-              className="gap-2 border-earth-light-brown text-earth-dark-green"
+              className="border-earth-light-brown text-earth-dark-green gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Review
             </Button>
-            
-            <Button 
-              variant="farmer" 
+
+            <Button
+              variant="farmer"
               onClick={handleProceedToConfirmation}
               disabled={!selectedCommodity}
               className="gap-2"
@@ -489,68 +522,93 @@ const OrderBookApproval = () => {
             <CardContent className="mt-4">
               <div className="space-y-6">
                 <Alert className="bg-earth-pale-green border-earth-medium-green">
-                  <CheckCircle2 className="h-4 w-4 text-earth-dark-green" />
+                  <CheckCircle2 className="text-earth-dark-green h-4 w-4" />
                   <AlertTitle className="text-earth-dark-green">Ready to Submit</AlertTitle>
                   <AlertDescription className="text-earth-medium-green">
-                    You're about to commit to fulfilling this order book. Please review the details before confirming.
+                    You're about to commit to fulfilling this order book. Please review the details
+                    before confirming.
                   </AlertDescription>
                 </Alert>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="p-4 rounded-lg bg-earth-clay/20">
-                    <h3 className="text-md font-medium text-earth-dark-green mb-3">Order Book Details</h3>
+
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <div className="bg-earth-clay/20 rounded-lg p-4">
+                    <h3 className="text-md text-earth-dark-green mb-3 font-medium">
+                      Order Book Details
+                    </h3>
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span className="text-earth-medium-green">Buyer:</span>
-                        <span className="text-earth-dark-green font-medium">{orderBook.buyerName}</span>
+                        <span className="text-earth-dark-green font-medium">
+                          {orderBook.buyerName}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-earth-medium-green">Commodity:</span>
-                        <span className="text-earth-dark-green font-medium">{orderBook.commodityType}</span>
+                        <span className="text-earth-dark-green font-medium">
+                          {orderBook.commodityType}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-earth-medium-green">Quantity:</span>
-                        <span className="text-earth-dark-green font-medium">{orderBook.quantity.toLocaleString()} {orderBook.unit}</span>
+                        <span className="text-earth-dark-green font-medium">
+                          {orderBook.quantity.toLocaleString()} {orderBook.unit}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-earth-medium-green">Grade:</span>
-                        <span className="text-earth-dark-green font-medium">{orderBook.requestedGrade}</span>
+                        <span className="text-earth-dark-green font-medium">
+                          {orderBook.requestedGrade}
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-earth-medium-green">Delivery by:</span>
-                        <span className="text-earth-dark-green font-medium">{formatDate(new Date(orderBook.requestedDeliveryDate))}</span>
+                        <span className="text-earth-dark-green font-medium">
+                          {formatDate(new Date(orderBook.requestedDeliveryDate))}
+                        </span>
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="p-4 rounded-lg bg-earth-pale-green/50">
-                    <h3 className="text-md font-medium text-earth-dark-green mb-3">Selected Commodity</h3>
+
+                  <div className="bg-earth-pale-green/50 rounded-lg p-4">
+                    <h3 className="text-md text-earth-dark-green mb-3 font-medium">
+                      Selected Commodity
+                    </h3>
                     <div className="space-y-2">
                       {selectedCommodity && (
                         <>
                           {farmerCommodities
-                            .filter(c => c.id === selectedCommodity)
-                            .map(commodity => (
+                            .filter((c) => c.id === selectedCommodity)
+                            .map((commodity) => (
                               <div key={commodity.id} className="space-y-2">
                                 <div className="flex justify-between">
                                   <span className="text-earth-medium-green">Name:</span>
-                                  <span className="text-earth-dark-green font-medium">{commodity.name}</span>
+                                  <span className="text-earth-dark-green font-medium">
+                                    {commodity.name}
+                                  </span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-earth-medium-green">Type:</span>
-                                  <span className="text-earth-dark-green font-medium">{commodity.type}</span>
+                                  <span className="text-earth-dark-green font-medium">
+                                    {commodity.type}
+                                  </span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-earth-medium-green">Available:</span>
-                                  <span className="text-earth-dark-green font-medium">{commodity.quantity.toLocaleString()} {commodity.unit}</span>
+                                  <span className="text-earth-dark-green font-medium">
+                                    {commodity.quantity.toLocaleString()} {commodity.unit}
+                                  </span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-earth-medium-green">Grade:</span>
-                                  <span className="text-earth-dark-green font-medium">{commodity.grade}</span>
+                                  <span className="text-earth-dark-green font-medium">
+                                    {commodity.grade}
+                                  </span>
                                 </div>
                                 <div className="flex justify-between">
                                   <span className="text-earth-medium-green">Location:</span>
-                                  <span className="text-earth-dark-green font-medium">{commodity.location}</span>
+                                  <span className="text-earth-dark-green font-medium">
+                                    {commodity.location}
+                                  </span>
                                 </div>
                               </div>
                             ))}
@@ -559,23 +617,27 @@ const OrderBookApproval = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <Separator className="bg-earth-light-brown/30" />
-                
-                <div className="p-4 rounded-lg bg-earth-light-brown/20">
-                  <h3 className="text-md font-medium text-earth-dark-green mb-3">Terms & Conditions Agreement</h3>
+
+                <div className="bg-earth-light-brown/20 rounded-lg p-4">
+                  <h3 className="text-md text-earth-dark-green mb-3 font-medium">
+                    Terms & Conditions Agreement
+                  </h3>
                   <div className="space-y-4">
-                    <div className="p-3 border border-earth-light-brown/50 rounded-md bg-white">
-                      <p className="text-earth-dark-green whitespace-pre-line">{orderBook.termsConditions}</p>
+                    <div className="border-earth-light-brown/50 rounded-md border bg-white p-3">
+                      <p className="text-earth-dark-green whitespace-pre-line">
+                        {orderBook.termsConditions}
+                      </p>
                     </div>
-                    
+
                     <div className="flex items-center">
                       <input
                         type="checkbox"
                         id="terms-agreement"
                         checked={termsAccepted}
                         onChange={() => setTermsAccepted(!termsAccepted)}
-                        className="rounded border-earth-medium-green text-earth-dark-green h-4 w-4 mr-2"
+                        className="border-earth-medium-green text-earth-dark-green mr-2 h-4 w-4 rounded"
                       />
                       <label htmlFor="terms-agreement" className="text-earth-dark-green">
                         I agree to the terms and conditions of this order book
@@ -586,19 +648,19 @@ const OrderBookApproval = () => {
               </div>
             </CardContent>
           </Card>
-          
+
           <div className="flex justify-between">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleGoBack}
-              className="gap-2 border-earth-light-brown text-earth-dark-green"
+              className="border-earth-light-brown text-earth-dark-green gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Selection
             </Button>
-            
-            <Button 
-              variant="farmer" 
+
+            <Button
+              variant="farmer"
               onClick={handleConfirmOffer}
               disabled={!termsAccepted}
               className="gap-2"

@@ -1,7 +1,6 @@
-
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, X, DollarSign } from "lucide-react";
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Check, X, DollarSign } from 'lucide-react';
 
 interface StatusCardProps {
   status: string;
@@ -16,7 +15,7 @@ export const StatusCard = ({
   onDeclineTransaction,
   onProceedToNegotiation,
 }: StatusCardProps) => {
-  if (status !== "menunggu_konfirmasi" && status !== "dikonfirmasi") {
+  if (status !== 'menunggu_konfirmasi' && status !== 'dikonfirmasi') {
     return null;
   }
 
@@ -27,25 +26,28 @@ export const StatusCard = ({
       </CardHeader>
       <CardContent className="mt-4">
         <div className="space-y-4">
-          {status === "menunggu_konfirmasi" && (
-            <div className="p-4 bg-earth-wheat/30 rounded-lg">
-              <h3 className="font-medium text-earth-dark-green mb-2">Transaction Awaiting Confirmation</h3>
+          {status === 'menunggu_konfirmasi' && (
+            <div className="bg-earth-wheat/30 rounded-lg p-4">
+              <h3 className="text-earth-dark-green mb-2 font-medium">
+                Transaction Awaiting Confirmation
+              </h3>
               <p className="text-earth-medium-green mb-4">
-                This transaction is waiting for your confirmation. Please review the details and decide whether to accept or decline this order.
+                This transaction is waiting for your confirmation. Please review the details and
+                decide whether to accept or decline this order.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 mt-4">
-                <Button 
-                  variant="farmer" 
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                <Button
+                  variant="farmer"
                   onClick={onConfirmTransaction}
-                  className="gap-2 w-full sm:w-auto"
+                  className="w-full gap-2 sm:w-auto"
                 >
                   <Check className="h-4 w-4" />
                   Confirm Transaction
                 </Button>
-                <Button 
-                  variant="destructive" 
+                <Button
+                  variant="destructive"
                   onClick={onDeclineTransaction}
-                  className="gap-2 w-full sm:w-auto"
+                  className="w-full gap-2 sm:w-auto"
                 >
                   <X className="h-4 w-4" />
                   Decline Transaction
@@ -54,17 +56,20 @@ export const StatusCard = ({
             </div>
           )}
 
-          {status === "dikonfirmasi" && (
-            <div className="p-4 bg-earth-wheat/30 rounded-lg">
-              <h3 className="font-medium text-earth-dark-green mb-2">Transaction Confirmed - Set Price</h3>
+          {status === 'dikonfirmasi' && (
+            <div className="bg-earth-wheat/30 rounded-lg p-4">
+              <h3 className="text-earth-dark-green mb-2 font-medium">
+                Transaction Confirmed - Set Price
+              </h3>
               <p className="text-earth-medium-green mb-4">
-                You have confirmed this transaction. The next step is to set a price and begin negotiation with the buyer.
+                You have confirmed this transaction. The next step is to set a price and begin
+                negotiation with the buyer.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 mt-4">
-                <Button 
-                  variant="farmer" 
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                <Button
+                  variant="farmer"
                   onClick={onProceedToNegotiation}
-                  className="gap-2 w-full sm:w-auto"
+                  className="w-full gap-2 sm:w-auto"
                 >
                   <DollarSign className="h-4 w-4" />
                   Set Price & Negotiate

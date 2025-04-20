@@ -1,0 +1,20 @@
+# Build outputs
+dist/
+build/
+
+# Dependencies
+node_modules/
+
+# Cache
+.cache/
+.eslintcache
+.npm
+.yarn
+
+# Environment files
+.env*
+
+# Misc
+.DS_Store
+*.log
+coverage/
