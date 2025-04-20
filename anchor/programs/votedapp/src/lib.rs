@@ -1,4 +1,5 @@
 #![allow(clippy::result_large_err)]
+#![allow(unexpected_cfgs)]
 
 use anchor_lang::prelude::*;
 
@@ -37,7 +38,7 @@ pub mod votedapp {
         Ok(())
     }
 
-    pub fn vote(ctx: Context<Vote>, candidate_name: String, _poll_id: u64) -> Result<()> {
+    pub fn vote(ctx: Context<Vote>, _candidate_name: String, _poll_id: u64) -> Result<()> {
         let vote = &mut ctx.accounts.candidate;
         vote.vote_count += 1;
         msg!("Vote name {}", vote.candidate_name);
