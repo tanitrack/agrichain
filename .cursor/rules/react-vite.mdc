@@ -1,0 +1,155 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Frontend Project Rules
+
+## Project Structure
+- Use feature-based folder structure under `frontend/src/`:
+  ```
+  frontend/src/
+  ├── assets/         # Static assets
+  ├── components/     # Shared components
+  │   ├── ui/        # UI components
+  │   └── common/    # Common components
+  ├── features/      # Feature-based modules
+  ├── hooks/         # Custom hooks
+  ├── layouts/       # Layout components
+  ├── lib/           # Utility functions and constants
+  ├── providers/     # Context providers
+  ├── routes/        # Route definitions
+  ├── services/      # API and external services
+  └── types/         # TypeScript type definitions
+  ```
+
+## TypeScript Rules
+- Enable strict TypeScript checks:
+  ```json
+  {
+    "compilerOptions": {
+      "strict": true,
+      "noImplicitAny": true,
+      "strictNullChecks": true,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true
+    }
+  }
+  ```
+- Use explicit type annotations for function parameters and return types
+- Prefer interfaces over type aliases for object definitions
+- Use type inference where types are obvious
+- Create dedicated type files for shared types
+
+## Component Rules
+- Use functional components with TypeScript:
+  ```tsx
+  type Props = {
+    title: string;
+    children: React.ReactNode;
+  };
+
+  const Component = ({ title, children }: Props): JSX.Element => {
+    return (
+      // JSX
+    );
+  };
+  ```
+- Implement proper prop types validation
+- Use named exports instead of default exports
+- Keep components focused and single-responsibility
+- Extract reusable logic into custom hooks
+
+## State Management
+- Use React Query for server state
+- Use React Context for global UI state
+- Prefer local state when possible
+- Implement proper loading and error states
+
+## Routing
+- Use React Router with typed routes:
+  ```tsx
+  type AppRoutes = {
+    path: string;
+    element: JSX.Element;
+    children?: AppRoutes[];
+  };
+  ```
+- Implement lazy loading for route components
+- Use proper route guards where needed
+
+## Styling
+- Use Tailwind CSS with consistent class ordering:
+  1. Layout (position, display, width, height)
+  2. Spacing (margin, padding)
+  3. Typography
+  4. Visual (colors, backgrounds, borders)
+  5. Interactive states
+- Create reusable utility classes
+- Use CSS variables for theme values
+
+## Error Handling
+- Implement proper error boundaries
+- Use typed error handling:
+  ```tsx
+  type ApiError = {
+    code: string;
+    message: string;
+  };
+  ```
+- Provide meaningful error messages to users
+
+## Testing
+- Write unit tests for utility functions
+- Write component tests for complex components
+- Use proper type mocking in tests
+- Maintain good test coverage
+
+## Code Quality
+- Use ESLint with TypeScript rules
+- Implement Prettier for consistent formatting
+- Follow naming conventions:
+  - PascalCase for components
+  - camelCase for functions and variables
+  - UPPER_CASE for constants
+- Keep files under 300 lines
+- Use meaningful variable and function names
+
+## Import/Export Rules
+- Use absolute imports with `@/` prefix
+- Group imports by:
+  1. React and external libraries
+  2. Internal components and utilities
+  3. Types
+  4. Styles
+- Export types and interfaces from dedicated files
+
+## Performance
+- Implement proper memoization (useMemo, useCallback)
+- Use React.lazy for code splitting
+- Optimize images and assets
+- Implement proper bundling strategies
+
+## Documentation
+- Document complex components with JSDoc
+- Include prop type documentation
+- Document custom hooks usage
+- Maintain a README for each feature module
+
+## Git Practices
+- Use conventional commits
+- Create meaningful branch names
+- Keep PRs focused and manageable
+- Include proper PR descriptions
+
+## API Integration
+- Use typed API calls:
+  ```tsx
+  type ApiResponse<T> = {
+    data: T;
+    status: number;
+    message: string;
+  };
+  ```
+- Implement proper request/response interceptors
+- Handle API errors consistently
