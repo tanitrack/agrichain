@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { User, Mail, Phone, MapPin, Edit, Upload, Camera, Save, Lock } from 'lucide-react';
+import { Mail, Phone, MapPin, Edit, Camera, Save, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';

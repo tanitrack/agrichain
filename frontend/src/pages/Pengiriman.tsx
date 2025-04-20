@@ -12,10 +12,7 @@ import {
   Truck,
   Search,
   Calendar as CalendarIcon,
-  Filter,
-  Package,
   Eye,
-  X,
   Check,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -38,7 +35,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { formatDate } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';

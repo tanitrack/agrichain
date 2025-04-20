@@ -6,10 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   ArrowLeft,
-  FileText,
   Clock,
   Package,
   Calendar,
@@ -22,7 +20,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { formatDate, formatCurrency } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 import {
   Table,
   TableBody,

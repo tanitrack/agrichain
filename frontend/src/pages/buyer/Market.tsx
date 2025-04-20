@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Wheat, Info, ShoppingCart, ExternalLink, Search, Filter, TrendingUp } from 'lucide-react';
+import { Wheat, Info, ShoppingCart, Search, Filter, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 

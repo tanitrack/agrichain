@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  BarChart3,
   Home,
-  Package,
   Wallet,
   ShoppingCart,
   ClipboardList,
@@ -13,14 +11,9 @@ import {
   ChevronRight,
   ChevronLeft,
   LogOut,
-  Leaf,
   Wheat,
   Sprout,
-  Receipt,
-  History,
-  CheckCircle,
   ShoppingBasket,
-  CreditCard,
   Store,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -32,7 +25,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuLabel,
-  DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';

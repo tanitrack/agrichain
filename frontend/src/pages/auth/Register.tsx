@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { AuthLeftSection } from '@/components/auth/AuthLeftSection';
 import { AuthRightSection } from '@/components/auth/AuthRightSection';
-import { OTPInput } from '@/components/common/OTPInput';
 
 export default function Register() {
   const [userType, setUserType] = useState('');

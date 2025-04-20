@@ -27,7 +27,6 @@ import { formatCurrency } from '@/lib/utils';
 import { type CommodityPrice } from '@/lib/data/types';
 import {
   LineChart as LineChartIcon,
-  BarChart3,
   TrendingUp,
   TrendingDown,
   Map,

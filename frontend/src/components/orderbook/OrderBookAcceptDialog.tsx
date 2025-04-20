@@ -7,7 +7,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -27,7 +26,6 @@ import {
   AlertTriangle,
   FileCheck,
   Search,
-  Filter,
   SlidersHorizontal,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';

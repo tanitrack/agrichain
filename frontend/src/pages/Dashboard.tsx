@@ -12,7 +12,7 @@ import {
   CloudRain,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { transactions, commodities, commodityPrices, currentUser } from '@/lib/data/mockData';
 import { formatCurrency, formatDate } from '@/lib/utils';

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { ClipboardList, Search, Filter, Eye, Plus, Calendar } from 'lucide-react';
+import { ClipboardList, Search, Filter, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

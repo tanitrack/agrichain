@@ -1,4 +1,4 @@
-import { Bell, Search, HelpCircle, User, Settings } from 'lucide-react';
+import { Bell, Search, HelpCircle, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -13,7 +13,6 @@ import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { DynamicWidget } from '@dynamic-labs/sdk-react-core';
 import { DynamicWidgetButton } from '@/components/layout/DynamicWidgetButton';
 
 interface TopNavProps {

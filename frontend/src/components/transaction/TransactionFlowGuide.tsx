@@ -9,7 +9,6 @@ import {
   MessageCircle,
   FileCheck,
   FileSignature,
-  Clock,
   History,
 } from 'lucide-react';
 

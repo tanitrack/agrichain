@@ -7,12 +7,6 @@ import {
   ArrowDown,
   ArrowUp,
   MapPin,
-  LineChart,
-  BarChart3,
-  CalendarDays,
-  TrendingDown,
-  Info,
-  Percent,
   Eye,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,9 +32,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
 } from '@/components/ui/dialog';
 import { type CommodityPrice } from '@/lib/data/types';
 import { CommodityPriceDetail } from '@/components/commodity/CommodityPriceDetail';

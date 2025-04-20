@@ -41,7 +41,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,7 +49,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
-import { formatCurrency } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 // Mock data for demo purposes

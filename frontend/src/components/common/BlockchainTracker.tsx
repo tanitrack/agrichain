@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { BlockchainCard, BlockchainCardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Link, LinkIcon, Check, Clock, Shield } from 'lucide-react';
+import { LinkIcon, Check, Clock, Shield } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 
