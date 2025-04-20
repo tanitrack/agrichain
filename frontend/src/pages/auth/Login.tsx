@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TaniTrackCard } from '@/components/custom/TaniTrackCard';
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
+import { OTPInput } from '@/components/common/OTPInput';
 
 export default function Login() {
   const [otp, setOtp] = useState('');
@@ -231,70 +232,15 @@ export default function Login() {
             </form>
           ) : (
             <div>
-              <CardContent className="space-y-6 px-8 pt-6">
-                <div className="space-y-3">
-                  <p className="text-earth-dark-green text-center font-medium">
-                    {language === 'id' ? 'Masukkan 6 Digit Kode OTP' : 'Enter 6 Digit OTP Code'}
-                  </p>
-                  <p className="text-earth-dark-green mb-4 text-center text-sm">
-                    {language === 'id'
-                      ? 'Kode dikirim ke perangkat yang terhubung dengan TaniTrack Card Anda'
-                      : 'Code sent to the device connected to your TaniTrack Card'}
-                  </p>
-                  <div className="flex justify-center">
-                    <InputOTP maxLength={6} value={otp} onChange={setOtp}>
-                      <InputOTPGroup>
-                        <InputOTPSlot
-                          index={0}
-                          className="border-earth-medium-green focus-visible:ring-earth-dark-green h-14 w-14 text-xl"
-                        />
-                        <InputOTPSlot
-                          index={1}
-                          className="border-earth-medium-green focus-visible:ring-earth-dark-green h-14 w-14 text-xl"
-                        />
-                        <InputOTPSlot
-                          index={2}
-                          className="border-earth-medium-green focus-visible:ring-earth-dark-green h-14 w-14 text-xl"
-                        />
-                        <InputOTPSlot
-                          index={3}
-                          className="border-earth-medium-green focus-visible:ring-earth-dark-green h-14 w-14 text-xl"
-                        />
-                        <InputOTPSlot
-                          index={4}
-                          className="border-earth-medium-green focus-visible:ring-earth-dark-green h-14 w-14 text-xl"
-                        />
-                        <InputOTPSlot
-                          index={5}
-                          className="border-earth-medium-green focus-visible:ring-earth-dark-green h-14 w-14 text-xl"
-                        />
-                      </InputOTPGroup>
-                    </InputOTP>
-                  </div>
-                </div>
+              <CardContent className="px-8 pt-6">
+                <OTPInput
+                  otp={otp}
+                  setOtp={setOtp}
+                  loading={loading}
+                  onVerify={verifyOtp}
+                  onBack={() => setShowOtpInput(false)}
+                />
               </CardContent>
-              <CardFooter className="flex flex-col gap-4 px-8 pb-8">
-                <Button
-                  onClick={verifyOtp}
-                  className="bg-earth-dark-green hover:bg-earth-medium-green h-12 w-full rounded-full text-base"
-                  disabled={loading || otp.length !== 6}
-                >
-                  {loading
-                    ? language === 'id'
-                      ? 'Memverifikasi...'
-                      : 'Verifying...'
-                    : language === 'id'
-                      ? 'Verifikasi & Masuk'
-                      : 'Verify & Login'}
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-earth-light-brown text-earth-dark-green hover:bg-earth-pale-green w-full rounded-full"
-                  onClick={() => setShowOtpInput(false)}
-                >
-                  {language === 'id' ? 'Kembali' : 'Back'}
-                </Button>
-              </CardFooter>
             </div>
           )}
         </Card>

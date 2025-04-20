@@ -1,0 +1,46 @@
+import { useLanguage } from '@/contexts/LanguageContext';
+import { AuthHeader } from './AuthHeader';
+import { AuthBenefits } from './AuthBenefits';
+import { AuthCardDisplay } from './AuthCardDisplay';
+import LanguageSwitcher from '@/components/common/LanguageSwitcher';
+
+interface AuthLeftSectionProps {
+  userType: string;
+}
+
+export function AuthLeftSection({ userType }: AuthLeftSectionProps) {
+  const { language } = useLanguage();
+
+  return (
+    <div className="relative flex w-full items-center justify-center p-8 md:w-1/2">
+      <div className="bg-earth-light-green/20 absolute -bottom-64 -left-64 h-96 w-96 rounded-full blur-3xl" />
+      <div className="bg-earth-wheat/30 absolute -right-64 -top-64 h-96 w-96 rounded-full blur-3xl" />
+
+      <div className="z-10 mx-auto max-w-md">
+        <AuthHeader userType={userType} />
+
+        {!!userType && (
+          <>
+            <h2 className="text-earth-dark-green mb-6 text-2xl font-bold">
+              {userType === 'petani'
+                ? language === 'id'
+                  ? 'Daftar sebagai Petani'
+                  : 'Register as Farmer'
+                : language === 'id'
+                  ? 'Daftar sebagai Konsumen'
+                  : 'Register as Buyer'}
+            </h2>
+
+            <AuthBenefits userType={userType} />
+            <AuthCardDisplay userType={userType} />
+          </>
+        )}
+      </div>
+
+      {/* Language Switcher positioned at bottom right */}
+      <div className="absolute bottom-4 right-4">
+        <LanguageSwitcher />
+      </div>
+    </div>
+  );
+}
