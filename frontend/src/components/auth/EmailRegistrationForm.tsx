@@ -17,11 +17,7 @@ import { OTPInput } from '@/components/common/OTPInput';
 
 // Updated form schema without password
 const formSchema = z.object({
-  email: z
-    .string()
-    .email('Invalid email format')
-    .min(1, 'Email is required')
-
+  email: z.string().email('Invalid email format').min(1, 'Email is required'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -31,7 +27,10 @@ interface EmailRegistrationFormProps {
   loading: boolean;
 }
 
-export const EmailRegistrationForm = ({ onComplete, loading }: EmailRegistrationFormProps): JSX.Element => {
+export const EmailRegistrationForm = ({
+  onComplete,
+  loading,
+}: EmailRegistrationFormProps): JSX.Element => {
   const { language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
@@ -50,13 +49,13 @@ export const EmailRegistrationForm = ({ onComplete, loading }: EmailRegistration
       setIsLoading(true);
       // TODO: Implement your registration API call here to send OTP
       console.log('Form values:', values);
-      
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Store the email for later use
       setRegisteredEmail(values.email);
-      
+
       // Show OTP verification after successful email submission
       setShowOTP(true);
     } catch (error) {
@@ -71,10 +70,10 @@ export const EmailRegistrationForm = ({ onComplete, loading }: EmailRegistration
       setIsLoading(true);
       // TODO: Implement your OTP verification API call here
       console.log('OTP:', otp);
-      
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Call onComplete with the registered email
       onComplete(registeredEmail);
     } catch (error) {
@@ -104,8 +103,6 @@ export const EmailRegistrationForm = ({ onComplete, loading }: EmailRegistration
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-6">
-        
-
         <FormField
           control={form.control}
           name="email"
@@ -117,9 +114,7 @@ export const EmailRegistrationForm = ({ onComplete, loading }: EmailRegistration
                   {...field}
                   type="email"
                   disabled={isLoading}
-                  placeholder={
-                    language === 'id' ? 'Masukkan email' : 'Enter email'
-                  }
+                  placeholder={language === 'id' ? 'Masukkan email' : 'Enter email'}
                   className="rounded-full"
                 />
               </FormControl>
@@ -138,8 +133,8 @@ export const EmailRegistrationForm = ({ onComplete, loading }: EmailRegistration
               ? 'Mengirim OTP...'
               : 'Sending OTP...'
             : language === 'id'
-            ? 'Kirim OTP'
-            : 'Send OTP'}
+              ? 'Kirim OTP'
+              : 'Send OTP'}
         </Button>
       </form>
     </Form>

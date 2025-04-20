@@ -13,7 +13,7 @@
     "type-check": "tsc --noEmit",
     "lint": "cd frontend && eslint . --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "cd frontend && eslint . --ext .ts,.tsx,.js,.jsx --fix",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format": "cd frontend && prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "pre-commit": "lint-staged"
   },
   "dependencies": {

@@ -17,7 +17,12 @@ interface UserProfileFormProps {
   userType?: string;
 }
 
-export function UserProfileForm({ onSubmit, loading, initialData = {}, userType = 'petani' }: UserProfileFormProps) {
+export function UserProfileForm({
+  onSubmit,
+  loading,
+  initialData = {},
+  userType = 'petani',
+}: UserProfileFormProps) {
   const { language } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -29,28 +34,20 @@ export function UserProfileForm({ onSubmit, loading, initialData = {}, userType 
     <form onSubmit={handleSubmit}>
       <CardContent className="space-y-4 px-8 pt-6">
         <div className="space-y-2">
-          <Label
-            htmlFor="ktp"
-            className="text-earth-dark-green flex items-center font-medium"
-          >
+          <Label htmlFor="ktp" className="text-earth-dark-green flex items-center font-medium">
             <UserCircle2 className="text-earth-medium-green mr-2 h-4 w-4" />
             {language === 'id' ? 'No. KTP' : 'ID Card Number'}
           </Label>
           <Input
             id="ktp"
-            placeholder={
-              language === 'id' ? 'Masukkan nomor KTP' : 'Enter ID card number'
-            }
+            placeholder={language === 'id' ? 'Masukkan nomor KTP' : 'Enter ID card number'}
             required
             defaultValue={initialData.ktp}
             className="border-earth-light-brown focus-visible:ring-earth-dark-green"
           />
         </div>
         <div className="space-y-2">
-          <Label
-            htmlFor="name"
-            className="text-earth-dark-green flex items-center font-medium"
-          >
+          <Label htmlFor="name" className="text-earth-dark-green flex items-center font-medium">
             <User className="text-earth-medium-green mr-2 h-4 w-4" />
             {language === 'id' ? 'Nama Lengkap' : 'Full Name'}
           </Label>
@@ -62,10 +59,7 @@ export function UserProfileForm({ onSubmit, loading, initialData = {}, userType 
           />
         </div>
         <div className="space-y-2">
-          <Label
-            htmlFor="phone"
-            className="text-earth-dark-green flex items-center font-medium"
-          >
+          <Label htmlFor="phone" className="text-earth-dark-green flex items-center font-medium">
             <Phone className="text-earth-medium-green mr-2 h-4 w-4" />
             {language === 'id' ? 'No. HP/Whatsapp' : 'Phone/Whatsapp Number'}
           </Label>
@@ -78,10 +72,7 @@ export function UserProfileForm({ onSubmit, loading, initialData = {}, userType 
           />
         </div>
         <div className="space-y-2">
-          <Label
-            htmlFor="address"
-            className="text-earth-dark-green flex items-center font-medium"
-          >
+          <Label htmlFor="address" className="text-earth-dark-green flex items-center font-medium">
             <MapPin className="text-earth-medium-green mr-2 h-4 w-4" />
             {language === 'id' ? 'Alamat Utama' : 'Main Address'}
           </Label>
@@ -93,7 +84,6 @@ export function UserProfileForm({ onSubmit, loading, initialData = {}, userType 
             className="border-earth-light-brown focus-visible:ring-earth-dark-green"
           />
         </div>
-  
       </CardContent>
       <CardFooter className="flex flex-col gap-4 px-8 pb-6">
         <Button
@@ -113,4 +103,4 @@ export function UserProfileForm({ onSubmit, loading, initialData = {}, userType 
       </CardFooter>
     </form>
   );
-} 
+}

@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import {
-  TrendingUp,
-  Search,
-  Filter,
-  ArrowDown,
-  ArrowUp,
-  MapPin,
-  Eye,
-} from 'lucide-react';
+import { TrendingUp, Search, Filter, ArrowDown, ArrowUp, MapPin, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,10 +21,7 @@ import {
 } from '@/components/ui/select';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Dialog,
-  DialogContent,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { type CommodityPrice } from '@/lib/data/types';
 import { CommodityPriceDetail } from '@/components/commodity/CommodityPriceDetail';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
