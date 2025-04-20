@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { OTPInput } from '@/components/common/OTPInput';
+import { useConnectWithOtp } from '@dynamic-labs/sdk-react-core';
+import { toast } from '@/hooks/use-toast';
 
 // Updated form schema without password
 const formSchema = z.object({
@@ -24,18 +26,15 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface EmailRegistrationFormProps {
   onComplete: (email: string) => void;
-  loading: boolean;
 }
 
-export const EmailRegistrationForm = ({
-  onComplete,
-  loading,
-}: EmailRegistrationFormProps): JSX.Element => {
+export const EmailRegistrationForm = ({ onComplete }: EmailRegistrationFormProps): JSX.Element => {
   const { language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [showOTP, setShowOTP] = useState(false);
   const [otp, setOtp] = useState('');
   const [registeredEmail, setRegisteredEmail] = useState('');
+  const { connectWithEmail, verifyOneTimePassword, retryOneTimePassword } = useConnectWithOtp();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -47,11 +46,7 @@ export const EmailRegistrationForm = ({
   const onSubmit = async (values: FormValues) => {
     try {
       setIsLoading(true);
-      // TODO: Implement your registration API call here to send OTP
-      console.log('Form values:', values);
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await connectWithEmail(values.email);
 
       // Store the email for later use
       setRegisteredEmail(values.email);
@@ -68,16 +63,29 @@ export const EmailRegistrationForm = ({
   const handleOTPVerification = async () => {
     try {
       setIsLoading(true);
-      // TODO: Implement your OTP verification API call here
-      console.log('OTP:', otp);
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await verifyOneTimePassword(otp);
 
       // Call onComplete with the registered email
       onComplete(registeredEmail);
     } catch (error) {
       console.error('OTP verification error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    try {
+      setIsLoading(true);
+      await retryOneTimePassword();
+      toast({
+        title:
+          language === 'id'
+            ? 'Kode OTP telah dikirim ulang ke email Anda'
+            : 'OTP has been resent to your email',
+      });
+    } catch (error) {
+      console.error('Resend OTP error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -96,6 +104,8 @@ export const EmailRegistrationForm = ({
         loading={isLoading}
         onVerify={handleOTPVerification}
         onBack={handleBackFromOTP}
+        onResend={handleResendOTP}
+        email={registeredEmail}
       />
     );
   }

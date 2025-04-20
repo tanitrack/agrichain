@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useConnectWithOtp } from '@dynamic-labs/sdk-react-core';
 import { UserProfileForm } from '@/components/auth/UserProfileForm';
 import { EmailRegistrationForm } from '@/components/auth/EmailRegistrationForm';
 import { Button } from '@/components/ui/button';
@@ -18,18 +17,13 @@ interface AuthRightSectionProps {
 type RegistrationStep = 'email' | 'userType' | 'profile' | 'complete';
 
 export function AuthRightSection({ userType, setUserType }: AuthRightSectionProps) {
-  const [loading, setLoading] = useState(false);
   const [registrationStep, setRegistrationStep] = useState<RegistrationStep>('email');
-  const [userEmail, setUserEmail] = useState<string>('');
   const navigate = useNavigate();
   const { toast } = useToast();
   const { language } = useLanguage();
 
-  const { connectWithEmail, verifyOneTimePassword } = useConnectWithOtp();
-
   // Handle email registration completion
-  const handleEmailRegistrationComplete = (email: string) => {
-    setUserEmail(email);
+  const handleEmailRegistrationComplete = () => {
     setRegistrationStep('userType');
   };
 
@@ -40,8 +34,7 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
   };
 
   // Handle profile completion
-  const handleProfileComplete = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleProfileComplete = () => {
     setRegistrationStep('complete');
 
     // Show success toast
@@ -68,9 +61,7 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
   const renderRegistrationForm = () => {
     switch (registrationStep) {
       case 'email':
-        return (
-          <EmailRegistrationForm onComplete={handleEmailRegistrationComplete} loading={loading} />
-        );
+        return <EmailRegistrationForm onComplete={handleEmailRegistrationComplete} />;
       case 'userType':
         return (
           <div className="p-6">
@@ -135,11 +126,7 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
                 </div>
               </div>
             </div>
-            <UserProfileForm
-              onSubmit={handleProfileComplete}
-              loading={loading}
-              userType={userType}
-            />
+            <UserProfileForm onSuccess={handleProfileComplete} userType={userType} />
           </div>
         );
       case 'complete':
@@ -182,8 +169,8 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
           <CardDescription className="mt-2 text-center text-white/90">
             {registrationStep === 'email'
               ? language === 'id'
-                ? 'Masukkan email Anda untuk mendaftar'
-                : 'Enter your email to register'
+                ? 'Pendaftaran dengan email'
+                : 'Registration with email'
               : registrationStep === 'userType'
                 ? language === 'id'
                   ? 'Pilih peran Anda dalam platform'

@@ -1,15 +1,18 @@
 import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useEffect, useState } from 'react';
 
 interface OTPInputProps {
   otp: string;
   setOtp: (value: string) => void;
   loading: boolean;
   onVerify: () => void;
+  onResend?: () => void;
   onBack?: () => void;
   title?: string;
   description?: string;
+  email?: string;
 }
 
 export const OTPInput = ({
@@ -18,10 +21,29 @@ export const OTPInput = ({
   loading,
   onVerify,
   onBack,
+  onResend,
   title,
   description,
+  email,
 }: OTPInputProps): JSX.Element => {
   const { language } = useLanguage();
+  const [countdown, setCountdown] = useState(30);
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
+
+  const handleResend = () => {
+    if (onResend) {
+      onResend();
+      setCountdown(30);
+    }
+  };
 
   return (
     <div className="space-y-6 p-6">
@@ -32,8 +54,8 @@ export const OTPInput = ({
         <p className="text-earth-dark-green mb-4 text-center text-sm">
           {description ||
             (language === 'id'
-              ? 'Kode dikirim ke perangkat yang terhubung dengan TaniTrack Card Anda'
-              : 'Code sent to the device connected to your TaniTrack Card')}
+              ? 'Kode dikirim ke email ' + email
+              : 'Code sent to the email ' + email)}
         </p>
         <div className="flex justify-center">
           <InputOTP maxLength={6} value={otp} onChange={setOtp}>
@@ -71,6 +93,29 @@ export const OTPInput = ({
           >
             {language === 'id' ? 'Kembali' : 'Back'}
           </Button>
+        )}
+        {onResend && (
+          <div>
+            <Button
+              variant="outline"
+              className="border-earth-light-brown text-earth-dark-green hover:bg-earth-pale-green w-full rounded-full"
+              onClick={handleResend}
+              disabled={countdown > 0}
+            >
+              {language === 'id' ? 'Kirim Ulang Kode' : 'Resend Code'}
+            </Button>
+            <p
+              className={`text-center text-sm ${
+                countdown > 0 ? 'text-earth-dark-green' : 'text-white'
+              }`}
+            >
+              {countdown > 0
+                ? language === 'id'
+                  ? `Tunggu ${countdown} detik untuk mengirim ulang`
+                  : `Wait ${countdown} seconds to resend`
+                : ''}
+            </p>
+          </div>
         )}
       </div>
     </div>
