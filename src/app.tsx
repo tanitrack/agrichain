@@ -35,7 +35,8 @@ import TransactionManagement from './pages/farmer/transaction-management';
 import OrderBookApproval from './pages/farmer/order-book-approval';
 import TransactionPriceSubmitted from './pages/farmer/transaction-price-submitted';
 
-import { ConvexProvider, ConvexReactClient } from 'convex/react';
+import { ConvexReactClient } from 'convex/react';
+import { ConvexDynamicProvider } from '@/contexts/convex-auth-context';
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
 
@@ -46,7 +47,7 @@ const App = () => (
       walletConnectors: [SolanaWalletConnectors],
     }}
   >
-    <ConvexProvider client={convex}>
+    <ConvexDynamicProvider convex={convex}>
       <LanguageProvider>
         <TooltipProvider>
           <Toaster />
@@ -239,7 +240,7 @@ const App = () => (
           </BrowserRouter>
         </TooltipProvider>
       </LanguageProvider>
-    </ConvexProvider>
+    </ConvexDynamicProvider>
   </DynamicContextProvider>
 );
 

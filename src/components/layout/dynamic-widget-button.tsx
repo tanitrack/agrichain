@@ -18,7 +18,7 @@ export function DynamicWidgetButton() {
         className="hidden h-8 w-8 md:flex"
         onClick={() => setShowDynamicUserProfile(true)}
       >
-        <User className="text-earth-medium-green h-4 w-4" />
+        <User className="h-4 w-4 text-earth-medium-green" />
       </Button>
       <DynamicUserProfile />
     </>
