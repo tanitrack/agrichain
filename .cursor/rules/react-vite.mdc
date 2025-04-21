@@ -5,6 +5,9 @@ alwaysApply: true
 ---
 # Frontend Project Rules
 
+## Package manager
+- This project is using pnpm as the package manager for javascript
+
 ## Project Structure
 - Use feature-based folder structure under `frontend/src/`:
   ```
