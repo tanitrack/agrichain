@@ -1,6 +1,5 @@
-import { ConvexProviderWithAuth, ConvexReactClient } from 'convex/react';
+import { ConvexProvider, ConvexReactClient } from 'convex/react';
 import { ReactNode } from 'react';
-import { useAuthFromDynamic } from '@/hooks/use-auth-from-dynamic';
 
 interface ConvexDynamicProviderProps {
   children: ReactNode;
@@ -8,9 +7,5 @@ interface ConvexDynamicProviderProps {
 }
 
 export function ConvexDynamicProvider({ children, convex }: ConvexDynamicProviderProps) {
-  return (
-    <ConvexProviderWithAuth client={convex} useAuth={useAuthFromDynamic}>
-      {children}
-    </ConvexProviderWithAuth>
-  );
+  return <ConvexProvider client={convex}>{children}</ConvexProvider>;
 }

@@ -35,10 +35,8 @@ import TransactionManagement from './pages/farmer/transaction-management';
 import OrderBookApproval from './pages/farmer/order-book-approval';
 import TransactionPriceSubmitted from './pages/farmer/transaction-price-submitted';
 
-import { ConvexReactClient } from 'convex/react';
 import { ConvexDynamicProvider } from '@/contexts/convex-auth-context';
-
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
+import { convex } from '@/lib/convex';
 
 const App = () => (
   <DynamicContextProvider
