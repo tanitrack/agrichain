@@ -8,8 +8,11 @@ alwaysApply: true
 ## Package manager
 - This project is using pnpm as the package manager for javascript
 
+## File naming
+- Use small case kebab case as the standard of tsx file naming e.g: blockchain-verification.tsx
+
 ## Project Structure
-- Use feature-based folder structure under `frontend/src/`:
+- Use feature-based folder structure under `src/`:
   ```
   frontend/src/
   ├── assets/         # Static assets
