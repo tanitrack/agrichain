@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,8 +16,9 @@ import { useLanguage } from '@/contexts/language-context';
 import { TaniTrackCard } from '@/components/custom/tani-track-card';
 import LanguageSwitcher from '@/components/common/language-switcher';
 import { OTPInput } from '@/components/common/otp-input';
-import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
+import { useDynamicContext, useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
 import { useConnectWithOtp } from '@dynamic-labs/sdk-react-core';
+import { Spinner } from '@/components/ui/spinner';
 
 interface LocationState {
   from: {
@@ -34,17 +35,20 @@ export default function Login() {
   const location = useLocation();
   const { toast } = useToast();
   const { language } = useLanguage();
-  const { user } = useDynamicContext();
+  const { sdkHasLoaded } = useDynamicContext();
   const { connectWithEmail, verifyOneTimePassword, retryOneTimePassword } = useConnectWithOtp();
 
   // Get the redirect path from location state or default to dashboard
   const from = (location.state as LocationState)?.from?.pathname || '/dashboard';
 
+  const isLoggedIn = useIsLoggedIn();
+
   // If already authenticated, redirect to the intended destination
-  if (user) {
-    navigate(from, { replace: true });
-    return null;
-  }
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate(from, { replace: true });
+    }
+  }, [isLoggedIn]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,6 +130,14 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  if (isLoggedIn || !sdkHasLoaded) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-earth-pale-green to-white md:flex-row">
+        <Spinner size='xl' />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col overflow-hidden bg-gradient-to-br from-earth-pale-green to-white md:flex-row">
