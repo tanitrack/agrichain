@@ -27,7 +27,7 @@ pnpm install
 
 #### Start the web app
 
-```
+```shell
 pnpm dev
 ```
 
@@ -42,7 +42,7 @@ This is a Solana program written in Rust using the Anchor framework.
 You can use any normal anchor commands. Either move to the `anchor` directory and run the `anchor` command or prefix the
 command with `pnpm`, eg: `pnpm anchor`.
 
-#### Sync the program id:
+#### Sync the program id
 
 Running this command will create a new keypair in the `anchor/target/deploy` directory and save the address to the
 Anchor config file and update the `declare_id!` macro in the `./src/lib.rs` file of the program.
@@ -53,13 +53,13 @@ You will manually need to update the constant in `anchor/lib/counter-exports.ts`
 pnpm anchor keys sync
 ```
 
-#### Build the program:
+#### Build the program
 
 ```shell
 pnpm anchor-build
 ```
 
-#### Start the test validator with the program deployed:
+#### Start the test validator with the program deployed
 
 ```shell
 pnpm anchor-localnet

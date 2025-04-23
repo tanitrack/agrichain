@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -16,15 +16,8 @@ import { useLanguage } from '@/contexts/language-context';
 import { TaniTrackCard } from '@/components/custom/tani-track-card';
 import LanguageSwitcher from '@/components/common/language-switcher';
 import { OTPInput } from '@/components/common/otp-input';
-import { useDynamicContext, useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
+import { useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
 import { useConnectWithOtp } from '@dynamic-labs/sdk-react-core';
-import { Spinner } from '@/components/ui/spinner';
-
-interface LocationState {
-  from: {
-    pathname: string;
-  };
-}
 
 export default function Login() {
   const [otp, setOtp] = useState('');
@@ -32,23 +25,11 @@ export default function Login() {
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [email, setEmail] = useState('');
   const navigate = useNavigate();
-  const location = useLocation();
   const { toast } = useToast();
   const { language } = useLanguage();
-  const { sdkHasLoaded } = useDynamicContext();
   const { connectWithEmail, verifyOneTimePassword, retryOneTimePassword } = useConnectWithOtp();
 
-  // Get the redirect path from location state or default to dashboard
-  const from = (location.state as LocationState)?.from?.pathname || '/dashboard';
-
   const isLoggedIn = useIsLoggedIn();
-
-  // If already authenticated, redirect to the intended destination
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate(from, { replace: true });
-    }
-  }, [isLoggedIn]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,7 +75,7 @@ export default function Login() {
           language === 'id' ? 'Selamat datang kembali di TaniTrack' : 'Welcome back to TaniTrack',
       });
       // Redirect to the intended destination after successful login
-      navigate(from, { replace: true });
+      navigate('/dashboard', { replace: true });
     } catch (error) {
       console.error('OTP verification error:', error);
       toast({
@@ -131,12 +112,8 @@ export default function Login() {
     }
   };
 
-  if (isLoggedIn || !sdkHasLoaded) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-earth-pale-green to-white md:flex-row">
-        <Spinner size='xl' />
-      </div>
-    );
+  if (isLoggedIn) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (

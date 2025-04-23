@@ -12,7 +12,6 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/language-context';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { DynamicWidgetButton } from '@/components/layout/dynamic-widget-button';
 
 interface TopNavProps {
@@ -21,7 +20,6 @@ interface TopNavProps {
 
 export function TopNav({ onMenuButtonClick }: TopNavProps) {
   const { t } = useLanguage();
-  const isMobile = useIsMobile();
 
   return (
     <header className="fixed top-0 z-30 w-full border-b border-gray-200 bg-white">
@@ -51,7 +49,7 @@ export function TopNav({ onMenuButtonClick }: TopNavProps) {
             <Input
               type="search"
               placeholder={t('action.search') + '...'}
-              className="focus-visible:ring-earth-medium-green w-full bg-gray-50 pl-8 pr-4"
+              className="w-full bg-gray-50 pl-8 pr-4 focus-visible:ring-earth-medium-green"
             />
           </div>
         </div>
@@ -61,7 +59,7 @@ export function TopNav({ onMenuButtonClick }: TopNavProps) {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="bg-earth-light-green/20 text-earth-dark-green hidden items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1.5 sm:flex">
+                <div className="hidden items-center gap-1.5 whitespace-nowrap rounded-full bg-earth-light-green/20 px-2.5 py-1.5 text-earth-dark-green sm:flex">
                   <span className="h-2 w-2 animate-pulse rounded-full bg-green-500"></span>
                   <span className="text-xs font-medium">
                     {t('language') === 'id' ? 'Blockchain Aktif' : 'Blockchain Active'}
@@ -83,7 +81,7 @@ export function TopNav({ onMenuButtonClick }: TopNavProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
-                  <HelpCircle className="text-earth-medium-green h-4 w-4" />
+                  <HelpCircle className="h-4 w-4 text-earth-medium-green" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -97,7 +95,7 @@ export function TopNav({ onMenuButtonClick }: TopNavProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon" className="hidden h-8 w-8 md:flex">
-                  <Settings className="text-earth-medium-green h-4 w-4" />
+                  <Settings className="h-4 w-4 text-earth-medium-green" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -110,8 +108,8 @@ export function TopNav({ onMenuButtonClick }: TopNavProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="relative h-8 w-8">
-                <Bell className="text-earth-medium-green h-4 w-4" />
-                <Badge className="bg-earth-medium-green absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center p-0">
+                <Bell className="h-4 w-4 text-earth-medium-green" />
+                <Badge className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center bg-earth-medium-green p-0">
                   3
                 </Badge>
               </Button>
@@ -168,7 +166,7 @@ export function TopNav({ onMenuButtonClick }: TopNavProps) {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="justify-center">
-                <span className="text-earth-dark-green text-sm font-medium">
+                <span className="text-sm font-medium text-earth-dark-green">
                   {t('language') === 'id' ? 'Lihat Semua Notifikasi' : 'View All Notifications'}
                 </span>
               </DropdownMenuItem>

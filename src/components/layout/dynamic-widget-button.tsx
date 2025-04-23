@@ -1,10 +1,10 @@
 import React from 'react';
 import { DynamicUserProfile, DynamicWidget, useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { Button } from '@/components/ui/button';
-import { User } from 'lucide-react';
+import { User, LogOut } from 'lucide-react';
 
 export function DynamicWidgetButton() {
-  const { setShowDynamicUserProfile, user } = useDynamicContext();
+  const { setShowDynamicUserProfile, user, handleLogOut } = useDynamicContext();
 
   if (!user) {
     return <DynamicWidget />;
@@ -21,6 +21,9 @@ export function DynamicWidgetButton() {
         <User className="h-4 w-4 text-earth-medium-green" />
       </Button>
       <DynamicUserProfile />
+      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleLogOut}>
+        <LogOut className="h-4 w-4 text-earth-medium-green" />
+      </Button>
     </>
   );
 }
