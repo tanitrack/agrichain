@@ -19,4 +19,19 @@ export default defineSchema({
       searchField: 'name',
       filterFields: ['category'],
     }),
+    harga_komoditas: defineTable({
+      name: v.string(),
+      price: v.string(),
+      unit: v.string(), // e.g., "kg", "ton", "piece"
+      grade: v.string(),
+      prediction: v.string(), 
+      region: v.string(),
+      updatedAt: v.number(), // Timestamp
+    })
+      .index('by_region', ['region'])
+      .index('by_name', ['name'])
+      .searchIndex('search', {
+        searchField: 'name',
+        filterFields: ['region'],
+      }),
 });
