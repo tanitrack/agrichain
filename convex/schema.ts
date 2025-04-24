@@ -34,4 +34,24 @@ export default defineSchema({
         searchField: 'name',
         filterFields: ['region'],
       }),
+    transaction: defineTable({
+      trxId: v.string(),
+      customerName: v.string(),
+      commodityName: v.string(),
+      unit: v.string(), // e.g., "kg", "ton", "piece"
+      totalUnit: v.number(),
+      status: v.string(), 
+      type: v.string(),
+      unitPrice: v.number(),
+      price: v.number(),
+      description: v.optional(v.string()),
+      createdBy: v.string(),
+      updatedAt: v.number(), 
+      })
+        .index('by_status', ['status'])
+        .index('by_trxId', ['trxId'])
+        .searchIndex('search', {
+          searchField: 'trxId',
+          filterFields: ['status'],
+        }),
 });
