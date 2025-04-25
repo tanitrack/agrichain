@@ -62,7 +62,7 @@ export function TopNav({ onMenuButtonClick }: TopNavProps) {
                 <div className="hidden items-center gap-1.5 whitespace-nowrap rounded-full bg-earth-light-green/20 px-2.5 py-1.5 text-earth-dark-green sm:flex">
                   <span className="h-2 w-2 animate-pulse rounded-full bg-green-500"></span>
                   <span className="text-xs font-medium">
-                    {t('language') === 'id' ? 'Blockchain Aktif' : 'Blockchain Active'}
+                    {t('language') === 'id' ? 'Solana Aktif' : 'Solana Active'}
                   </span>
                 </div>
               </TooltipTrigger>

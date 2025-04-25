@@ -7,7 +7,7 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
     <div
       ref={ref}
       className={cn(
-        'text-earth-dark-green rounded-lg border bg-white shadow-sm transition-shadow hover:shadow-md',
+        'rounded-lg border bg-white text-earth-dark-green shadow-sm transition-shadow hover:shadow-md',
         className
       )}
       {...props}
@@ -28,7 +28,7 @@ const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HT
     <h3
       ref={ref}
       className={cn(
-        'text-earth-dark-green text-xl font-bold leading-none tracking-tight',
+        'text-xl font-bold leading-none tracking-tight text-earth-dark-green',
         className
       )}
       {...props}
@@ -43,16 +43,14 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn('text-earth-dark-green/70 text-sm font-medium', className)}
+    className={cn('text-sm font-medium text-earth-dark-green/70', className)}
     {...props}
   />
 ));
 CardDescription.displayName = 'CardDescription';
 
 const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('px-5 py-4', className)} {...props} />
-  )
+  ({ className, ...props }, ref) => <div ref={ref} className={cn('', className)} {...props} />
 );
 CardContent.displayName = 'CardContent';
 
@@ -69,7 +67,7 @@ const BlockchainCard = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
     <div
       ref={ref}
       className={cn(
-        'border-earth-light-green/70 text-earth-dark-green relative overflow-hidden rounded-lg border-2 bg-white shadow-md',
+        'relative overflow-hidden rounded-lg border-2 border-earth-light-green/70 bg-white text-earth-dark-green shadow-md',
         className
       )}
       {...props}
@@ -83,7 +81,7 @@ const BlockchainCardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttribut
     <div
       ref={ref}
       className={cn(
-        'from-earth-dark-green to-earth-medium-green flex flex-col space-y-1.5 bg-gradient-to-r p-6',
+        'flex flex-col space-y-1.5 bg-gradient-to-r from-earth-dark-green to-earth-medium-green p-6',
         className
       )}
       {...props}

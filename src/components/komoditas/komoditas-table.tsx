@@ -31,7 +31,7 @@ export const KomoditasTable = ({
   const { t } = useLanguage();
 
   return (
-    <Card className="earth-card-wheat">
+    <Card className="">
       <CardHeader className="earth-header-forest pb-3">
         <CardTitle className="flex items-center text-lg text-white">
           <Package className="mr-2 h-5 w-5" />
@@ -39,7 +39,7 @@ export const KomoditasTable = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border border-earth-light-green">
+        <div className="">
           <Table>
             <TableHeader className="bg-earth-light-green/30">
               <TableRow>
