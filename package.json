@@ -19,6 +19,7 @@
     "pre-commit": "lint-staged"
   },
   "dependencies": {
+    "@dynamic-labs/sdk-react": "^0.18.30",
     "@dynamic-labs/sdk-react-core": "^4.12.3",
     "@dynamic-labs/solana": "^4.12.3",
     "@hookform/resolvers": "^3.9.0",
@@ -87,6 +88,7 @@
     "globals": "^15.9.0",
     "husky": "9.1.7",
     "jiti": "^2.4.2",
+    "jose": "^5.1.0",
     "lint-staged": "^15.0.0",
     "lovable-tagger": "^1.1.7",
     "npm-run-all2": "^7.0.0",

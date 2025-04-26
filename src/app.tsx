@@ -36,7 +36,6 @@ import OrderBookApproval from './pages/farmer/order-book-approval';
 import TransactionPriceSubmitted from './pages/farmer/transaction-price-submitted';
 
 import { ConvexDynamicProvider } from '@/contexts/convex-auth-context';
-import { convex } from '@/lib/convex';
 
 const App = () => (
   <DynamicContextProvider
@@ -45,7 +44,7 @@ const App = () => (
       walletConnectors: [SolanaWalletConnectors],
     }}
   >
-    <ConvexDynamicProvider convex={convex}>
+    <ConvexDynamicProvider>
       <LanguageProvider>
         <TooltipProvider>
           <Toaster />

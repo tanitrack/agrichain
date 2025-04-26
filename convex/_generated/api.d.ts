@@ -13,10 +13,15 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as auth from "../auth.js";
+import type * as corsHeaders from "../corsHeaders.js";
+import type * as crons from "../crons.js";
 import type * as harga_komoditas_mutations from "../harga_komoditas_mutations.js";
 import type * as harga_komoditas_queries from "../harga_komoditas_queries.js";
+import type * as http from "../http.js";
 import type * as komoditas_mutations from "../komoditas_mutations.js";
 import type * as komoditas_queries from "../komoditas_queries.js";
+import type * as sessions from "../sessions.js";
 import type * as transaction_mutations from "../transaction_mutations.js";
 import type * as transaction_queries from "../transaction_queries.js";
 
@@ -29,10 +34,15 @@ import type * as transaction_queries from "../transaction_queries.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  auth: typeof auth;
+  corsHeaders: typeof corsHeaders;
+  crons: typeof crons;
   harga_komoditas_mutations: typeof harga_komoditas_mutations;
   harga_komoditas_queries: typeof harga_komoditas_queries;
+  http: typeof http;
   komoditas_mutations: typeof komoditas_mutations;
   komoditas_queries: typeof komoditas_queries;
+  sessions: typeof sessions;
   transaction_mutations: typeof transaction_mutations;
   transaction_queries: typeof transaction_queries;
 }>;
