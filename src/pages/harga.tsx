@@ -1,113 +1,39 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useQuery } from 'convex/react';
 import { MainLayout } from '@/components/layout/main-layout';
-import { TrendingUp, Search, Filter, ArrowDown, ArrowUp, MapPin, Eye } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { formatCurrency, formatDate } from '@/lib/utils';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ArrowDown, ArrowUp } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { type CommodityPrice } from '@/lib/data/types';
 import { CommodityPriceDetail } from '@/components/commodity/commodity-price-detail';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import type { PriceItem } from '@/components/price/price-row';
+import { PriceTable } from '@/components/price/price-table';
+import { api } from '@/lib/convex';
+import { useNavigate } from 'react-router-dom';
 
-// Sample commodity price data
-const commodityPrices: CommodityPrice[] = [
-  {
-    id: 'PRICE-001',
-    name: 'Beras Putih',
-    price: 10500,
-    unit: 'kg',
-    predictedChange: 2.5,
-    region: 'Jawa Barat',
-    grade: 'A',
-    updatedAt: new Date('2023-11-20'),
-  },
-  {
-    id: 'PRICE-002',
-    name: 'Jagung Manis',
-    price: 8000,
-    unit: 'kg',
-    predictedChange: -1.2,
-    region: 'Jawa Timur',
-    grade: 'B',
-    updatedAt: new Date('2023-11-19'),
-  },
-  {
-    id: 'PRICE-003',
-    name: 'Kedelai',
-    price: 12500,
-    unit: 'kg',
-    predictedChange: 3.8,
-    region: 'Jawa Tengah',
-    grade: 'Premium',
-    updatedAt: new Date('2023-11-18'),
-  },
-  {
-    id: 'PRICE-004',
-    name: 'Kopi Arabika',
-    price: 85000,
-    unit: 'kg',
-    predictedChange: 5.2,
-    region: 'Aceh',
-    grade: 'Premium',
-    updatedAt: new Date('2023-11-17'),
-  },
-  {
-    id: 'PRICE-005',
-    name: 'Cabai Merah',
-    price: 35000,
-    unit: 'kg',
-    predictedChange: -3.5,
-    region: 'Sumatera Utara',
-    grade: 'A',
-    updatedAt: new Date('2023-11-20'),
-  },
-  {
-    id: 'PRICE-006',
-    name: 'Bawang Merah',
-    price: 28000,
-    unit: 'kg',
-    predictedChange: 1.8,
-    region: 'Jawa Barat',
-    grade: 'A',
-    updatedAt: new Date('2023-11-19'),
-  },
-  {
-    id: 'PRICE-007',
-    name: 'Gula Pasir',
-    price: 14500,
-    unit: 'kg',
-    predictedChange: 0.5,
-    region: 'Lampung',
-    grade: 'A',
-    updatedAt: new Date('2023-11-18'),
-  },
-  {
-    id: 'PRICE-008',
-    name: 'Minyak Goreng',
-    price: 18000,
-    unit: 'kg',
-    predictedChange: -0.8,
-    region: 'Nasional',
-    updatedAt: new Date('2023-11-17'),
-  },
-];
+interface ConvexPrice {
+  _id: string;
+  _creationTime: number;
+  name: string;
+  price: string;
+  unit: string;
+  prediction: string;
+  region?: string;
+  grade: string;
+  updatedAt: number;
+}
+
+const mapToPriceItem = (item: ConvexPrice): PriceItem => ({
+  // Pass through all Convex fields
+  _id: item._id,
+  _creationTime: item._creationTime,
+  name: item.name,
+  price: item.price,
+  unit: item.unit,
+  prediction: item.prediction,
+  region: item.region,
+  updatedAt: item.updatedAt,
+  grade: item.grade,
+});
 
 // Add historical price data for sample visualization
 const commodityPriceHistory = {
@@ -193,51 +119,41 @@ const regionalPriceComparison = {
     { region: 'Sumatra Utara', price: 8300 },
     { region: 'Sulawesi Selatan', price: 7900 },
   ],
-  // ... add similar data for other commodities
+
 };
 
 const Harga = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [regionFilter, setRegionFilter] = useState('all');
-  const [trendFilter, setTrendFilter] = useState('all');
-  const [activeTab, setActiveTab] = useState('all');
-  const [selectedCommodity, setSelectedCommodity] = useState<CommodityPrice | null>(null);
+  const [selectedPrice, setSelectedPrice] = useState<CommodityPrice | null>(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
+  const [qrCodeDialogOpen, setQrCodeDialogOpen] = useState(false);
+
+  // Fetch komoditas data using Convex query
+  const priceData = useQuery(api.harga_komoditas_queries.list, {
+    paginationOpts: {
+      numItems: 10,
+      cursor: null,
+    },
+  }) || { page: [], isDone: true, continueCursor: null };
+
+  // Use search query if there's a search term
+  const searchResults = useQuery(
+    api.harga_komoditas_queries.search,
+    searchQuery ? { query: searchQuery } : 'skip'
+  );
+
+  const displayData =
+    searchQuery && searchResults
+      ? searchResults.map(mapToPriceItem)
+      : priceData.page.map(mapToPriceItem);
+
+  const handleViewDetail = (id: string) => {
+    navigate(`/harga/${id}`);
+  };
 
   // Get unique regions for filter
-  const regions = ['all', ...new Set(commodityPrices.map((price) => price.region))];
 
-  // Filter commodity prices based on search query, region and trend
-  const filteredCommodityPrices = commodityPrices.filter((price) => {
-    const matchesSearch =
-      price.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      price.region.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesRegion = regionFilter === 'all' || price.region === regionFilter;
-
-    const matchesTrend =
-      trendFilter === 'all' ||
-      (trendFilter === 'rising' && price.predictedChange > 0) ||
-      (trendFilter === 'falling' && price.predictedChange < 0) ||
-      (trendFilter === 'stable' && price.predictedChange >= -0.5 && price.predictedChange <= 0.5);
-
-    // Match tab
-    const matchesTab =
-      activeTab === 'all' ||
-      (activeTab === 'pangan' &&
-        [
-          'Beras Putih',
-          'Jagung Manis',
-          'Kedelai',
-          'Cabai Merah',
-          'Bawang Merah',
-          'Gula Pasir',
-          'Minyak Goreng',
-        ].includes(price.name)) ||
-      (activeTab === 'perkebunan' && ['Kopi Arabika'].includes(price.name));
-
-    return matchesSearch && matchesRegion && matchesTrend && matchesTab;
-  });
 
   // Function to render trend indicator
   const getTrendIndicator = (change: number) => {
@@ -262,7 +178,7 @@ const Harga = () => {
 
   // Function to handle row click and show details
   const handleRowClick = (commodity: CommodityPrice) => {
-    setSelectedCommodity(commodity);
+    setSelectedPrice(commodity);
     setIsDetailDialogOpen(true);
   };
 
@@ -275,178 +191,29 @@ const Harga = () => {
         </p>
       </div>
 
-      <Card className="earth-card-forest mb-6 shadow-md">
-        <CardHeader className="earth-header-forest">
-          <CardTitle className="flex items-center text-lg text-white">
-            <TrendingUp className="mr-2 h-5 w-5" />
-            Daftar Harga Komoditas
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col justify-between gap-4 sm:flex-row">
-              <div className="relative flex-1">
-                <Search className="text-earth-dark-green absolute left-2.5 top-2.5 h-4 w-4" />
-                <Input
-                  type="search"
-                  placeholder="Cari komoditas atau wilayah..."
-                  className="border-earth-medium-green focus:ring-earth-dark-green pl-8 focus:ring-2"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              <div className="flex flex-col gap-4 sm:flex-row">
-                <Select value={regionFilter} onValueChange={setRegionFilter}>
-                  <SelectTrigger className="border-earth-medium-green text-earth-dark-green w-full bg-white sm:w-[180px]">
-                    <SelectValue placeholder="Pilih Wilayah" />
-                  </SelectTrigger>
-                  <SelectContent className="border-earth-light-green">
-                    <SelectItem value="all">Semua Wilayah</SelectItem>
-                    {regions
-                      .filter((r) => r !== 'all')
-                      .map((region) => (
-                        <SelectItem key={region} value={region}>
-                          {region}
-                        </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-                <Select value={trendFilter} onValueChange={setTrendFilter}>
-                  <SelectTrigger className="border-earth-medium-green text-earth-dark-green w-full bg-white sm:w-[180px]">
-                    <SelectValue placeholder="Filter Tren" />
-                  </SelectTrigger>
-                  <SelectContent className="border-earth-light-green">
-                    <SelectItem value="all">Semua Tren</SelectItem>
-                    <SelectItem value="rising">Naik</SelectItem>
-                    <SelectItem value="falling">Turun</SelectItem>
-                    <SelectItem value="stable">Stabil</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button
-                  variant="outline"
-                  className="border-earth-medium-green text-earth-dark-green bg-earth-pale-green hover:bg-earth-light-green/40 flex gap-2"
-                >
-                  <Filter className="h-4 w-4" />
-                  Filter Lanjutan
-                </Button>
-              </div>
-            </div>
-
-            <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
-              <TabsList className="bg-earth-pale-green mb-4">
-                <TabsTrigger
-                  value="all"
-                  className="data-[state=active]:bg-earth-dark-green data-[state=active]:text-white"
-                >
-                  Semua
-                </TabsTrigger>
-                <TabsTrigger
-                  value="pangan"
-                  className="data-[state=active]:bg-earth-dark-green data-[state=active]:text-white"
-                >
-                  Pangan
-                </TabsTrigger>
-                <TabsTrigger
-                  value="perkebunan"
-                  className="data-[state=active]:bg-earth-dark-green data-[state=active]:text-white"
-                >
-                  Perkebunan
-                </TabsTrigger>
-              </TabsList>
-
-              {['all', 'pangan', 'perkebunan'].map((tabValue) => (
-                <TabsContent key={tabValue} value={tabValue} className="mt-0">
-                  <div className="border-earth-medium-green overflow-hidden rounded-md border-2 shadow-sm">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="bg-earth-medium-green/20">
-                          <TableHead className="text-earth-dark-green font-bold">
-                            Komoditas
-                          </TableHead>
-                          <TableHead className="text-earth-dark-green font-bold">Harga</TableHead>
-                          <TableHead className="text-earth-dark-green font-bold">Grade</TableHead>
-                          <TableHead className="text-earth-dark-green font-bold">
-                            Prediksi Perubahan
-                          </TableHead>
-                          <TableHead className="text-earth-dark-green font-bold">Wilayah</TableHead>
-                          <TableHead className="text-earth-dark-green font-bold">
-                            Terakhir Diperbarui
-                          </TableHead>
-                          <TableHead className="text-earth-dark-green text-center font-bold">
-                            Detail
-                          </TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {filteredCommodityPrices.length > 0 ? (
-                          filteredCommodityPrices.map((price) => (
-                            <TableRow key={price.id} className="hover:bg-earth-pale-green/50">
-                              <TableCell className="text-earth-dark-green font-medium">
-                                {price.name}
-                              </TableCell>
-                              <TableCell className="text-earth-dark-green font-medium">
-                                {formatCurrency(price.price)}/{price.unit}
-                              </TableCell>
-                              <TableCell className="text-earth-dark-green font-medium">
-                                {price.grade || '-'}
-                              </TableCell>
-                              <TableCell>{getTrendIndicator(price.predictedChange)}</TableCell>
-                              <TableCell className="text-earth-dark-green flex items-center gap-1">
-                                <MapPin className="text-earth-dark-green h-4 w-4" />
-                                {price.region}
-                              </TableCell>
-                              <TableCell className="text-earth-dark-green">
-                                {formatDate(price.updatedAt)}
-                              </TableCell>
-                              <TableCell className="text-center">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => handleRowClick(price)}
-                                        className="hover:bg-earth-pale-green"
-                                      >
-                                        <Eye className="text-earth-dark-green hover:text-earth-medium-green h-4 w-4 transition-colors" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Lihat detail harga</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              </TableCell>
-                            </TableRow>
-                          ))
-                        ) : (
-                          <TableRow>
-                            <TableCell
-                              colSpan={6}
-                              className="text-earth-dark-green py-8 text-center font-medium"
-                            >
-                              Tidak ada harga komoditas yang ditemukan
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </TabsContent>
-              ))}
-            </Tabs>
-          </div>
-        </CardContent>
-      </Card>
+      <PriceTable
+        data={displayData}
+        onViewDetail={handleViewDetail}
+        onEdit={(id) => console.log('Edit', id)}
+        onDelete={(id) => console.log('Delete', id)}
+        onShowQR={(id) => {
+          const item = displayData.find((k) => k._id === id);
+          if (item) {
+            // setSelectedPrice(item._id);
+            setQrCodeDialogOpen(true);
+          }
+        }}
+        searchQuery={searchQuery}
+      />
 
       {/* Commodity Price Detail Dialog */}
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
         <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
-          {selectedCommodity && (
+          {selectedPrice && (
             <CommodityPriceDetail
-              commodity={selectedCommodity}
-              priceHistory={commodityPriceHistory[selectedCommodity.id] || []}
-              regionalComparison={regionalPriceComparison[selectedCommodity.id] || []}
+              commodity={selectedPrice}
+              priceHistory={commodityPriceHistory[selectedPrice.id] || []}
+              regionalComparison={regionalPriceComparison[selectedPrice.id] || []}
             />
           )}
         </DialogContent>
