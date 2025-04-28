@@ -1,18 +1,19 @@
 import { v } from 'convex/values';
 import { httpAction, internalAction } from './_generated/server';
 import * as jose from 'jose';
-import { CONVEX_APPLICATION_ID, CONVEX_HTTP_API_URL } from './auth.config';
 import { internal } from './_generated/api';
 import { corsHeaders } from './corsHeaders';
+import {
+  CONVEX_HTTP_API_URL,
+  CONVEX_APPLICATION_ID,
+  JWT_PRIVATE_KEY,
+  JWT_PUBLIC_KEY,
+  JWKS_ENDPOINT,
+  JWKS_CONVEX_ENDPOINT,
+} from './constants';
 
 // Cache JWKS to prevent rate limiting
 let cachedJWKS: ReturnType<typeof jose.createRemoteJWKSet> | null = null;
-
-// const JWT_PRIVATE_KEY = process.env.JWT_PRIVATE_KEY;
-// const JWT_PUBLIC_KEY = process.env.JWKS;
-
-const JWT_PRIVATE_KEY = process.env.CONVEX_PRIVATE_JWK;
-const JWT_PUBLIC_KEY = process.env.CONVEX_PUBLIC_JWK;
 
 function getDynamicJWKS() {
   if (!cachedJWKS) {
@@ -25,12 +26,13 @@ function getDynamicJWKS() {
   return cachedJWKS;
 }
 
-function getConvexJWKS() {
-  const url = `${CONVEX_HTTP_API_URL}/.well-known/jwks.json`;
+async function getConvexJWKS() {
+  const url = JWKS_CONVEX_ENDPOINT;
   const convexRemoteURL = new URL(url);
-  console.log('convexRemoteURL', url);
 
-  return jose.createRemoteJWKSet(convexRemoteURL);
+  const JWKS = jose.createRemoteJWKSet(convexRemoteURL);
+
+  return JWKS;
 }
 
 async function verifyDynamicToken(token: string) {
@@ -44,11 +46,16 @@ async function verifyDynamicToken(token: string) {
   return payload;
 }
 
+/**
+ * A debug function for verifying a JWT token issued by Convex using JWKS (JSON Web Key Set)
+ * @param token - The JWT token string to verify
+ * @returns The decoded token payload if verification succeeds, null if verification fails
+ */
+
+// eslint-disable-next-line unused-imports/no-unused-vars
 async function verifyConvexToken(token: string) {
   try {
-    const convexJWKS = getConvexJWKS();
-
-    console.log('convexJWKS:jwks', convexJWKS.jwks.toString());
+    const convexJWKS = await getConvexJWKS();
 
     const { payload } = await jose.jwtVerify(token, convexJWKS, {
       issuer: CONVEX_HTTP_API_URL,
@@ -57,11 +64,11 @@ async function verifyConvexToken(token: string) {
 
     return payload;
   } catch (error) {
-    console.error('Verification error details:', {
-      error: error instanceof Error ? error.message : String(error),
-      errorName: error instanceof Error ? error.name : 'Unknown',
-      errorMessage: error instanceof Error ? error.message : 'Unknown error',
-    });
+    console.error('Verification error details:');
+    console.error(' error: ', String(error));
+    console.error('errorName:', error instanceof Error ? error.message : 'Unknown error');
+    console.error('errorMessage:', error instanceof Error ? error.message : 'Unknown error');
+
     return null;
   }
 }
@@ -114,24 +121,12 @@ export const verifyConvexTokenAction = internalAction({
   args: { token: v.string() },
   handler: async (ctx, { token }) => {
     try {
-      // Decode without verification first to see what we're working with
-      const decoded = jose.decodeJwt(token);
-      console.log('Token debug:', {
-        decodedHeader: jose.decodeProtectedHeader(token),
-        decodedPayload: decoded,
-        expectedIssuer: CONVEX_HTTP_API_URL,
-        expectedAudience: CONVEX_APPLICATION_ID,
-      });
-
-      const convexJWKS = getConvexJWKS();
-      console.log('convexJWKS:jwks', convexJWKS.jwks);
+      const convexJWKS = await getConvexJWKS();
 
       const { payload } = await jose.jwtVerify(token, convexJWKS, {
         issuer: CONVEX_HTTP_API_URL,
         audience: CONVEX_APPLICATION_ID,
       });
-
-      console.log('Verification succeeded:', { payload });
 
       // Type assertion with runtime validation
       const convexPayload = payload as ConvexTokenPayload;
@@ -214,14 +209,6 @@ async function signConvexToken(payload: DynamicTokenPayload) {
     .setAudience(CONVEX_APPLICATION_ID)
     .sign(privateKey);
 
-  const verificationResult = await verifyConvexToken(token);
-  if (verificationResult) {
-    console.log('--- token self verification success ---');
-    console.log('verificationResult', verificationResult);
-  } else {
-    console.log('failed self verification');
-  }
-
   return token;
 }
 
@@ -285,13 +272,13 @@ export const openIdConfigurationHttpHandler = httpAction(async (ctx, request) =>
   return new Response(
     JSON.stringify({
       issuer: CONVEX_HTTP_API_URL,
-      jwks_uri: `${CONVEX_HTTP_API_URL}/.well-known/jwks.json`,
+      jwks_uri: `${CONVEX_HTTP_API_URL}${JWKS_ENDPOINT}`,
       authorization_endpoint: `${CONVEX_HTTP_API_URL}/oauth/authorize`,
     }),
     {
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=86400',
+        'Cache-Control': 'no-store',
       },
     }
   );
@@ -308,25 +295,36 @@ export const jwksHttpHandler = httpAction(async (ctx, request) => {
       status: 204,
       headers: {
         ...corsHeaders,
-        'Access-Control-Max-Age': '86400',
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        Pragma: 'no-cache',
+        Expires: '0',
       },
     });
   }
 
-  if (!process.env.JWKS) {
+  if (!JWT_PUBLIC_KEY) {
     return new Response(JSON.stringify({ error: 'JWKS not configured' }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        Pragma: 'no-cache',
+        Expires: '0',
       },
     });
   }
 
+  const parsedJWKS = JSON.parse(JWT_PUBLIC_KEY);
+
   // Use the existing JWKS directly since it's already in the correct format
-  return new Response(process.env.JWKS, {
+  return new Response(JSON.stringify(parsedJWKS), {
     headers: {
+      ...corsHeaders,
       'Content-Type': 'application/json',
-      'Cache-Control': 'public, max-age=86400',
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+      Pragma: 'no-cache',
+      Expires: '0',
     },
   });
 });

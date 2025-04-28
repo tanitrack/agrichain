@@ -28,7 +28,7 @@ export function useAuthFromDynamic() {
           console.error(e);
         });
 
-      const { valid, payload } = await fetch(
+      const { valid } = await fetch(
         `${import.meta.env.VITE_CONVEX_URL.replace('.cloud', '.site')}/auth/verify-token`,
         {
           method: 'POST',
@@ -43,9 +43,7 @@ export function useAuthFromDynamic() {
           console.error(e);
         });
 
-      console.log({ token, valid, payload });
-
-      if (token) {
+      if (token && valid) {
         return token;
       }
 

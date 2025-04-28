@@ -2,6 +2,7 @@ import { httpRouter } from 'convex/server';
 import { httpAction } from './_generated/server';
 import { internal } from './_generated/api';
 import { jwksHttpHandler, openIdConfigurationHttpHandler } from './auth';
+import { JWKS_ENDPOINT } from './constants';
 
 const http = httpRouter();
 
@@ -27,14 +28,14 @@ http.route({
 });
 
 http.route({
-  path: '/.well-known/jwks.json',
+  path: JWKS_ENDPOINT,
   method: 'OPTIONS',
   handler: jwksHttpHandler,
 });
 
 // JWKS endpoint
 http.route({
-  path: '/.well-known/jwks.json',
+  path: JWKS_ENDPOINT,
   method: 'GET',
   handler: jwksHttpHandler,
 });
@@ -126,7 +127,8 @@ http.route({
   handler: httpAction(async (ctx, request) => {
     try {
       // Extract token from Authorization header
-      const token = request.headers.get('Authorization')?.split(' ')[1];
+      const authorizationHeader = request.headers.get('Authorization');
+      const token = authorizationHeader?.split(' ')[1];
       if (!token) {
         return new Response(
           JSON.stringify({

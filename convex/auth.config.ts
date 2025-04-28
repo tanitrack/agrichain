@@ -2,11 +2,7 @@
  * Configuration for Dynamic.xyz authentication integration with Convex
  */
 
-// Replace .cloud with .site for the auth domain
-// export const CONVEX_HTTP_API_URL = 'https://precise-ocelot-791.convex.site';
-export const CONVEX_HTTP_API_URL = process.env.SITE_URL;
-
-export const CONVEX_APPLICATION_ID = 'convex';
+import { CONVEX_APPLICATION_ID, CONVEX_HTTP_API_URL } from './constants';
 
 export default {
   providers: [

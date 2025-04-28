@@ -14,6 +14,7 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as auth from "../auth.js";
+import type * as constants from "../constants.js";
 import type * as corsHeaders from "../corsHeaders.js";
 import type * as crons from "../crons.js";
 import type * as harga_komoditas_mutations from "../harga_komoditas_mutations.js";
@@ -35,6 +36,7 @@ import type * as transaction_queries from "../transaction_queries.js";
  */
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  constants: typeof constants;
   corsHeaders: typeof corsHeaders;
   crons: typeof crons;
   harga_komoditas_mutations: typeof harga_komoditas_mutations;
