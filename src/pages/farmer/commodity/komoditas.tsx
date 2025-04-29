@@ -2,10 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'convex/react';
 import { MainLayout } from '@/components/layout/main-layout';
-import { Search, Filter, QrCode } from 'lucide-react';
+import { QrCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -141,7 +139,7 @@ const Komoditas = () => {
         </Dialog>
       </div>
 
-      <Card className="earth-card-green mb-6">
+      {/* <Card className="earth-card-green mb-6">
         <CardContent className="p-6">
           <div className="flex flex-col gap-4 sm:flex-row">
             <div className="relative flex-1">
@@ -162,7 +160,7 @@ const Komoditas = () => {
             </Button>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       <KomoditasTable
         data={displayData}
@@ -176,7 +174,6 @@ const Komoditas = () => {
             setQrCodeDialogOpen(true);
           }
         }}
-        searchQuery={searchQuery}
       />
     </MainLayout>
   );

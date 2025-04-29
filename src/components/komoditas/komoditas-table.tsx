@@ -1,4 +1,4 @@
-import { Package } from 'lucide-react';
+import { Filter, Package, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -10,6 +10,10 @@ import {
 } from '@/components/ui/table';
 import { useLanguage } from '@/contexts/language-context';
 import { KomoditasRow, type KomoditasItem } from './komoditas-row';
+import { Input } from '../ui/input';
+
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
 interface KomoditasTableProps {
   data: KomoditasItem[];
@@ -17,7 +21,6 @@ interface KomoditasTableProps {
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
   onShowQR?: (id: string) => void;
-  searchQuery?: string;
 }
 
 export const KomoditasTable = ({
@@ -26,17 +29,36 @@ export const KomoditasTable = ({
   onEdit,
   onDelete,
   onShowQR,
-  searchQuery,
 }: KomoditasTableProps) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   return (
     <Card className="">
       <CardHeader className="earth-header-forest pb-3">
-        <CardTitle className="flex items-center text-lg text-white">
+        <CardTitle className="mb-4 flex items-center text-lg text-white">
           <Package className="mr-2 h-5 w-5" />
           {t('commodities.list')}
         </CardTitle>
+        <div className=" flex flex-col justify-between gap-4 sm:flex-row">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="search"
+              placeholder={t('commodities.search')}
+              className="pl-8"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className=" flex flex-col gap-4 sm:flex-row">
+            <Button variant="outline" className="flex gap-2 text-tani-green-dark">
+              <Filter className="h-4 w-4" />
+              {language === 'id' ? 'Filter' : 'Filter'}
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="">

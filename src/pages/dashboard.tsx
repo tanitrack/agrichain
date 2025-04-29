@@ -144,22 +144,22 @@ export default function Dashboard() {
 
           <Card className="earth-card-clay shadow-md">
             <div className="absolute right-0 top-0 p-3">
-              <Wallet className="h-6 w-6 text-orange-700 opacity-60" />
+              <Wallet className="h-6 w-6 text-blue-700 opacity-60" />
             </div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-bold text-orange-800">
+              <CardTitle className="text-sm font-bold text-blue-800">
                 {t('balance.title')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-800">
+              <div className="text-2xl font-bold text-blue-800">
                 {formatCurrency(currentUser.balance)}
               </div>
-              <p className="mt-1 text-sm font-medium text-orange-700">
+              <p className="mt-1 text-sm font-medium text-blue-700">
                 5 SOL (≈ {formatCurrency(currentUser.balance)})
               </p>
-              <div className="mt-3 h-2 w-full rounded-full bg-orange-100">
-                <div className="h-2 rounded-full bg-orange-600" style={{ width: '85%' }}></div>
+              <div className="mt-3 h-2 w-full rounded-full bg-blue-100">
+                <div className="h-2 rounded-full bg-blue-600" style={{ width: '85%' }}></div>
               </div>
             </CardContent>
           </Card>

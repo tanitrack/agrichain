@@ -2,7 +2,6 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/language-context';
 import {
-  UserCircle,
   ClipboardList,
   CheckCircle,
   DollarSign,
@@ -10,6 +9,7 @@ import {
   FileCheck,
   FileSignature,
   History,
+  UserCircle,
 } from 'lucide-react';
 
 interface TransactionFlowGuideProps {
@@ -23,7 +23,7 @@ export const TransactionFlowGuide = ({ currentStep }: TransactionFlowGuideProps)
   const flowSteps = [
     {
       id: 'login',
-      icon: <UserCircle className="text-earth-brown h-8 w-8" />,
+      icon: <UserCircle className="h-8 w-8 text-earth-brown" />,
       title: language === 'id' ? '1. Login' : '1. Login',
       description:
         language === 'id'
@@ -32,8 +32,8 @@ export const TransactionFlowGuide = ({ currentStep }: TransactionFlowGuideProps)
     },
     {
       id: 'review',
-      icon: <ClipboardList className="text-earth-brown h-8 w-8" />,
-      title: language === 'id' ? '2. Peninjauan Pesanan' : '2. Order Review',
+      icon: <ClipboardList className="h-8 w-8 text-earth-brown" />,
+      title: language === 'id' ? '1. Peninjauan Pesanan' : '2. Order Review',
       description:
         language === 'id'
           ? 'Tinjau pesanan dari pembeli, termasuk jenis komoditas, kuantitas, dan detail lainnya.'
@@ -41,8 +41,8 @@ export const TransactionFlowGuide = ({ currentStep }: TransactionFlowGuideProps)
     },
     {
       id: 'approve',
-      icon: <CheckCircle className="text-earth-brown h-8 w-8" />,
-      title: language === 'id' ? '3. Setujui Transaksi' : '3. Approve Transaction',
+      icon: <CheckCircle className="h-8 w-8 text-earth-brown" />,
+      title: language === 'id' ? '2. Setujui Transaksi' : '3. Approve Transaction',
       description:
         language === 'id'
           ? "Klik tombol 'Konfirmasi Transaksi' untuk menyetujui pesanan dari pembeli."
@@ -50,8 +50,8 @@ export const TransactionFlowGuide = ({ currentStep }: TransactionFlowGuideProps)
     },
     {
       id: 'price_setting',
-      icon: <DollarSign className="text-earth-medium-green h-8 w-8" />,
-      title: language === 'id' ? '4. Pengaturan Harga' : '4. Price Setting',
+      icon: <DollarSign className="h-8 w-8 text-earth-medium-green" />,
+      title: language === 'id' ? '3. Pengaturan Harga' : '4. Price Setting',
       description:
         language === 'id'
           ? 'Setelah disetujui, Anda akan diarahkan ke halaman transaksi untuk mengatur harga.'
@@ -59,8 +59,8 @@ export const TransactionFlowGuide = ({ currentStep }: TransactionFlowGuideProps)
     },
     {
       id: 'negotiation',
-      icon: <MessageCircle className="text-earth-medium-green h-8 w-8" />,
-      title: language === 'id' ? '5. Negosiasi Harga' : '5. Price Negotiation',
+      icon: <MessageCircle className="h-8 w-8 text-earth-medium-green" />,
+      title: language === 'id' ? '4. Negosiasi Harga' : '5. Price Negotiation',
       description:
         language === 'id'
           ? 'Diskusikan dan negosiasikan harga dengan pembeli melalui WhatsApp.'
@@ -68,8 +68,8 @@ export const TransactionFlowGuide = ({ currentStep }: TransactionFlowGuideProps)
     },
     {
       id: 'price_input',
-      icon: <FileCheck className="text-earth-medium-green h-8 w-8" />,
-      title: language === 'id' ? '6. Input Harga Final' : '6. Final Price Input',
+      icon: <FileCheck className="h-8 w-8 text-earth-medium-green" />,
+      title: language === 'id' ? '5. Input Harga Final' : '6. Final Price Input',
       description:
         language === 'id'
           ? 'Setelah negosiasi, masukkan harga yang disepakati dalam formulir di halaman detail transaksi.'
@@ -77,8 +77,8 @@ export const TransactionFlowGuide = ({ currentStep }: TransactionFlowGuideProps)
     },
     {
       id: 'agreement',
-      icon: <FileSignature className="text-earth-dark-green h-8 w-8" />,
-      title: language === 'id' ? '7. Persetujuan & Tanda Tangan' : '7. Agreement & Signature',
+      icon: <FileSignature className="h-8 w-8 text-earth-dark-green" />,
+      title: language === 'id' ? '6. Persetujuan & Tanda Tangan' : '7. Agreement & Signature',
       description:
         language === 'id'
           ? 'Setelah pembeli menyetujui Terms & Conditions, Anda perlu mengupload tanda tangan untuk finalisasi.'
@@ -86,8 +86,8 @@ export const TransactionFlowGuide = ({ currentStep }: TransactionFlowGuideProps)
     },
     {
       id: 'complete',
-      icon: <History className="text-earth-dark-green h-8 w-8" />,
-      title: language === 'id' ? '8. Riwayat Transaksi' : '8. Transaction History',
+      icon: <History className="h-8 w-8 text-earth-dark-green" />,
+      title: language === 'id' ? '7. Riwayat Transaksi' : '8. Transaction History',
       description:
         language === 'id'
           ? 'Transaksi yang diselesaikan akan muncul di riwayat transaksi Anda.'
@@ -113,27 +113,26 @@ export const TransactionFlowGuide = ({ currentStep }: TransactionFlowGuideProps)
   const currentStepIndex = flowSteps.findIndex((step) => step.id === currentStepId);
 
   return (
-    <Card className="earth-card-moss overflow-hidden">
+    <Card className=" overflow-hidden">
       <CardHeader className="earth-header-moss pb-3">
         <CardTitle className="text-white">
           {language === 'id' ? 'Panduan Alur Transaksi' : 'Transaction Flow Guide'}
         </CardTitle>
+        <p className="text-sm text-gray-300">
+          {language === 'id'
+            ? 'Berikut adalah langkah-langkah dalam proses transaksi reguler:'
+            : 'Here are the steps in the regular transaction process:'}
+        </p>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="p-6">
         <div className="space-y-6">
-          <p className="text-earth-medium-green">
-            {language === 'id'
-              ? 'Berikut adalah langkah-langkah dalam proses transaksi reguler:'
-              : 'Here are the steps in the regular transaction process:'}
-          </p>
-
           <div className="space-y-6">
             {flowSteps.map((step, index) => (
               <div
                 key={step.id}
                 className={`flex ${
                   currentStepIndex === index
-                    ? 'bg-earth-light-green/10 border-earth-light-green rounded-lg border-2 p-3'
+                    ? 'rounded-lg border-2 border-earth-light-green bg-earth-light-green/10 p-3'
                     : ''
                 }`}
               >
@@ -163,7 +162,7 @@ export const TransactionFlowGuide = ({ currentStep }: TransactionFlowGuideProps)
                       {step.title}
                     </h3>
                     {currentStepIndex === index && (
-                      <span className="bg-earth-wheat text-earth-brown ml-2 rounded-full px-2 py-1 text-xs">
+                      <span className="ml-2 rounded-full bg-earth-wheat px-2 py-1 text-xs text-earth-brown">
                         {language === 'id' ? 'Langkah Saat Ini' : 'Current Step'}
                       </span>
                     )}
@@ -180,11 +179,11 @@ export const TransactionFlowGuide = ({ currentStep }: TransactionFlowGuideProps)
             ))}
           </div>
 
-          <div className="bg-earth-light-green/10 rounded-lg p-4">
-            <h4 className="text-earth-dark-green mb-2 font-medium">
+          <div className="rounded-lg bg-earth-light-green/10 p-4">
+            <h4 className="mb-2 font-medium text-earth-dark-green">
               {language === 'id' ? 'Butuh bantuan?' : 'Need help?'}
             </h4>
-            <p className="text-earth-medium-green text-sm">
+            <p className="text-sm text-earth-medium-green">
               {language === 'id'
                 ? 'Jika Anda memerlukan bantuan dengan transaksi Anda, silakan hubungi tim dukungan kami melalui WhatsApp atau telepon.'
                 : 'If you need assistance with your transaction, please contact our support team via WhatsApp or phone.'}

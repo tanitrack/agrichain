@@ -230,7 +230,7 @@ export const translations: TranslationsType = {
     // Dashboard
     'dashboard.title': 'Dashboard',
     'dashboard.welcome': 'Welcome to TaniTrack',
-    'dashboard.summary': 'Summary',
+    'dashboard.summary': 'Summary Income',
     'dashboard.recentTransactions': 'Recent Transactions',
     'dashboard.pendingOrders': 'Pending Orders',
     'dashboard.upcomingShipments': 'Upcoming Shipments',
@@ -617,7 +617,7 @@ export const translations: TranslationsType = {
     // Dashboard
     'dashboard.title': 'Dasbor',
     'dashboard.welcome': 'Selamat Datang di TaniTrack',
-    'dashboard.summary': 'Ringkasan',
+    'dashboard.summary': 'Ringkasan Pemasukkan',
     'dashboard.recentTransactions': 'Transaksi Terbaru',
     'dashboard.pendingOrders': 'Pesanan Tertunda',
     'dashboard.upcomingShipments': 'Pengiriman Mendatang',

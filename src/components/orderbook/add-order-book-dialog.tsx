@@ -7,11 +7,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
+  DialogDescription,
+  DialogFooter,
 } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/language-context';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -19,8 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
-import { useLanguage } from '@/contexts/language-context';
 
 // Sample commodity types - replace with API data
 const commodityTypes = ['Padi', 'Jagung', 'Kedelai', 'Cabai'];
@@ -77,27 +78,24 @@ export function AddOrderBookDialog() {
     });
   };
 
+  const { t } = useLanguage();
+
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(isOpen) => {
-        setOpen(isOpen);
-        if (!isOpen) resetForm();
-      }}
-    >
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green gap-2 bg-gradient-to-r">
+        <Button className="gap-2 bg-gradient-to-r from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green">
           <Plus className="h-4 w-4" />
-          {language === 'id' ? 'Tambah Order Book' : 'Add Order Book'}
+          {'Tambah Order Book'}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>
-            {language === 'id' ? 'Tambah Order Book Baru' : 'Add New Order Book'}
-          </DialogTitle>
+      <DialogContent className="border-earth-light-green sm:max-w-[625px]">
+        <DialogHeader className="earth-header-moss">
+          <DialogTitle>{'Tambah Order Book'}</DialogTitle>
+          <DialogDescription className="text-white">
+            Isi formulir di bawah ini untuk menambahkan Order Book baru ke daftar Anda.
+          </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4  p-6">
           <div className="space-y-2">
             <Label htmlFor="commodityType">
               {language === 'id' ? 'Jenis Komoditas' : 'Commodity Type'}
@@ -170,16 +168,19 @@ export function AddOrderBookDialog() {
               accept=".pdf,.doc,.docx"
             />
           </div>
-
-          <div className="flex justify-end gap-2 pt-4">
-            <DialogClose asChild>
-              <Button variant="outline" type="button">
-                {language === 'id' ? 'Batal' : 'Cancel'}
-              </Button>
-            </DialogClose>
-            <Button type="submit">{language === 'id' ? 'Simpan' : 'Save'}</Button>
-          </div>
-        </form>
+        </div>
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => setOpen(false)}
+            className="border-earth-light-green text-earth-dark-green hover:bg-earth-light-green/20"
+          >
+            {t('action.cancel')}
+          </Button>
+          <Button onClick={() => {}} className="bg-earth-dark-green hover:bg-earth-medium-green">
+            {t('action.save')}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
