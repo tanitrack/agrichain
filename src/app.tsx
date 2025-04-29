@@ -174,7 +174,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/farmer/order-book/:id"
+                path="/order-book/:id"
                 element={
                   <ProtectedRoute>
                     <OrderBookApproval />
@@ -216,7 +216,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/buyer/order-book"
+                path="/order-book"
                 element={
                   <ProtectedRoute>
                     <OrderBookList />
@@ -224,7 +224,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/buyer/order-book/:id"
+                path="/order-book/:id"
                 element={
                   <ProtectedRoute>
                     <OrderBookDetail />
