@@ -1,11 +1,18 @@
 import { getAuthToken, useDynamicContext, useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
 import { useCallback, useMemo } from 'react';
+import { clientEnv } from '@/lib/client-env-variables';
 
 export function useAuthFromDynamic() {
-  const { sdkHasLoaded, handleLogOut } = useDynamicContext();
+  const { sdkHasLoaded, handleLogOut, user } = useDynamicContext();
   const isLoggedIn = useIsLoggedIn();
 
   const dynamicJwtToken = getAuthToken();
+
+  console.log({
+    isLoggedIn,
+    dynamicJwtToken,
+    user,
+  });
 
   const fetchAccessToken = useCallback(
     async ({ forceRefreshToken }: { forceRefreshToken?: boolean } = {}) => {
@@ -14,7 +21,7 @@ export function useAuthFromDynamic() {
       }
 
       const { token } = await fetch(
-        `${import.meta.env.VITE_CONVEX_URL.replace('.cloud', '.site')}/auth/convert-token`,
+        `${clientEnv.VITE_CONVEX_URL.replace('.cloud', '.site')}/auth/convert-token`,
         {
           method: 'POST',
           headers: {
@@ -29,7 +36,7 @@ export function useAuthFromDynamic() {
         });
 
       const { valid } = await fetch(
-        `${import.meta.env.VITE_CONVEX_URL.replace('.cloud', '.site')}/auth/verify-token`,
+        `${clientEnv.VITE_CONVEX_URL.replace('.cloud', '.site')}/auth/verify-token`,
         {
           method: 'POST',
           headers: {
