@@ -24,6 +24,9 @@ export function DynamicWidgetButton() {
       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleLogOut}>
         <LogOut className="h-4 w-4 text-earth-medium-green" />
       </Button>
+      {/* <Authenticated>AUTHED</Authenticated>
+      <Unauthenticated>UNAUTHED</Unauthenticated>
+      <AuthLoading>LOADING</AuthLoading> */}
     </>
   );
 }

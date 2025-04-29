@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react';
 import { Sidebar } from './sidebar';
-import { TopNav } from './top-nav';
+import { TopNav } from './top-nav/top-nav';
 import { cn } from '@/lib/utils';
 import LanguageSwitcher from '@/components/common/language-switcher';
 import { useLanguage } from '@/contexts/language-context';

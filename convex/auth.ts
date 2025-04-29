@@ -40,7 +40,7 @@ async function verifyDynamicToken(token: string) {
 
   const payload = await jose.jwtVerify(token, DynamicJWKS, {
     issuer: 'app.dynamicauth.com/8becfdc4-eadf-4f17-9d46-4dfff0abf098',
-    audience: 'http://localhost:8080',
+    audience: ['http://localhost:8080', 'https://agrichain.pages.dev'],
   });
 
   return payload;
