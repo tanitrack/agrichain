@@ -215,7 +215,7 @@ export default function Login() {
       <div className="flex w-full items-center justify-center bg-white p-8 md:w-1/2 md:bg-transparent">
         <Card className="w-full max-w-md overflow-hidden border-earth-light-brown/40 bg-white shadow-lg backdrop-blur-sm md:bg-white/95">
           <CardHeader className="bg-gradient-to-r from-earth-dark-green to-earth-medium-green py-6 text-white">
-            <CardTitle className="text-center text-2xl">
+            <CardTitle className="text-center text-2xl text-white">
               {language === 'id' ? 'Masuk ke TaniTrack' : 'Login to TaniTrack'}
             </CardTitle>
             <CardDescription className="mt-2 text-center text-white/90">

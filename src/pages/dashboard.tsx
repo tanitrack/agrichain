@@ -38,9 +38,12 @@ export default function Dashboard() {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-tight text-earth-dark-green">
-            {t('dashboard.title')}
-          </h1>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-earth-dark-green">
+              {t('dashboard.title')}
+            </h1>
+            <h2>Selamat datang kembali ({'nama_user'})👋</h2>
+          </div>
           {/* <Tabs
             value={timeframe}
             onValueChange={(value) => setTimeframe(value as any)}

@@ -1,4 +1,4 @@
-import { Bell, Search, HelpCircle, Settings } from 'lucide-react';
+import { Bell, Search, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -23,7 +23,7 @@ export function TopNav({ onMenuButtonClick }: TopNavProps) {
 
   return (
     <header className="fixed top-0 z-30 w-full border-b border-gray-200 bg-white">
-      <div className="flex h-16 items-center gap-4 px-4 lg:px-6">
+      <div className="flex h-16  items-center justify-between gap-4 px-4 lg:w-10/12 lg:px-6">
         <Button variant="ghost" size="icon" onClick={onMenuButtonClick} className="md:hidden">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -91,7 +91,7 @@ export function TopNav({ onMenuButtonClick }: TopNavProps) {
           </TooltipProvider>
 
           {/* Settings Button */}
-          <TooltipProvider>
+          {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon" className="hidden h-8 w-8 md:flex">
@@ -102,7 +102,7 @@ export function TopNav({ onMenuButtonClick }: TopNavProps) {
                 <p>{t('language') === 'id' ? 'Pengaturan' : 'Settings'}</p>
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </TooltipProvider> */}
 
           {/* Notifications */}
           <DropdownMenu>
