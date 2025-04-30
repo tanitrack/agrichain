@@ -16,7 +16,7 @@ export const useAuthCheck = () => {
 
   const isLoadingAuth = isLoading || !sdkHasLoaded;
 
-  const wallet = user.verifiedCredentials.find((credential) => {
+  const wallet = user?.verifiedCredentials?.find((credential) => {
     return credential.chain === 'solana';
   });
 
