@@ -1,12 +1,4 @@
-import { useLanguage } from '@/contexts/language-context';
-
-interface AuthHeaderProps {
-  userType: string;
-}
-
-export function AuthHeader({ userType }: AuthHeaderProps) {
-  const { language } = useLanguage();
-
+export function AuthHeader() {
   return (
     <div className="mb-6 flex items-center">
       <div className="mr-4 flex h-12 w-12 items-center justify-center overflow-hidden rounded-md bg-white/90">
@@ -16,7 +8,7 @@ export function AuthHeader({ userType }: AuthHeaderProps) {
           className="h-full w-full object-contain"
         />
       </div>
-      <h1 className="text-earth-dark-green text-4xl font-bold">TaniTrack</h1>
+      <h1 className="text-4xl font-bold text-earth-dark-green">TaniTrack</h1>
     </div>
   );
 }

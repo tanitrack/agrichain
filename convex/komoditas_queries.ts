@@ -1,4 +1,3 @@
-/* eslint-disable @eslint-react/naming-convention/filename */
 import { query } from './_generated/server';
 import { v } from 'convex/values';
 
@@ -39,6 +38,10 @@ export const list = query({
     category: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    // check user
+    const auth = await ctx.auth.getUserIdentity();
+    console.log(auth);
+
     // Build the query step by step
     const baseQuery = ctx.db.query('komoditas');
 

@@ -25,6 +25,8 @@ import type * as komoditas_queries from "../komoditas_queries.js";
 import type * as sessions from "../sessions.js";
 import type * as transaction_mutations from "../transaction_mutations.js";
 import type * as transaction_queries from "../transaction_queries.js";
+import type * as users_mutations from "../users_mutations.js";
+import type * as users_queries from "../users_queries.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -47,6 +49,8 @@ declare const fullApi: ApiFromModules<{
   sessions: typeof sessions;
   transaction_mutations: typeof transaction_mutations;
   transaction_queries: typeof transaction_queries;
+  users_mutations: typeof users_mutations;
+  users_queries: typeof users_queries;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

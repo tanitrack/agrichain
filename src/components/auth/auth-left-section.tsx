@@ -5,7 +5,7 @@ import { AuthCardDisplay } from './auth-card-display';
 import LanguageSwitcher from '@/components/common/language-switcher';
 
 interface AuthLeftSectionProps {
-  userType: string;
+  userType?: string;
 }
 
 export function AuthLeftSection({ userType }: AuthLeftSectionProps) {
@@ -17,7 +17,7 @@ export function AuthLeftSection({ userType }: AuthLeftSectionProps) {
       <div className="absolute -right-64 -top-64 h-96 w-96 rounded-full bg-earth-wheat/30 blur-3xl" />
 
       <div className="z-10 mx-auto max-w-md">
-        <AuthHeader userType={userType} />
+        <AuthHeader />
 
         {!!userType && (
           <>

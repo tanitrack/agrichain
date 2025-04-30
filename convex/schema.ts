@@ -1,23 +1,11 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
+import users from './auth.schemas.users';
+import sessions from './auth.schema.sessions';
 
 export default defineSchema({
-  sessions: defineTable({
-    userId: v.string(),
-    sessionToken: v.string(),
-    provider: v.string(),
-    lastVerified: v.number(),
-    expiresAt: v.number(),
-    createdAt: v.number(),
-    // Optional user data from Dynamic
-    wallet: v.optional(v.string()),
-    chainId: v.optional(v.string()),
-    email: v.optional(v.string()),
-    name: v.optional(v.string()),
-  })
-    .index('by_session_token', ['sessionToken'])
-    .index('by_user', ['userId'])
-    .index('by_expiry', ['expiresAt']),
+  users,
+  sessions,
   komoditas: defineTable({
     name: v.string(),
     description: v.optional(v.string()),
