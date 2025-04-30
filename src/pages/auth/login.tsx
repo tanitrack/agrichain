@@ -74,7 +74,9 @@ export default function Login() {
       const responseNotNull = response as Exclude<typeof response, void>;
       const { user } = responseNotNull;
 
-      const userProfile = await convex.query(api.users_queries.get, { userId: user?.id });
+      const userProfile = await convex.query(api.users_queries.getUserByUserId, {
+        userId: user?.id,
+      });
 
       if (!userProfile) {
         toast({
