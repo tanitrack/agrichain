@@ -408,3 +408,66 @@ export const jwksHttpHandler = httpAction(async (ctx, request) => {
     },
   });
 });
+
+export const verifyConvexTokenHttpHandler = httpAction(async (ctx, request) => {
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        ...corsHeaders,
+        'Access-Control-Max-Age': '86400',
+      },
+    });
+  }
+
+  if (request.method === 'POST') {
+    try {
+      const token = request.headers.get('Authorization')?.split(' ')[1];
+      if (!token) {
+        return new Response(JSON.stringify({ error: 'No token provided' }), {
+          status: 400,
+          headers: corsHeaders,
+        });
+      }
+
+      const result = await ctx.runAction(internal.auth.verifyConvexTokenAction, {
+        token,
+      });
+
+      if (!result.valid) {
+        return new Response(
+          JSON.stringify({
+            valid: false,
+            error: result.error,
+          }),
+          {
+            status: result.error?.includes('expired') ? 401 : 400,
+            headers: corsHeaders,
+          }
+        );
+      }
+
+      return new Response(JSON.stringify(result), {
+        status: 200,
+        headers: corsHeaders,
+      });
+    } catch (error) {
+      console.error('Token verification error:', error);
+      return new Response(
+        JSON.stringify({
+          valid: false,
+          error: 'Internal server error during token verification',
+        }),
+        {
+          status: 500,
+          headers: corsHeaders,
+        }
+      );
+    }
+  }
+
+  return new Response(JSON.stringify({ error: 'Invalid request method' }), {
+    status: 405,
+    headers: corsHeaders,
+  });
+});

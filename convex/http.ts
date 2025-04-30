@@ -1,18 +1,13 @@
 import { httpRouter } from 'convex/server';
-import { httpAction } from './_generated/server';
-import { internal } from './_generated/api';
-import { convertTokenHttpHandler, jwksHttpHandler, openIdConfigurationHttpHandler } from './auth';
+import {
+  convertTokenHttpHandler,
+  jwksHttpHandler,
+  openIdConfigurationHttpHandler,
+  verifyConvexTokenHttpHandler,
+} from './auth';
 import { JWKS_ENDPOINT } from './constants';
 
 const http = httpRouter();
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  Vary: 'Origin',
-  'Content-Type': 'application/json',
-};
 
 // OpenID Configuration endpoint
 http.route({
@@ -58,82 +53,14 @@ http.route({
 http.route({
   path: '/auth/verify-token',
   method: 'OPTIONS',
-  handler: httpAction(async (ctx, request) => {
-    const headers = request.headers;
-    if (
-      headers.get('Origin') !== null &&
-      headers.get('Access-Control-Request-Method') !== null &&
-      headers.get('Access-Control-Request-Headers') !== null
-    ) {
-      return new Response(null, {
-        status: 204,
-        headers: {
-          ...corsHeaders,
-        },
-      });
-    }
-    return new Response(null, { headers: corsHeaders });
-  }),
+  handler: verifyConvexTokenHttpHandler,
 });
 
 // Token verification endpoint
 http.route({
   path: '/auth/verify-token',
   method: 'POST',
-  handler: httpAction(async (ctx, request) => {
-    try {
-      // Extract token from Authorization header
-      const authorizationHeader = request.headers.get('Authorization');
-      const token = authorizationHeader?.split(' ')[1];
-      if (!token) {
-        return new Response(
-          JSON.stringify({
-            error: 'No token provided',
-            details: 'Authorization header must be in the format: Bearer <token>',
-          }),
-          {
-            status: 400,
-            headers: corsHeaders,
-          }
-        );
-      }
-
-      // Use the internal action to verify the token
-      const result = await ctx.runAction(internal.auth.verifyConvexTokenAction, {
-        token,
-      });
-
-      if (!result.valid) {
-        return new Response(
-          JSON.stringify({
-            valid: false,
-            error: result.error,
-          }),
-          {
-            status: result.error?.includes('expired') ? 401 : 400,
-            headers: corsHeaders,
-          }
-        );
-      }
-
-      return new Response(JSON.stringify(result), {
-        status: 200,
-        headers: corsHeaders,
-      });
-    } catch (error) {
-      console.error('Token verification error:', error);
-      return new Response(
-        JSON.stringify({
-          valid: false,
-          error: 'Internal server error during token verification',
-        }),
-        {
-          status: 500,
-          headers: corsHeaders,
-        }
-      );
-    }
-  }),
+  handler: verifyConvexTokenHttpHandler,
 });
 
 export default http;
