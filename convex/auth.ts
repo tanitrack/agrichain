@@ -72,6 +72,29 @@ async function verifyConvexToken(token: string) {
     return null;
   }
 }
+export interface DynamicUserProfile {
+  environmentId?: string;
+  lastVerifiedCredentialId?: string;
+  lists?: Array<unknown>;
+  metadata?: Record<string, unknown>;
+  missingFields?: Array<unknown>;
+  newUser?: boolean;
+  sessionId?: string;
+  userId?: string;
+  verifiedCredentials?: Array<{
+    address?: string;
+    chain?: string;
+    id: string;
+    publicIdentifier: string;
+    walletName?: string;
+    walletProvider?: string;
+    walletProperties?: Record<string, unknown>;
+    format: 'blockchain' | 'email';
+    lastSelectedAt: string;
+    signInEnabled: boolean;
+  }>;
+  email?: string;
+}
 
 interface DynamicTokenPayload extends jose.JWTPayload {
   kid: string;
@@ -212,12 +235,19 @@ async function signConvexToken(payload: DynamicTokenPayload) {
   return token;
 }
 
+// dynamicUserProfile is DynamicUserProfile
 export const convertDynamicToken = internalAction({
-  args: { dynamicToken: v.string() },
-  handler: async (ctx, { dynamicToken }) => {
+  args: {
+    dynamicToken: v.string(),
+    dynamicUserProfile: v.any(),
+  },
+  handler: async (ctx, args) => {
     try {
+      const dynamicToken = args.dynamicToken;
+      const dynamicUserProfile = args.dynamicUserProfile as DynamicUserProfile;
+
       // Verify the Dynamic token
-      const { payload } = await verifyDynamicToken(dynamicToken);
+      const { payload } = await verifyDynamicToken(dynamicToken as string);
       const dynamicPayload = payload as DynamicTokenPayload;
 
       // Validate environment ID
@@ -225,24 +255,20 @@ export const convertDynamicToken = internalAction({
         throw new Error('Invalid environment ID');
       }
 
+      // Validate dynamicUserProfile
+      if (dynamicUserProfile.environmentId !== dynamicPayload.environment_id) {
+        throw new Error('Invalid dynamicUserProfile');
+      }
+
       // Create Convex token with necessary claims
       const convexToken = await signConvexToken(dynamicPayload);
 
-      // Get the primary credential for session creation
-      const primaryCredential = dynamicPayload.verified_credentials.find(
-        (vc) => vc.id === dynamicPayload.last_verified_credential_id
-      );
-
       // Create a session for the user
       await ctx.runMutation(internal.sessions.createSession, {
-        userId: dynamicPayload.sub,
         sessionToken: convexToken,
         provider: 'dynamic',
-        wallet: primaryCredential?.address,
-        chainId: primaryCredential?.chain,
+        userId: dynamicPayload.sub,
         email: dynamicPayload.email,
-        // Use public_identifier as name if no email credential exists
-        name: primaryCredential?.public_identifier,
       });
 
       return { token: convexToken };
@@ -253,11 +279,65 @@ export const convertDynamicToken = internalAction({
   },
 });
 
+export const convertTokenHttpHandler = httpAction(async (ctx, request) => {
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        ...corsHeaders,
+        'Access-Control-Max-Age': '86400',
+      },
+    });
+  }
+
+  if (request.method === 'POST') {
+    try {
+      const dynamicToken = request.headers.get('Authorization')?.split(' ')[1];
+      if (!dynamicToken) {
+        return new Response(JSON.stringify({ error: 'No token provided' }), {
+          status: 400,
+          headers: corsHeaders,
+        });
+      }
+
+      const { dynamicUserProfile } = await request.json();
+
+      if (!dynamicUserProfile) {
+        return new Response(JSON.stringify({ error: 'No dynamicProfile provided' }), {
+          status: 400,
+          headers: corsHeaders,
+        });
+      }
+
+      const result = await ctx.runAction(internal.auth.convertDynamicToken, {
+        dynamicToken,
+        dynamicUserProfile,
+      });
+
+      return new Response(JSON.stringify(result), {
+        status: 200,
+        headers: corsHeaders,
+      });
+    } catch (error) {
+      console.error('Token conversion error:', error);
+      return new Response(JSON.stringify({ error: 'Token conversion failed' }), {
+        status: 500,
+        headers: corsHeaders,
+      });
+    }
+  }
+
+  return new Response(JSON.stringify({ error: 'Invalid request method' }), {
+    status: 405,
+    headers: corsHeaders,
+  });
+});
+
 export const openIdConfigurationHttpHandler = httpAction(async (ctx, request) => {
-  console.log('openid-configuration called by request');
-  console.log('origin:', request.headers.get('origin'));
-  console.log('endpoint:', request.url);
-  console.log({ request });
+  // console.log('openid-configuration called by request');
+  // console.log('origin:', request.headers.get('origin'));
+  // console.log('endpoint:', request.url);
+  // console.log({ request });
 
   if (request.method === 'OPTIONS') {
     return new Response(null, {
@@ -285,10 +365,10 @@ export const openIdConfigurationHttpHandler = httpAction(async (ctx, request) =>
 });
 
 export const jwksHttpHandler = httpAction(async (ctx, request) => {
-  console.log('/jwks called by request');
-  console.log('origin:', request.headers.get('origin'));
-  console.log(`endpoint: ${request.url}`);
-  console.log({ request });
+  // console.log('/jwks called by request');
+  // console.log('origin:', request.headers.get('origin'));
+  // console.log(`endpoint: ${request.url}`);
+  // console.log({ request });
 
   if (request.method === 'OPTIONS') {
     return new Response(null, {

@@ -9,11 +9,7 @@ export default defineSchema({
     lastVerified: v.number(),
     expiresAt: v.number(),
     createdAt: v.number(),
-    // Optional user data from Dynamic
-    wallet: v.optional(v.string()),
-    chainId: v.optional(v.string()),
     email: v.optional(v.string()),
-    name: v.optional(v.string()),
   })
     .index('by_session_token', ['sessionToken'])
     .index('by_user', ['userId'])

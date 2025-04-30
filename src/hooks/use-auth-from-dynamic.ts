@@ -14,50 +14,50 @@ export function useAuthFromDynamic() {
     user,
   });
 
-  const fetchAccessToken = useCallback(
-    async ({ forceRefreshToken }: { forceRefreshToken?: boolean } = {}) => {
-      if (!isLoggedIn) {
-        return null;
-      }
-
-      const { token } = await fetch(
-        `${clientEnv.VITE_CONVEX_URL.replace('.cloud', '.site')}/auth/convert-token`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${dynamicJwtToken}`,
-          },
-        }
-      )
-        .then((r) => r.json())
-        .catch((e) => {
-          console.error(e);
-        });
-
-      const { valid } = await fetch(
-        `${clientEnv.VITE_CONVEX_URL.replace('.cloud', '.site')}/auth/verify-token`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-        .then((r) => r.json())
-        .catch((e) => {
-          console.error(e);
-        });
-
-      if (token && valid) {
-        return token;
-      }
-
+  const fetchAccessToken = useCallback(async () => {
+    if (!isLoggedIn) {
       return null;
-    },
-    [isLoggedIn, dynamicJwtToken]
-  );
+    }
+
+    const { token } = await fetch(
+      `${clientEnv.VITE_CONVEX_URL.replace('.cloud', '.site')}/auth/convert-token`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${dynamicJwtToken}`,
+        },
+        body: JSON.stringify({
+          dynamicUserProfile: user,
+        }),
+      }
+    )
+      .then((r) => r.json())
+      .catch((e) => {
+        console.error(e);
+      });
+
+    const { valid } = await fetch(
+      `${clientEnv.VITE_CONVEX_URL.replace('.cloud', '.site')}/auth/verify-token`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+      .then((r) => r.json())
+      .catch((e) => {
+        console.error(e);
+      });
+
+    if (token && valid) {
+      return token;
+    }
+
+    return null;
+  }, [isLoggedIn, dynamicJwtToken, user]);
 
   return useMemo(
     () => ({

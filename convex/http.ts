@@ -1,7 +1,7 @@
 import { httpRouter } from 'convex/server';
 import { httpAction } from './_generated/server';
 import { internal } from './_generated/api';
-import { jwksHttpHandler, openIdConfigurationHttpHandler } from './auth';
+import { convertTokenHttpHandler, jwksHttpHandler, openIdConfigurationHttpHandler } from './auth';
 import { JWKS_ENDPOINT } from './constants';
 
 const http = httpRouter();
@@ -40,61 +40,18 @@ http.route({
   handler: jwksHttpHandler,
 });
 
-// Token conversion preflight handler
+// Token verification preflight handler
 http.route({
   path: '/auth/convert-token',
   method: 'OPTIONS',
-  handler: httpAction(async (ctx, request) => {
-    // Make sure the necessary headers are present
-    // for this to be a valid pre-flight request
-    const headers = request.headers;
-    if (
-      headers.get('Origin') !== null &&
-      headers.get('Access-Control-Request-Method') !== null &&
-      headers.get('Access-Control-Request-Headers') !== null
-    ) {
-      return new Response(null, {
-        status: 204,
-        headers: {
-          ...corsHeaders,
-          'Access-Control-Max-Age': '86400',
-        },
-      });
-    }
-    return new Response(null, { headers: corsHeaders });
-  }),
+  handler: convertTokenHttpHandler,
 });
 
-// Token conversion endpoint
+// Token verification endpoint
 http.route({
   path: '/auth/convert-token',
   method: 'POST',
-  handler: httpAction(async (ctx, request) => {
-    try {
-      const dynamicToken = request.headers.get('Authorization')?.split(' ')[1];
-      if (!dynamicToken) {
-        return new Response(JSON.stringify({ error: 'No token provided' }), {
-          status: 400,
-          headers: corsHeaders,
-        });
-      }
-
-      const result = await ctx.runAction(internal.auth.convertDynamicToken, {
-        dynamicToken,
-      });
-
-      return new Response(JSON.stringify(result), {
-        status: 200,
-        headers: corsHeaders,
-      });
-    } catch (error) {
-      console.error('Token conversion error:', error);
-      return new Response(JSON.stringify({ error: 'Token conversion failed' }), {
-        status: 500,
-        headers: corsHeaders,
-      });
-    }
-  }),
+  handler: convertTokenHttpHandler,
 });
 
 // Token verification preflight handler
@@ -112,7 +69,6 @@ http.route({
         status: 204,
         headers: {
           ...corsHeaders,
-          'Access-Control-Max-Age': '86400',
         },
       });
     }

@@ -9,10 +9,7 @@ export const createSession = internalMutation({
     userId: v.string(),
     sessionToken: v.string(),
     provider: v.string(),
-    wallet: v.optional(v.string()),
-    chainId: v.optional(v.string()),
     email: v.optional(v.string()),
-    name: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const now = Date.now();
