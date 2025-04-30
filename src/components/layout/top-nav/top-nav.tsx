@@ -2,7 +2,7 @@ import { TopNavHelpButton } from '@/components/layout/top-nav/top-nav-help-butto
 import { TopNavMenuButton } from './top-nav-menu-button';
 import { TopNavSearch } from './top-nav-search';
 import { TopNavUserMenu } from './top-nav-user-menu';
-import { DynamicWidgetButton } from '@/components/layout/dynamic-widget-button';
+import { DynamicWidgetButton } from '@/components/layout/top-nav/dynamic-widget-button';
 import { TopNavSettingsButton } from '@/components/layout/top-nav/top-nav-settings-button';
 import { TopNavNotifications } from '@/components/layout/top-nav/top-nav-notifications';
 import { TopNavBlockchainStatus } from '@/components/layout/top-nav/top-nav-blockchain-status';
