@@ -11,7 +11,7 @@ const users = defineTable({
   nationalIdNumber: v.string(),
   createdAt: v.number(),
   updatedAt: v.number(),
-  userType: v.string(),
+  userType: v.union(v.literal('farmer'), v.literal('consumer')),
 })
   .index('by_email', ['email'])
   .index('by_name', ['name'])

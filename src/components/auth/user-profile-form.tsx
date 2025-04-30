@@ -21,7 +21,7 @@ import { api } from '@/lib/convex';
 
 const userProfileSchema = z.object({
   userId: z.string().optional(),
-  taniId: z.string().optional(),
+  taniId: z.number().optional(),
   nationalIdNumber: z
     .string()
     .min(16, { message: 'ID number must be 16 digits' })
@@ -65,7 +65,7 @@ export function UserProfileForm({
   const createConvexUser = useMutation(api.users_mutations.createUser);
   const updateConvexUser = useMutation(api.users_mutations.updateUser);
   const userConvex = useQuery(
-    api.users_queries.get,
+    api.users_queries.getUserByUserId,
     initialData.userId ? { userId: initialData.userId } : 'skip'
   );
 
@@ -111,8 +111,8 @@ export function UserProfileForm({
       } else {
         await updateConvexUser({
           convexId: userConvex._id,
-          fullName: metadata.fullName,
-          phoneNumber: metadata.phoneNumber,
+          name: metadata.fullName,
+          phone: metadata.phoneNumber,
           address: metadata.address,
           nationalIdNumber: metadata.nationalIdNumber,
           userType: metadata.userType,

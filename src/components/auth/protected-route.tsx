@@ -1,17 +1,16 @@
 import { useNavigate } from 'react-router-dom';
-import { useDynamicContext, useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
+import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { Spinner } from '@/components/ui/spinner';
 import { useEffect } from 'react';
-import { useConvexAuth } from 'convex/react';
+import { useAuthCheck } from '@/hooks/use-auth-check';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const isLoggedIn = useIsLoggedIn();
-  const { sdkHasLoaded, handleLogOut } = useDynamicContext();
-  const { isLoading } = useConvexAuth();
+  const { isSystemAuthenticated, isLoadingAuth, userProfile } = useAuthCheck();
+  const { handleLogOut } = useDynamicContext();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,12 +18,13 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
       await handleLogOut();
       navigate('/login');
     };
-    if (!isLoggedIn && sdkHasLoaded) {
+
+    if (!isSystemAuthenticated && !isLoadingAuth) {
       logout();
     }
-  }, [isLoggedIn, handleLogOut, navigate, sdkHasLoaded, isLoading]);
+  }, [isSystemAuthenticated, handleLogOut, navigate, isLoadingAuth]);
 
-  if (isLoading || !sdkHasLoaded) {
+  if (isLoadingAuth && !userProfile) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Spinner size="xl" />

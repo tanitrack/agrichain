@@ -9,7 +9,7 @@ export const createUser = mutation({
     phone: v.string(),
     address: v.string(),
     nationalIdNumber: v.string(),
-    userType: v.string(),
+    userType: v.union(v.literal('farmer'), v.literal('consumer')),
   },
   handler: async (ctx, args) => {
     // Find the current max taniId
@@ -38,11 +38,11 @@ export const createUser = mutation({
 export const updateUser = mutation({
   args: {
     convexId: v.id('users'),
-    fullName: v.string(),
-    phoneNumber: v.string(),
+    name: v.string(),
+    phone: v.string(),
     address: v.string(),
     nationalIdNumber: v.string(),
-    userType: v.string(),
+    userType: v.union(v.literal('farmer'), v.literal('consumer')),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
