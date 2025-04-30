@@ -10,8 +10,8 @@ import { ProtectedRoute } from '@/components/auth/protected-route';
 import Dashboard from './pages/dashboard';
 import Login from './pages/auth/login';
 import Register from './pages/auth/register';
-import Komoditas from './pages/komoditas';
-import KomoditasDetail from './pages/komoditas-detail';
+import Komoditas from './pages/farmer/commodity/komoditas';
+import KomoditasDetail from './pages/farmer/commodity/komoditas-detail';
 import Saldo from './pages/saldo';
 import Transaksi from './pages/transaksi';
 import TransaksiDetail from './pages/transaksi-detail';
@@ -173,7 +173,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/farmer/order-book/:id"
+                path="/order-book/:id"
                 element={
                   <ProtectedRoute>
                     <OrderBookApproval />
@@ -215,7 +215,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/buyer/order-book"
+                path="/order-book"
                 element={
                   <ProtectedRoute>
                     <OrderBookList />
@@ -223,7 +223,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/buyer/order-book/:id"
+                path="/order-book/:id"
                 element={
                   <ProtectedRoute>
                     <OrderBookDetail />

@@ -40,9 +40,7 @@ export function MainLayout({ children }: MainLayoutProps) {
             </div>
             <div className="flex items-center gap-2 md:gap-4">
               <span className="rounded-full bg-earth-light-green/20 px-2 py-1 text-xs text-earth-dark-green">
-                {t('app.name') === 'TaniTrack'
-                  ? 'Powered by Blockchain'
-                  : 'Didukung oleh Blockchain'}
+                {t('app.name') === 'TaniTrack' ? 'Powered by Solana' : 'Didukung oleh Solana'}
               </span>
               <LanguageSwitcher />
             </div>

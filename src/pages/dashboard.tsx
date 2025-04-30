@@ -1,18 +1,6 @@
 import { useState } from 'react';
-import {
-  BarChart3,
-  TrendingUp,
-  TrendingDown,
-  ShoppingCart,
-  Package,
-  Truck,
-  Wallet,
-  Leaf,
-  Sun,
-  CloudRain,
-} from 'lucide-react';
+import { BarChart3, ShoppingCart, Wallet, Leaf, Sun } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MainLayout } from '@/components/layout/main-layout';
 import { transactions, commodities, commodityPrices, currentUser } from '@/lib/data/mock-data';
 import { formatCurrency, formatDate } from '@/lib/utils';
@@ -50,15 +38,15 @@ export default function Dashboard() {
     <MainLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-earth-dark-green text-2xl font-bold tracking-tight">
+          <h1 className="text-2xl font-bold tracking-tight text-earth-dark-green">
             {t('dashboard.title')}
           </h1>
-          <Tabs
+          {/* <Tabs
             value={timeframe}
             onValueChange={(value) => setTimeframe(value as any)}
             className="w-auto"
           >
-            <TabsList className="bg-earth-pale-green grid w-[300px] grid-cols-4">
+            <TabsList className="grid w-[300px] grid-cols-4 bg-earth-pale-green">
               <TabsTrigger
                 value="day"
                 className="data-[state=active]:bg-earth-dark-green data-[state=active]:text-white"
@@ -84,29 +72,29 @@ export default function Dashboard() {
                 {t('time.thisYear')}
               </TabsTrigger>
             </TabsList>
-          </Tabs>
+          </Tabs> */}
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card className="earth-card-green shadow-md">
             <div className="absolute right-0 top-0 p-3">
-              <ShoppingCart className="text-earth-dark-green h-6 w-6 opacity-60" />
+              <ShoppingCart className="h-6 w-6 text-earth-dark-green opacity-60" />
             </div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-earth-dark-green text-sm font-bold">
+              <CardTitle className="text-sm font-bold text-earth-dark-green">
                 {t('dashboard.summary')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-earth-dark-green text-2xl font-bold">
+              <div className="text-2xl font-bold text-earth-dark-green">
                 {formatCurrency(totalSales)}
               </div>
-              <p className="text-earth-dark-green mt-1 text-sm font-medium">
+              <p className="mt-1 text-sm font-medium text-earth-dark-green">
                 {completedTransactions.length} {t('transactions.completed').toLowerCase()}
               </p>
-              <div className="bg-earth-pale-green mt-3 h-2 w-full rounded-full">
+              <div className="mt-3 h-2 w-full rounded-full bg-earth-pale-green">
                 <div
-                  className="bg-earth-dark-green h-2 rounded-full"
+                  className="h-2 rounded-full bg-earth-dark-green"
                   style={{ width: '70%' }}
                 ></div>
               </div>
@@ -115,20 +103,20 @@ export default function Dashboard() {
 
           <Card className="earth-card-brown shadow-md">
             <div className="absolute right-0 top-0 p-3">
-              <Leaf className="text-earth-brown h-6 w-6 opacity-60" />
+              <Leaf className="h-6 w-6 text-earth-brown opacity-60" />
             </div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-earth-brown text-sm font-bold">
+              <CardTitle className="text-sm font-bold text-earth-brown">
                 {t('commodities.title')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-earth-brown text-2xl font-bold">{totalCommodities} kg</div>
-              <p className="text-earth-brown mt-1 text-sm font-medium">
+              <div className="text-2xl font-bold text-earth-brown">{totalCommodities} kg</div>
+              <p className="mt-1 text-sm font-medium text-earth-brown">
                 {commodities.length} {t('commodities.type').toLowerCase()}
               </p>
-              <div className="bg-earth-light-brown mt-3 h-2 w-full rounded-full">
-                <div className="bg-earth-brown h-2 rounded-full" style={{ width: '60%' }}></div>
+              <div className="mt-3 h-2 w-full rounded-full bg-earth-light-brown">
+                <div className="h-2 rounded-full bg-earth-brown" style={{ width: '60%' }}></div>
               </div>
             </CardContent>
           </Card>
@@ -156,28 +144,31 @@ export default function Dashboard() {
 
           <Card className="earth-card-clay shadow-md">
             <div className="absolute right-0 top-0 p-3">
-              <Wallet className="h-6 w-6 text-orange-700 opacity-60" />
+              <Wallet className="h-6 w-6 text-blue-700 opacity-60" />
             </div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-bold text-orange-800">
+              <CardTitle className="text-sm font-bold text-blue-800">
                 {t('balance.title')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-orange-800">
+              <div className="text-2xl font-bold text-blue-800">
                 {formatCurrency(currentUser.balance)}
               </div>
-              <p className="mt-1 text-sm font-medium text-orange-700">
+              <p className="mt-1 text-sm font-medium text-blue-700">
                 5 SOL (≈ {formatCurrency(currentUser.balance)})
               </p>
-              <div className="mt-3 h-2 w-full rounded-full bg-orange-100">
-                <div className="h-2 rounded-full bg-orange-600" style={{ width: '85%' }}></div>
+              <div className="mt-3 h-2 w-full rounded-full bg-blue-100">
+                <div className="h-2 rounded-full bg-blue-600" style={{ width: '85%' }}></div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+        <div
+          // className="grid gap-6 md:grid-cols-2 lg:grid-cols-7"
+          className="grid gap-6 md:grid-cols-1 lg:grid-cols-1"
+        >
           <Card className="border-none bg-white shadow-md lg:col-span-4">
             <CardHeader className="earth-header-forest">
               <CardTitle className="flex items-center gap-2 text-white">
@@ -190,19 +181,19 @@ export default function Dashboard() {
                 <table className="w-full caption-bottom text-sm">
                   <thead className="bg-earth-medium-green/20">
                     <tr className="border-b transition-colors">
-                      <th className="text-earth-dark-green h-12 px-4 text-left align-middle font-bold">
+                      <th className="h-12 px-4 text-left align-middle font-bold text-earth-dark-green">
                         {t('transactions.commodity')}
                       </th>
-                      <th className="text-earth-dark-green h-12 px-4 text-left align-middle font-bold">
+                      <th className="h-12 px-4 text-left align-middle font-bold text-earth-dark-green">
                         {t('transactions.buyer')}
                       </th>
-                      <th className="text-earth-dark-green h-12 px-4 text-left align-middle font-bold">
+                      <th className="h-12 px-4 text-left align-middle font-bold text-earth-dark-green">
                         {t('transactions.date')}
                       </th>
-                      <th className="text-earth-dark-green h-12 px-4 text-left align-middle font-bold">
+                      <th className="h-12 px-4 text-left align-middle font-bold text-earth-dark-green">
                         {t('transactions.status')}
                       </th>
-                      <th className="text-earth-dark-green h-12 px-4 text-right align-middle font-bold">
+                      <th className="h-12 px-4 text-right align-middle font-bold text-earth-dark-green">
                         {t('transactions.total')}
                       </th>
                     </tr>
@@ -211,15 +202,15 @@ export default function Dashboard() {
                     {transactions.slice(0, 5).map((transaction) => (
                       <tr
                         key={transaction.id}
-                        className="hover:bg-earth-pale-green/40 border-b transition-colors"
+                        className="border-b transition-colors hover:bg-earth-pale-green/40"
                       >
-                        <td className="text-earth-dark-green p-4 align-middle font-medium">
+                        <td className="p-4 align-middle font-medium text-earth-dark-green">
                           {transaction.commodityName}
                         </td>
-                        <td className="text-earth-dark-green p-4 align-middle">
+                        <td className="p-4 align-middle text-earth-dark-green">
                           {transaction.buyerName}
                         </td>
-                        <td className="text-earth-dark-green p-4 align-middle">
+                        <td className="p-4 align-middle text-earth-dark-green">
                           {formatDate(transaction.createdAt)}
                         </td>
                         <td className="p-4 align-middle">
@@ -268,7 +259,7 @@ export default function Dashboard() {
                             </span>
                           </div>
                         </td>
-                        <td className="text-earth-dark-green p-4 text-right align-middle font-bold">
+                        <td className="p-4 text-right align-middle font-bold text-earth-dark-green">
                           {formatCurrency(transaction.totalPrice || 0)}
                         </td>
                       </tr>
@@ -278,7 +269,7 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-none shadow-md lg:col-span-3">
+          {/* <Card className="border-none shadow-md lg:col-span-3">
             <CardHeader className="earth-header-brown">
               <CardTitle className="flex items-center gap-2 text-white">
                 <TrendingUp className="h-5 w-5" />
@@ -290,15 +281,15 @@ export default function Dashboard() {
                 {trendingCommodities.map((commodity) => (
                   <div
                     key={commodity.id}
-                    className="hover:bg-earth-light-brown/20 flex items-center rounded-lg p-3 transition-colors"
+                    className="flex items-center rounded-lg p-3 transition-colors hover:bg-earth-light-brown/20"
                   >
                     <div className="flex-1 space-y-1">
-                      <p className="text-earth-dark-green text-sm font-bold leading-none">
+                      <p className="text-sm font-bold leading-none text-earth-dark-green">
                         {commodity.name} ({commodity.grade})
                       </p>
-                      <p className="text-earth-brown text-sm font-medium">{commodity.region}</p>
+                      <p className="text-sm font-medium text-earth-brown">{commodity.region}</p>
                     </div>
-                    <div className="text-earth-dark-green text-sm font-bold">
+                    <div className="text-sm font-bold text-earth-dark-green">
                       {formatCurrency(commodity.price)}/{commodity.unit}
                     </div>
                     <div
@@ -319,7 +310,7 @@ export default function Dashboard() {
               <div className="mt-6 border-t pt-3">
                 <a
                   href="/harga"
-                  className="text-earth-brown hover:text-earth-dark-green inline-flex items-center gap-1 text-sm font-bold"
+                  className="inline-flex items-center gap-1 text-sm font-bold text-earth-brown hover:text-earth-dark-green"
                 >
                   <span>{language === 'id' ? 'Lihat semua harga' : 'View all prices'}</span>
                   <svg
@@ -339,10 +330,10 @@ export default function Dashboard() {
                 </a>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        {/* <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Card className="overflow-hidden border-none bg-white shadow-md">
             <CardHeader className="earth-header-moss">
               <CardTitle className="flex items-center gap-2 text-white">
@@ -355,20 +346,20 @@ export default function Dashboard() {
                 {commodities.map((commodity) => (
                   <div
                     key={commodity.id}
-                    className="hover:bg-earth-pale-green/30 flex items-center rounded-lg p-3 transition-colors"
+                    className="flex items-center rounded-lg p-3 transition-colors hover:bg-earth-pale-green/30"
                   >
-                    <div className="bg-earth-medium-green/20 text-earth-dark-green mr-3 flex h-10 w-10 items-center justify-center rounded-full">
+                    <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-earth-medium-green/20 text-earth-dark-green">
                       <Leaf className="h-5 w-5" />
                     </div>
                     <div className="flex-1 space-y-1">
-                      <p className="text-earth-dark-green text-sm font-bold leading-none">
+                      <p className="text-sm font-bold leading-none text-earth-dark-green">
                         {commodity.name}
                       </p>
-                      <p className="text-earth-medium-green text-sm font-medium">
+                      <p className="text-sm font-medium text-earth-medium-green">
                         {commodity.type} - Grade {commodity.grade}
                       </p>
                     </div>
-                    <div className="text-earth-dark-green text-sm font-bold">
+                    <div className="text-sm font-bold text-earth-dark-green">
                       {commodity.quantity} {commodity.unit}
                     </div>
                   </div>
@@ -377,7 +368,7 @@ export default function Dashboard() {
               <div className="mt-6 border-t pt-3">
                 <a
                   href="/komoditas"
-                  className="text-earth-medium-green hover:text-earth-dark-green inline-flex items-center gap-1 text-sm font-bold"
+                  className="inline-flex items-center gap-1 text-sm font-bold text-earth-medium-green hover:text-earth-dark-green"
                 >
                   <span>{language === 'id' ? 'Kelola komoditas' : 'Manage commodities'}</span>
                   <svg
@@ -411,23 +402,23 @@ export default function Dashboard() {
                 {pendingTransactions.slice(0, 4).map((transaction) => (
                   <div
                     key={transaction.id}
-                    className="hover:bg-earth-pale-green/30 flex items-center rounded-lg p-3 transition-colors"
+                    className="flex items-center rounded-lg p-3 transition-colors hover:bg-earth-pale-green/30"
                   >
-                    <div className="bg-earth-medium-green/30 text-earth-dark-green mr-3 flex h-10 w-10 items-center justify-center rounded-full">
+                    <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-earth-medium-green/30 text-earth-dark-green">
                       <Truck className="h-5 w-5" />
                     </div>
                     <div className="flex-1 space-y-1">
-                      <p className="text-earth-dark-green text-sm font-bold leading-none">
+                      <p className="text-sm font-bold leading-none text-earth-dark-green">
                         {transaction.commodityName}
                       </p>
-                      <p className="text-earth-medium-green text-sm font-medium">
+                      <p className="text-sm font-medium text-earth-medium-green">
                         {transaction.buyerName}
                       </p>
                     </div>
-                    <div className="text-earth-dark-green text-sm font-bold">
+                    <div className="text-sm font-bold text-earth-dark-green">
                       {transaction.quantity} {transaction.unit}
                     </div>
-                    <div className="bg-earth-dark-green ml-4 rounded-full px-2.5 py-1 text-xs font-medium text-white">
+                    <div className="ml-4 rounded-full bg-earth-dark-green px-2.5 py-1 text-xs font-medium text-white">
                       {language === 'id'
                         ? transaction.status.replace('_', ' ')
                         : transaction.status === 'negosiasi'
@@ -454,7 +445,7 @@ export default function Dashboard() {
               <div className="mt-6 border-t pt-3">
                 <a
                   href="/transaksi"
-                  className="text-earth-medium-green hover:text-earth-dark-green inline-flex items-center gap-1 text-sm font-bold"
+                  className="inline-flex items-center gap-1 text-sm font-bold text-earth-medium-green hover:text-earth-dark-green"
                 >
                   <span>
                     {language === 'id' ? 'Lihat semua transaksi' : 'View all transactions'}
@@ -477,7 +468,7 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </div> */}
       </div>
     </MainLayout>
   );

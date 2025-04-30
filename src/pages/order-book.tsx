@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/main-layout';
-import { ClipboardList, Search, Filter, Eye, Check, X } from 'lucide-react';
+import { Eye, Check, X, Package } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import {
   Table,
@@ -14,15 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+
 import { formatDate } from '@/lib/utils';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLanguage } from '@/contexts/language-context';
 import { useToast } from '@/hooks/use-toast';
 
@@ -184,8 +176,95 @@ const OrderBook = () => {
         <h1 className="mb-2 text-2xl font-bold">{t('orderbook.title')}</h1>
         <p className="text-gray-600">{t('orderbook.subtitle')}</p>
       </div>
+      <Card className="">
+        <CardHeader className="earth-header-forest pb-3">
+          <CardTitle className="flex items-center text-lg text-white">
+            <Package className="mr-2 h-5 w-5" />
+            {t('commodities.list')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="">
+            <Table>
+              <TableHeader className="bg-earth-light-green/30">
+                <TableRow>
+                  <TableHead className="text-earth-dark-green">{t('commodities.name')}</TableHead>
+                  <TableHead className="text-earth-dark-green">{t('commodities.type')}</TableHead>
+                  <TableHead className="hidden text-earth-dark-green md:table-cell">
+                    {t('commodities.quantity')}
+                  </TableHead>
+                  <TableHead className="hidden text-earth-dark-green lg:table-cell">
+                    {t('commodities.location')}
+                  </TableHead>
+                  <TableHead className="text-earth-dark-green">{t('commodities.grade')}</TableHead>
+                  <TableHead className="text-right text-earth-dark-green">
+                    {t('commodities.action')}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredOrderBooks.length > 0 ? (
+                  filteredOrderBooks.map((orderBook) => (
+                    <TableRow key={orderBook.id}>
+                      <TableCell className="font-medium">{orderBook.id}</TableCell>
+                      <TableCell>{orderBook.buyerName}</TableCell>
+                      <TableCell>{orderBook.commodityType}</TableCell>
+                      <TableCell>
+                        {orderBook.quantity} {orderBook.unit}
+                      </TableCell>
+                      <TableCell>{orderBook.requestedGrade}</TableCell>
+                      <TableCell>{formatDate(orderBook.requestedDeliveryDate)}</TableCell>
+                      <TableCell>{formatDate(orderBook.offerExpiryDate)}</TableCell>
+                      <TableCell>{getStatusBadge(orderBook.status)}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleViewDetails(orderBook.id)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          {orderBook.status === 'open' && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-green-600"
+                                onClick={() => handleAccept(orderBook.id)}
+                              >
+                                <Check className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-red-600"
+                                onClick={() => handleReject(orderBook.id)}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="py-8 text-center text-earth-medium-green">
+                      {searchQuery
+                        ? `${t('commodities.notfound')} "${searchQuery}"`
+                        : `${t('commodities.notfound')}. ${t('commodities.add')} to get started.`}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
 
-      <Card className="mb-6">
+      {/* <Card className="mb-6">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center text-lg">
             <ClipboardList className="text-tani-green-dark mr-2 h-5 w-5" />
@@ -309,7 +388,7 @@ const OrderBook = () => {
                 </div>
               </TabsContent>
 
-              {/* Other tabs have similar structure but just for display since actual filtering happens in JS */}
+             
               <TabsContent value="open" className="mt-0">
                 <div className="rounded-md border">
                   <Table>
@@ -381,11 +460,11 @@ const OrderBook = () => {
                 </div>
               </TabsContent>
 
-              {/* Other tabs content is similar */}
+            
               <TabsContent value="accepted" className="mt-0">
                 <div className="rounded-md border">
                   <Table>
-                    {/* ... same table structure as above ... */}
+                 
                     <TableHeader>
                       <TableRow>
                         <TableHead>{t('orderbook.id')}</TableHead>
@@ -437,7 +516,7 @@ const OrderBook = () => {
               </TabsContent>
 
               <TabsContent value="completed" className="mt-0">
-                {/* ... similar structure ... */}
+              
                 <div className="rounded-md border">
                   <Table>
                     <TableHeader>
@@ -491,7 +570,7 @@ const OrderBook = () => {
               </TabsContent>
 
               <TabsContent value="expired" className="mt-0">
-                {/* ... similar structure ... */}
+             
                 <div className="rounded-md border">
                   <Table>
                     <TableHeader>
@@ -546,7 +625,7 @@ const OrderBook = () => {
             </Tabs>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </MainLayout>
   );
 };
