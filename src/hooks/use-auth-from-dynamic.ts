@@ -8,12 +8,6 @@ export function useAuthFromDynamic() {
 
   const dynamicJwtToken = getAuthToken();
 
-  console.log({
-    isLoggedIn,
-    dynamicJwtToken,
-    user,
-  });
-
   const fetchAccessToken = useCallback(async () => {
     if (!isLoggedIn) {
       return null;

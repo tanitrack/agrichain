@@ -33,6 +33,7 @@ import OrderBookApproval from './pages/farmer/order-book-approval';
 import TransactionPriceSubmitted from './pages/farmer/transaction-price-submitted';
 
 import { ConvexDynamicProvider } from '@/contexts/convex-auth-context';
+import RegisterProfile from '@/pages/auth/register-profile';
 
 const App = () => (
   <ConvexDynamicProvider>
@@ -45,6 +46,7 @@ const App = () => (
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/register-profile" element={<RegisterProfile />} />
 
             {/* Protected routes */}
             <Route

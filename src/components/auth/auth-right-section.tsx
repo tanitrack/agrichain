@@ -9,15 +9,17 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 
 interface AuthRightSectionProps {
-  userType: string;
-  setUserType: (value: string) => void;
+  userType?: string;
+  setUserType?: (value: string) => void;
 }
 
 // Define registration steps
 type RegistrationStep = 'email' | 'userType' | 'profile' | 'complete';
 
 export function AuthRightSection({ userType, setUserType }: AuthRightSectionProps) {
-  const [registrationStep, setRegistrationStep] = useState<RegistrationStep>('email');
+  const [registrationStep, setRegistrationStep] = useState<RegistrationStep>(
+    userType ? 'userType' : 'email'
+  );
   const navigate = useNavigate();
   const { toast } = useToast();
   const { language } = useLanguage();
@@ -70,6 +72,7 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <button
+                type="button"
                 onClick={() => handleUserTypeSelection('petani')}
                 className="rounded-lg border border-earth-light-brown p-4 transition-colors hover:bg-earth-pale-green"
               >
@@ -83,6 +86,7 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
                 </p>
               </button>
               <button
+                type="button"
                 onClick={() => handleUserTypeSelection('konsumen')}
                 className="rounded-lg border border-earth-light-brown p-4 transition-colors hover:bg-earth-pale-green"
               >

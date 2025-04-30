@@ -16,8 +16,10 @@ import { useLanguage } from '@/contexts/language-context';
 import { TaniTrackCard } from '@/components/custom/tani-track-card';
 import LanguageSwitcher from '@/components/common/language-switcher';
 import { OTPInput } from '@/components/common/otp-input';
-import { useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
 import { useConnectWithOtp } from '@dynamic-labs/sdk-react-core';
+import { api } from '@/lib/convex';
+import { Spinner } from '@/components/ui/spinner';
+import { useAuthCheck } from '@/hooks/use-auth-check';
 
 export default function Login() {
   const [otp, setOtp] = useState('');
@@ -29,7 +31,7 @@ export default function Login() {
   const { language } = useLanguage();
   const { connectWithEmail, verifyOneTimePassword, retryOneTimePassword } = useConnectWithOtp();
 
-  const isLoggedIn = useIsLoggedIn();
+  const { convex, isLoadingAuth, isSystemAuthenticated, userProfile } = useAuthCheck();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,13 +69,31 @@ export default function Login() {
 
     try {
       // Verify OTP using Dynamic SDK
-      await verifyOneTimePassword(otp);
+      const response = await verifyOneTimePassword(otp);
+
+      const responseNotNull = response as Exclude<typeof response, void>;
+      const { user } = responseNotNull;
+
+      const userProfile = await convex.query(api.users_queries.get, { userId: user?.id });
+
+      if (!userProfile) {
+        toast({
+          title: language === 'id' ? 'Profil belum terdaftar' : 'Profile not registered',
+          description:
+            language === 'id'
+              ? 'Silakan lengkapi profil Anda terlebih dahulu'
+              : 'Please complete your profile first',
+        });
+        navigate('/register-profile', { replace: true });
+        return;
+      }
 
       toast({
         title: language === 'id' ? 'Login berhasil!' : 'Login successful!',
         description:
           language === 'id' ? 'Selamat datang kembali di TaniTrack' : 'Welcome back to TaniTrack',
       });
+
       // Redirect to the intended destination after successful login
       navigate('/dashboard', { replace: true });
     } catch (error) {
@@ -112,8 +132,22 @@ export default function Login() {
     }
   };
 
-  if (isLoggedIn) {
+  if (isSystemAuthenticated && userProfile) {
     return <Navigate to="/dashboard" replace />;
+  }
+
+  if (isSystemAuthenticated && !userProfile) {
+    console.log('navigate to register profile');
+    return <Navigate to="/register-profile" replace />;
+  }
+
+  if (isLoadingAuth) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Spinner size="xl" />
+        <span className="sr-only">loading</span>
+      </div>
+    );
   }
 
   return (

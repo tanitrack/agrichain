@@ -6,8 +6,12 @@ const users = defineTable({
   taniId: v.number(),
   email: v.string(),
   name: v.string(),
+  phone: v.string(),
+  address: v.string(),
+  nationalIdNumber: v.string(),
   createdAt: v.number(),
   updatedAt: v.number(),
+  userType: v.string(),
 })
   .index('by_email', ['email'])
   .index('by_name', ['name'])

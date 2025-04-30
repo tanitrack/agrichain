@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/language-context';
 import { UserCircle2, User, Phone, MapPin, ArrowRightIcon } from 'lucide-react';
 import { CardContent, CardFooter } from '@/components/ui/card';
 import { useState } from 'react';
-import { useDynamicContext, useUserUpdateRequest } from '@dynamic-labs/sdk-react-core';
+import { useUserUpdateRequest } from '@dynamic-labs/sdk-react-core';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -16,8 +16,12 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
+import { useMutation, useQuery } from 'convex/react';
+import { api } from '@/lib/convex';
 
 const userProfileSchema = z.object({
+  userId: z.string().optional(),
+  taniId: z.string().optional(),
   nationalIdNumber: z
     .string()
     .min(16, { message: 'ID number must be 16 digits' })
@@ -48,15 +52,22 @@ interface UserProfileFormProps {
   userType?: string;
 }
 
+const emptyInitialData = {};
+
 export function UserProfileForm({
   onSuccess,
-  initialData = {},
+  initialData = emptyInitialData,
   userType = 'petani',
 }: UserProfileFormProps) {
   const [loading, setLoading] = useState(false);
   const { language } = useLanguage();
-  const { user } = useDynamicContext();
   const { updateUser } = useUserUpdateRequest();
+  const createConvexUser = useMutation(api.users_mutations.createUser);
+  const updateConvexUser = useMutation(api.users_mutations.updateUser);
+  const userConvex = useQuery(
+    api.users_queries.get,
+    initialData.userId ? { userId: initialData.userId } : 'skip'
+  );
 
   const form = useForm<UserProfileFormValues>({
     resolver: zodResolver(userProfileSchema),
@@ -79,11 +90,34 @@ export function UserProfileForm({
         data.userType = 'consumer';
       }
 
-      const updatedUser = await updateUser({
+      const result = await updateUser({
         metadata: data,
       });
 
-      console.log({ updatedUser });
+      const user = result.updateUserProfileResponse.user;
+
+      const metadata = user.metadata as UserProfileFormValues;
+
+      if (!initialData.taniId) {
+        await createConvexUser({
+          userId: user.id,
+          email: user.email,
+          name: metadata.fullName,
+          phone: metadata.phoneNumber,
+          address: metadata.address,
+          nationalIdNumber: metadata.nationalIdNumber,
+          userType: metadata.userType,
+        });
+      } else {
+        await updateConvexUser({
+          convexId: userConvex._id,
+          fullName: metadata.fullName,
+          phoneNumber: metadata.phoneNumber,
+          address: metadata.address,
+          nationalIdNumber: metadata.nationalIdNumber,
+          userType: metadata.userType,
+        });
+      }
 
       onSuccess?.();
     } catch (error) {
@@ -102,8 +136,8 @@ export function UserProfileForm({
             name="nationalIdNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-earth-dark-green flex items-center font-medium">
-                  <UserCircle2 className="text-earth-medium-green mr-2 h-4 w-4" />
+                <FormLabel className="flex items-center font-medium text-earth-dark-green">
+                  <UserCircle2 className="mr-2 h-4 w-4 text-earth-medium-green" />
                   {language === 'id' ? 'No. KTP' : 'ID Card Number'}
                 </FormLabel>
                 <FormControl>
@@ -123,8 +157,8 @@ export function UserProfileForm({
             name="fullName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-earth-dark-green flex items-center font-medium">
-                  <User className="text-earth-medium-green mr-2 h-4 w-4" />
+                <FormLabel className="flex items-center font-medium text-earth-dark-green">
+                  <User className="mr-2 h-4 w-4 text-earth-medium-green" />
                   {language === 'id' ? 'Nama Lengkap' : 'Full Name'}
                 </FormLabel>
                 <FormControl>
@@ -144,8 +178,8 @@ export function UserProfileForm({
             name="phoneNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-earth-dark-green flex items-center font-medium">
-                  <Phone className="text-earth-medium-green mr-2 h-4 w-4" />
+                <FormLabel className="flex items-center font-medium text-earth-dark-green">
+                  <Phone className="mr-2 h-4 w-4 text-earth-medium-green" />
                   {language === 'id' ? 'No. HP/Whatsapp' : 'Phone/Whatsapp Number'}
                 </FormLabel>
                 <FormControl>
@@ -165,8 +199,8 @@ export function UserProfileForm({
             name="address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-earth-dark-green flex items-center font-medium">
-                  <MapPin className="text-earth-medium-green mr-2 h-4 w-4" />
+                <FormLabel className="flex items-center font-medium text-earth-dark-green">
+                  <MapPin className="mr-2 h-4 w-4 text-earth-medium-green" />
                   {language === 'id' ? 'Alamat Utama' : 'Main Address'}
                 </FormLabel>
                 <FormControl>
@@ -184,7 +218,7 @@ export function UserProfileForm({
 
         <CardFooter className="flex flex-col gap-4 px-8 pb-6">
           <Button
-            className="bg-earth-dark-green hover:bg-earth-medium-green h-12 w-full rounded-full text-base"
+            className="h-12 w-full rounded-full bg-earth-dark-green text-base hover:bg-earth-medium-green"
             disabled={loading}
             type="submit"
           >
