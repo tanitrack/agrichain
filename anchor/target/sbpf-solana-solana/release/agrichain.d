@@ -1,1 +1,0 @@
-/Users/ajiguruhprasetyo/code/blockchain/tanitrack/agrichain/anchor/target/sbpf-solana-solana/release/agrichain.so: /Users/ajiguruhprasetyo/code/blockchain/tanitrack/agrichain/anchor/programs/agrichain/src/lib.rs
