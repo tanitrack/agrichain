@@ -42,7 +42,7 @@ const farmerLinks = [
   { name: 'Order Book', href: '/order-book', icon: ClipboardList },
   { name: 'Harga Komoditas', href: '/harga', icon: TrendingUp },
   // { name: 'Pengiriman', href: '/pengiriman', icon: Truck },
-  { name: 'Profil', href: '/profile', icon: User },
+  // { name: 'Profil', href: '/profile', icon: User },
 ];
 
 // New links specifically for buyers
@@ -54,7 +54,7 @@ const buyerLinks = [
   { name: 'Transaksi', href: '/transaksi', icon: ShoppingCart },
   // { name: 'Pengiriman', href: '/pengiriman', icon: Truck },
   { name: 'Harga Komoditas', href: '/harga', icon: TrendingUp },
-  { name: 'Profil', href: '/profile', icon: User },
+  // { name: 'Profil', href: '/profile', icon: User },
 ];
 
 export function Sidebar({ open, setOpen }: SidebarProps) {
