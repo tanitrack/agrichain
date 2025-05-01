@@ -17,6 +17,9 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import { formatDate } from '@/lib/utils';
+import { useQuery } from 'convex/react';
+import { api } from '@/lib/convex';
+import { Id } from 'convex/_generated/dataModel';
 
 // Mock data for demo purposes - to be replaced with API calls
 const komoditasData = [
@@ -125,9 +128,13 @@ const KomoditasDetail = () => {
   const [komoditas, setKomoditas] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // const komoditasData = useQuery(api.komoditas_queries.get, {
-  //   id: id as Id<'komoditas'>,
-  // });
+  const komoditasData = useQuery(api.komoditas_queries.get, {
+    id: id as Id<'komoditas'>,
+  });
+
+  console.log('====================================');
+  console.log('DATA ---<> ', komoditasData);
+  console.log('====================================');
 
   // const getCommodity = query({
   //   args: { id: v.id('komoditas') },
