@@ -10,6 +10,7 @@ import {
   JWT_PUBLIC_KEY,
   JWKS_ENDPOINT,
   JWKS_CONVEX_ENDPOINT,
+  DYNAMIC_ENVIRONMENT_ID,
 } from './constants';
 
 // Cache JWKS to prevent rate limiting
@@ -258,7 +259,7 @@ export const convertDynamicToken = internalAction({
       const dynamicPayload = payload as DynamicTokenPayload;
 
       // Validate environment ID
-      if (dynamicPayload.environment_id !== '8becfdc4-eadf-4f17-9d46-4dfff0abf098') {
+      if (dynamicPayload.environment_id !== DYNAMIC_ENVIRONMENT_ID) {
         throw new Error('Invalid environment ID');
       }
 
