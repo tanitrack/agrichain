@@ -1,0 +1,1 @@
+/Users/ajiguruhprasetyo/code/blockchain/tanitrack/agrichain/anchor/target/sbpf-solana-solana/release/libagrichain.rlib: /Users/ajiguruhprasetyo/code/blockchain/tanitrack/agrichain/anchor/programs/agrichain/src/lib.rs

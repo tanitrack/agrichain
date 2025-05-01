@@ -1,0 +1,10 @@
+/Users/ajiguruhprasetyo/code/blockchain/tanitrack/agrichain/anchor/target/sbpf-solana-solana/release/deps/libbs58-3899c4d316c79eeb.rmeta: /Users/ajiguruhprasetyo/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bs58-0.5.1/src/lib.rs /Users/ajiguruhprasetyo/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bs58-0.5.1/src/alphabet.rs /Users/ajiguruhprasetyo/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bs58-0.5.1/src/decode.rs /Users/ajiguruhprasetyo/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bs58-0.5.1/src/encode.rs
+
+/Users/ajiguruhprasetyo/code/blockchain/tanitrack/agrichain/anchor/target/sbpf-solana-solana/release/deps/libbs58-3899c4d316c79eeb.rlib: /Users/ajiguruhprasetyo/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bs58-0.5.1/src/lib.rs /Users/ajiguruhprasetyo/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bs58-0.5.1/src/alphabet.rs /Users/ajiguruhprasetyo/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bs58-0.5.1/src/decode.rs /Users/ajiguruhprasetyo/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bs58-0.5.1/src/encode.rs
+
+/Users/ajiguruhprasetyo/code/blockchain/tanitrack/agrichain/anchor/target/sbpf-solana-solana/release/deps/bs58-3899c4d316c79eeb.d: /Users/ajiguruhprasetyo/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bs58-0.5.1/src/lib.rs /Users/ajiguruhprasetyo/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bs58-0.5.1/src/alphabet.rs /Users/ajiguruhprasetyo/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bs58-0.5.1/src/decode.rs /Users/ajiguruhprasetyo/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bs58-0.5.1/src/encode.rs
+
+/Users/ajiguruhprasetyo/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bs58-0.5.1/src/lib.rs:
+/Users/ajiguruhprasetyo/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bs58-0.5.1/src/alphabet.rs:
+/Users/ajiguruhprasetyo/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bs58-0.5.1/src/decode.rs:
+/Users/ajiguruhprasetyo/.cargo/registry/src/index.crates.io-6f17d22bba15001f/bs58-0.5.1/src/encode.rs:
