@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { cn } from '@/lib/utils';
 import { Leaf } from 'lucide-react';
+import { TaniCardDownloadBtn } from './tani-card-download-btn';
 
 interface TaniCardProps {
   name?: string;
@@ -13,18 +14,24 @@ interface TaniCardProps {
 const TaniCard: React.FC<TaniCardProps> = ({ name, taniId, email, walletAddress }) => {
   const isDataAvailable = taniId && email && walletAddress;
   const qrValue = isDataAvailable ? JSON.stringify({ taniId, email, walletAddress }) : '';
+  const cardRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className={cn('relative mx-auto flex w-full items-center justify-center py-6')}>
       {' '}
       {/* container for centering */}
       <div
+        ref={cardRef}
         className={cn(
           'relative flex h-[220px] w-[350px] overflow-hidden rounded-2xl bg-gradient-to-br from-[#224c2a] via-[#356d3a] to-[#193c1e] text-white shadow-xl md:h-[250px] md:w-[400px]',
           'items-stretch'
         )}
         style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}
       >
+        {/* Download Button Overlay */}
+        <div className="absolute right-3 top-3 z-10">
+          <TaniCardDownloadBtn cardRef={cardRef} />
+        </div>
         {/* Left: Info */}
         <div className="flex flex-1 flex-col justify-between py-5 pl-6 pr-3">
           {/* Card Header */}
