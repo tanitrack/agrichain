@@ -8,7 +8,10 @@ interface TaniCardDownloadBtnProps {
   filename?: string;
 }
 
-export const TaniCardDownloadBtn: React.FC<TaniCardDownloadBtnProps> = ({ cardRef, filename = 'tani-card.png' }) => {
+export const TaniCardDownloadBtn: React.FC<TaniCardDownloadBtnProps> = ({
+  cardRef,
+  filename = 'tani-card.png',
+}) => {
   const [loading, setLoading] = React.useState(false);
 
   const handleDownload = async () => {
@@ -20,15 +23,22 @@ export const TaniCardDownloadBtn: React.FC<TaniCardDownloadBtnProps> = ({ cardRe
       link.href = dataUrl;
       link.download = filename;
       link.click();
-    } catch (err) {
+    } catch (error) {
       alert('Failed to download card. Please try again.');
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Button variant="default" onClick={handleDownload} disabled={loading} title="Download Card as Image" className="gap-2">
+    <Button
+      variant="default"
+      onClick={handleDownload}
+      disabled={loading}
+      title="Download Card as Image"
+      className="gap-2"
+    >
       <Download className="h-5 w-5" />
       <span>Download Card</span>
     </Button>
