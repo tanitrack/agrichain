@@ -10,6 +10,7 @@ import {
   JWT_PUBLIC_KEY,
   JWKS_ENDPOINT,
   JWKS_CONVEX_ENDPOINT,
+  DYNAMIC_ENVIRONMENT_ID,
 } from './constants';
 
 // Cache JWKS to prevent rate limiting
@@ -205,7 +206,14 @@ async function signConvexToken(payload: DynamicTokenPayload) {
     throw new Error('JWT_PRIVATE_KEY environment variable not set');
   }
 
-  const privateKey = await jose.importPKCS8(JWT_PRIVATE_KEY, 'RS256');
+  let privateKey;
+
+  try {
+    privateKey = await jose.importPKCS8(JWT_PRIVATE_KEY, 'RS256');
+  } catch (error) {
+    console.error('Failed to import private key:', error);
+    throw new Error('Failed to import private key');
+  }
 
   if (!JWT_PUBLIC_KEY) {
     throw new Error('JWT_PUBLIC_KEY environment variable not set');
@@ -251,7 +259,7 @@ export const convertDynamicToken = internalAction({
       const dynamicPayload = payload as DynamicTokenPayload;
 
       // Validate environment ID
-      if (dynamicPayload.environment_id !== '8becfdc4-eadf-4f17-9d46-4dfff0abf098') {
+      if (dynamicPayload.environment_id !== DYNAMIC_ENVIRONMENT_ID) {
         throw new Error('Invalid environment ID');
       }
 

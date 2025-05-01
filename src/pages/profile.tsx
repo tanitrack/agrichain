@@ -1,4 +1,5 @@
 import { MainLayout } from '@/components/layout/main-layout';
+import TaniCard from '@/components/tani-card';
 import { Mail, Phone, MapPin, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -91,7 +92,14 @@ const Profile = () => {
             {/* TODO: Flesh out the details */}
 
             <TabsContent value="tani-card">
-              {!!userProfile && <div>Tani Card Number: {userProfile.taniId}</div>}
+              {!!userProfile && (
+                <TaniCard
+                  name={userProfile.name}
+                  taniId={userProfile.taniId}
+                  email={userProfile.email}
+                  walletAddress={wallet?.address}
+                />
+              )}
             </TabsContent>
             <TabsContent value="wallet">
               {!!userProfile && <div>Wallet Address: {wallet?.address}</div>}
