@@ -205,7 +205,14 @@ async function signConvexToken(payload: DynamicTokenPayload) {
     throw new Error('JWT_PRIVATE_KEY environment variable not set');
   }
 
-  const privateKey = await jose.importPKCS8(JWT_PRIVATE_KEY, 'RS256');
+  let privateKey;
+
+  try {
+    privateKey = await jose.importPKCS8(JWT_PRIVATE_KEY, 'RS256');
+  } catch (error) {
+    console.error('Failed to import private key:', error);
+    throw new Error('Failed to import private key');
+  }
 
   if (!JWT_PUBLIC_KEY) {
     throw new Error('JWT_PUBLIC_KEY environment variable not set');
