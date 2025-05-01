@@ -17,9 +17,11 @@ const TaniCard: React.FC<TaniCardProps> = ({ name, taniId, email, walletAddress 
   const cardRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className={cn('relative mx-auto flex w-full items-center justify-center py-6')}>
-      {' '}
-      {/* container for centering */}
+    <div
+      className={cn(
+        'relative mx-auto flex w-full flex-col items-center justify-center space-y-3 py-6'
+      )}
+    >
       <div
         ref={cardRef}
         className={cn(
@@ -28,10 +30,6 @@ const TaniCard: React.FC<TaniCardProps> = ({ name, taniId, email, walletAddress 
         )}
         style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}
       >
-        {/* Download Button Overlay */}
-        <div className="absolute right-3 top-3 z-10">
-          <TaniCardDownloadBtn cardRef={cardRef} />
-        </div>
         {/* Left: Info */}
         <div className="flex flex-1 flex-col justify-between py-5 pl-6 pr-3">
           {/* Card Header */}
@@ -92,6 +90,10 @@ const TaniCard: React.FC<TaniCardProps> = ({ name, taniId, email, walletAddress 
           <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-white" />
           <div className="absolute -bottom-16 -left-16 h-56 w-56 rounded-full bg-white" />
         </div>
+      </div>
+      {/* Download Button outside the card */}
+      <div className="mb-3 flex w-full max-w-[400px] justify-center">
+        <TaniCardDownloadBtn cardRef={cardRef} filename={`tani-card-tani_id_${taniId}.png`} />
       </div>
     </div>
   );

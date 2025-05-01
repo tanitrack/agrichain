@@ -28,9 +28,9 @@ export const TaniCardDownloadBtn: React.FC<TaniCardDownloadBtnProps> = ({ cardRe
   };
 
   return (
-    <Button variant="outline" size="icon" onClick={handleDownload} disabled={loading} title="Download Card as Image">
+    <Button variant="default" onClick={handleDownload} disabled={loading} title="Download Card as Image" className="gap-2">
       <Download className="h-5 w-5" />
-      <span className="sr-only">Download Card as Image</span>
+      <span>Download Card</span>
     </Button>
   );
 };
