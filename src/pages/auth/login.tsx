@@ -217,12 +217,7 @@ export default function Login() {
             <div className="mt-8 flex justify-center">
               <div className="relative mx-auto h-60 w-72">
                 {/* Front card (Farmer card) */}
-                <TaniTrackCard
-                  name="AGUS SURYANA"
-                  taniId={230599}
-                  email="petani@tanitrack.id"
-                  walletAddress="123456789"
-                />
+                <TaniTrackCard />
               </div>
             </div>
           </div>

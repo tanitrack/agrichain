@@ -3,6 +3,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 import { cn } from '@/lib/utils';
 import { Leaf } from 'lucide-react';
 import { TaniCardDownloadBtn } from './tani-card-download-btn';
+import { clientEnv } from '@/lib/client-env-variables';
 
 interface TaniCardProps {
   name?: string;
@@ -13,14 +14,16 @@ interface TaniCardProps {
 }
 
 const TaniCard: React.FC<TaniCardProps> = ({
-  name,
-  taniId,
-  email,
-  walletAddress,
+  name = 'Petani Sejahtera',
+  taniId = '7777777',
+  email = 'petani@tanitrack.id',
+  walletAddress = '123456789',
   showDownloadBtn,
 }) => {
+  const site = clientEnv.VITE_SITE_URL;
+
   const isDataAvailable = taniId && email && walletAddress;
-  const qrValue = isDataAvailable ? JSON.stringify({ taniId, email, walletAddress }) : '';
+  const qrValue = isDataAvailable ? `${site}/login?taniId=${taniId}` : '';
   const cardRef = useRef<HTMLDivElement>(null);
 
   return (
