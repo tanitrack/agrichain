@@ -271,14 +271,6 @@ export const convertDynamicToken = internalAction({
       // Create Convex token with necessary claims
       const convexToken = await signConvexToken(dynamicPayload);
 
-      // Create a session for the user
-      await ctx.runMutation(internal.sessions.createSession, {
-        sessionToken: convexToken,
-        provider: 'dynamic',
-        userId: dynamicPayload.sub,
-        email: dynamicPayload.email,
-      });
-
       return { token: convexToken };
     } catch (error) {
       console.error('Token conversion error:', error);

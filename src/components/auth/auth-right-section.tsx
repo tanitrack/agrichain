@@ -26,7 +26,8 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
 
   // Handle email registration completion
   const handleEmailRegistrationComplete = () => {
-    setRegistrationStep('userType');
+    console.log('handleEmailRegistrationComplete');
+    navigate('/register-profile', { replace: true });
   };
 
   // Handle user type selection

@@ -1,23 +1,9 @@
-import { TaniTrackCard } from '@/components/custom/tani-track-card';
+import TaniTrackCard from '@/components/tani-card/tani-card';
 
-interface AuthCardDisplayProps {
-  userType: string;
-}
-
-export function AuthCardDisplay({ userType }: AuthCardDisplayProps) {
+export function AuthCardDisplay() {
   return (
     <div className="mt-8 flex justify-center">
-      {userType === 'petani' ? (
-        <TaniTrackCard type="farmer" name="AGUS SURYANA" id="F-230599-JB" />
-      ) : (
-        <TaniTrackCard
-          type="buyer"
-          name="PT PANGAN SEJAHTERA"
-          id="B-451022-JK"
-          location="JAKARTA"
-          expiryDate="09/2025"
-        />
-      )}
+      <TaniTrackCard name="AGUS SURYANA" taniId={230599} />
     </div>
   );
 }

@@ -48,23 +48,35 @@ export const OTPInput = ({
   return (
     <div className="space-y-6 p-6">
       <div className="space-y-3">
-        <p className="text-earth-dark-green text-center font-medium">
+        <p className="text-center font-medium text-earth-dark-green">
           {title || (language === 'id' ? 'Masukkan 6 Digit Kode OTP' : 'Enter 6 Digit OTP Code')}
         </p>
-        <p className="text-earth-dark-green mb-4 text-center text-sm">
-          {description ||
-            (language === 'id'
-              ? 'Kode dikirim ke email ' + email
-              : 'Code sent to the email ' + email)}
-        </p>
+        {!!email && (
+          <p className="mb-4 text-center text-sm text-earth-dark-green">
+            {description ||
+              (language === 'id'
+                ? 'Kode dikirim ke email ' + email
+                : 'Code sent to the email ' + email)}
+          </p>
+        )}
+        {!email && (
+          <p className="mb-4 text-center text-sm text-earth-dark-green">
+            {description ||
+              (language === 'id'
+                ? 'Kode dikirim ke email yang terdaftar'
+                : 'Code sent to the email that is registered')}
+          </p>
+        )}
+
         <div className="flex justify-center">
           <InputOTP maxLength={6} value={otp} onChange={setOtp}>
             <InputOTPGroup>
               {[...Array(6)].map((_, index) => (
                 <InputOTPSlot
+                  // eslint-disable-next-line @eslint-react/no-array-index-key
                   key={index}
                   index={index}
-                  className="border-earth-medium-green focus-visible:ring-earth-dark-green h-14 w-14 text-xl"
+                  className="h-14 w-14 border-earth-medium-green text-xl focus-visible:ring-earth-dark-green"
                 />
               ))}
             </InputOTPGroup>
@@ -74,7 +86,7 @@ export const OTPInput = ({
       <div className="flex flex-col gap-4">
         <Button
           onClick={onVerify}
-          className="bg-earth-dark-green hover:bg-earth-medium-green h-12 w-full rounded-full text-base"
+          className="h-12 w-full rounded-full bg-earth-dark-green text-base hover:bg-earth-medium-green"
           disabled={loading || otp.length !== 6}
         >
           {loading
@@ -88,7 +100,7 @@ export const OTPInput = ({
         {onBack && (
           <Button
             variant="outline"
-            className="border-earth-light-brown text-earth-dark-green hover:bg-earth-pale-green w-full rounded-full"
+            className="w-full rounded-full border-earth-light-brown text-earth-dark-green hover:bg-earth-pale-green"
             onClick={onBack}
           >
             {language === 'id' ? 'Kembali' : 'Back'}
@@ -98,14 +110,14 @@ export const OTPInput = ({
           <div>
             <Button
               variant="outline"
-              className="border-earth-light-brown text-earth-dark-green hover:bg-earth-pale-green w-full rounded-full"
+              className="w-full rounded-full border-earth-light-brown text-earth-dark-green hover:bg-earth-pale-green"
               onClick={handleResend}
               disabled={countdown > 0}
             >
               {language === 'id' ? 'Kirim Ulang Kode' : 'Resend Code'}
             </Button>
             <p
-              className={`text-center text-sm ${
+              className={`py-4 text-center text-sm ${
                 countdown > 0 ? 'text-earth-dark-green' : 'text-white'
               }`}
             >

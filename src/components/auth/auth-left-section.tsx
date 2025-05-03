@@ -32,7 +32,7 @@ export function AuthLeftSection({ userType }: AuthLeftSectionProps) {
             </h2>
 
             <AuthBenefits userType={userType} />
-            <AuthCardDisplay userType={userType} />
+            <AuthCardDisplay />
           </>
         )}
       </div>

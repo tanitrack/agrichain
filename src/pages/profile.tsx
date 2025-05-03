@@ -1,5 +1,5 @@
 import { MainLayout } from '@/components/layout/main-layout';
-import TaniCard from '@/components/tani-card';
+import TaniCard from '@/components/tani-card/tani-card';
 import { Mail, Phone, MapPin, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -98,6 +98,7 @@ const Profile = () => {
                   taniId={userProfile.taniId}
                   email={userProfile.email}
                   walletAddress={wallet?.address}
+                  showDownloadBtn
                 />
               )}
             </TabsContent>
