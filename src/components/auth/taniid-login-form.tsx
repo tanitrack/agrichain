@@ -42,8 +42,13 @@ const TaniIdLoginForm: React.FC<TaniIdLoginFormProps> = ({
         <Input
           id="taniId"
           type="text"
-          value={taniId}
-          onChange={(e) => onTaniIdChange(e.target.value)}
+          value={taniId?.toString()}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value === '' || /^[0-9]*$/.test(value)) {
+              onTaniIdChange(value);
+            }
+          }}
           autoComplete="off"
           required
           placeholder="Tani Id"

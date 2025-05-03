@@ -15,6 +15,7 @@ const users = defineTable({
 })
   .index('by_email', ['email'])
   .index('by_name', ['name'])
-  .index('by_user_id', ['userId']);
+  .index('by_user_id', ['userId'])
+  .index('by_tani_id', ['taniId']);
 
 export default users;

@@ -22,6 +22,7 @@ import { useAuthCheck } from '@/hooks/use-auth-check';
 import LoginModeSwitcher from '@/components/auth/login-mode-switcher';
 import EmailLoginForm from '@/components/auth/email-login-form';
 import TaniIdLoginForm from '@/components/auth/taniid-login-form';
+import { clientEnv } from '@/lib/client-env-variables';
 
 export default function Login() {
   // State for login mode and form fields (mode, email, taniId now managed by nuqs)
@@ -143,13 +144,49 @@ export default function Login() {
   // TaniId login handler (placeholder)
   const handleTaniIdLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!taniId) {
+      setError(language === 'id' ? 'TaniId is required' : 'TaniId is required');
+      return;
+    }
+
     setLoading(true);
     setError(undefined);
-    // TODO: Implement backend call for TaniId login
-    setTimeout(() => {
+
+    try {
+      const result = await fetch(`${clientEnv.VITE_CONVEX_SITE_URL}/auth/tani-id-login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ taniId }),
+      });
+
+      if (!result.ok) {
+        throw new Error('Failed to login with TaniId');
+      }
+
+      const data = await result.json();
+
+      if (!data.user) {
+        throw new Error('User not found');
+      }
+
+      console.log({ data });
+    } catch (error) {
+      setError(language === 'id' ? 'Gagal login dengan TaniId' : 'Failed to login with TaniId');
+      toast({
+        variant: 'destructive',
+        title: language === 'id' ? 'Gagal login dengan TaniId' : 'Failed to login with TaniId',
+        description:
+          language === 'id'
+            ? 'Terjadi kesalahan saat login dengan TaniId'
+            : 'An error occurred while logging in with TaniId',
+      });
+      console.error('TaniId login failed', error);
+    } finally {
       setLoading(false);
-      setError('TaniId login is not implemented yet.');
-    }, 1000);
+    }
   };
 
   // Auth redirects

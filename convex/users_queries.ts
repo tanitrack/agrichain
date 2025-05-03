@@ -10,3 +10,13 @@ export const getUserByUserId = query({
       .unique();
   },
 });
+
+export const getUserByTanidId = query({
+  args: { tanidId: v.number() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query('users')
+      .withIndex('by_tani_id', (q) => q.eq('taniId', args.tanidId))
+      .unique();
+  },
+});

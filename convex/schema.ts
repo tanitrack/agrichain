@@ -1,11 +1,9 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 import users from './auth.schemas.users';
-import sessions from './auth.schema.sessions';
 
 export default defineSchema({
   users,
-  sessions,
   komoditas: defineTable({
     name: v.string(),
     description: v.optional(v.string()),

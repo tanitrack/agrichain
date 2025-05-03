@@ -6,6 +6,7 @@ import {
   verifyConvexTokenHttpHandler,
 } from './auth';
 import { JWKS_ENDPOINT } from './constants';
+import { taniIdLoginHttpHandler } from './users';
 
 const http = httpRouter();
 
@@ -61,6 +62,20 @@ http.route({
   path: '/auth/verify-token',
   method: 'POST',
   handler: verifyConvexTokenHttpHandler,
+});
+
+// Tani ID login preflight handler
+http.route({
+  path: '/auth/tani-id-login',
+  method: 'OPTIONS',
+  handler: taniIdLoginHttpHandler,
+});
+
+// Tani ID login endpoint
+http.route({
+  path: '/auth/tani-id-login',
+  method: 'POST',
+  handler: taniIdLoginHttpHandler,
 });
 
 export default http;
