@@ -368,7 +368,7 @@ export default function Login() {
                         setQrCodeRawValue(rawValue);
                         const url = new URL(rawValue);
                         // check if card is for current host
-                        if (url.origin !== clientEnv.VITE_SITE_URL) {
+                        if (url.origin !== window.location.origin) {
                           console.log('QR code host is not valid');
                           return;
                         }
