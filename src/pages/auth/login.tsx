@@ -13,7 +13,7 @@ import {
 import { ArrowRightIcon, HelpCircle, QrCode, Smartphone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/language-context';
-import { TaniTrackCard } from '@/components/custom/tani-track-card';
+import TaniTrackCard from '@/components/tani-card/tani-card';
 import LanguageSwitcher from '@/components/common/language-switcher';
 import { OTPInput } from '@/components/common/otp-input';
 import { useConnectWithOtp } from '@dynamic-labs/sdk-react-core';
@@ -216,25 +216,12 @@ export default function Login() {
             {/* Stacked cards in perspective view */}
             <div className="mt-8 flex justify-center">
               <div className="relative mx-auto h-60 w-72">
-                {/* Back card (Buyer card) */}
-                <TaniTrackCard
-                  type="buyer"
-                  name="PT PANGAN SEJAHTERA"
-                  id="B-451022-JK"
-                  location="JAKARTA"
-                  expiryDate="09/2025"
-                  isStacked={true}
-                  stackPosition="back"
-                />
-
                 {/* Front card (Farmer card) */}
                 <TaniTrackCard
-                  type="farmer"
                   name="AGUS SURYANA"
-                  id="F-230599-JB"
-                  isStacked={true}
-                  stackPosition="front"
-                  className="relative z-10 -translate-x-2 translate-y-2 -rotate-3 transform"
+                  taniId={230599}
+                  email="petani@tanitrack.id"
+                  walletAddress="123456789"
                 />
               </div>
             </div>

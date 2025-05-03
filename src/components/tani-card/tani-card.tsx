@@ -9,9 +9,16 @@ interface TaniCardProps {
   taniId?: number;
   email?: string;
   walletAddress?: string;
+  showDownloadBtn?: boolean;
 }
 
-const TaniCard: React.FC<TaniCardProps> = ({ name, taniId, email, walletAddress }) => {
+const TaniCard: React.FC<TaniCardProps> = ({
+  name,
+  taniId,
+  email,
+  walletAddress,
+  showDownloadBtn,
+}) => {
   const isDataAvailable = taniId && email && walletAddress;
   const qrValue = isDataAvailable ? JSON.stringify({ taniId, email, walletAddress }) : '';
   const cardRef = useRef<HTMLDivElement>(null);
@@ -50,8 +57,7 @@ const TaniCard: React.FC<TaniCardProps> = ({ name, taniId, email, walletAddress 
               <div className="text-base font-bold">{taniId != null ? taniId : 'No Tani ID'}</div>
             </div>
           </div>
-          {/* Card Chip/Stripe (visual element) */}
-          <div className="mb-2 h-4 w-20 rounded bg-white/10 bg-opacity-20" />
+
           {/* Card Info */}
           <div className="space-y-1">
             <div>
@@ -92,9 +98,11 @@ const TaniCard: React.FC<TaniCardProps> = ({ name, taniId, email, walletAddress 
         </div>
       </div>
       {/* Download Button outside the card */}
-      <div className="mb-3 flex w-full max-w-[400px] justify-center">
-        <TaniCardDownloadBtn cardRef={cardRef} filename={`tani-card-tani_id_${taniId}.png`} />
-      </div>
+      {showDownloadBtn && (
+        <div className="mb-3 flex w-full max-w-[400px] justify-center">
+          <TaniCardDownloadBtn cardRef={cardRef} filename={`tani-card-tani_id_${taniId}.png`} />
+        </div>
+      )}
     </div>
   );
 };
