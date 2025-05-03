@@ -98,6 +98,7 @@ const Profile = () => {
                   taniId={userProfile.taniId}
                   email={userProfile.email}
                   walletAddress={wallet?.address}
+                  showDownloadBtn
                 />
               )}
             </TabsContent>

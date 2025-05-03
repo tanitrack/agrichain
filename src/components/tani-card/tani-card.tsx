@@ -23,7 +23,9 @@ const TaniCard: React.FC<TaniCardProps> = ({
   const site = clientEnv.VITE_SITE_URL;
 
   const isDataAvailable = taniId && email && walletAddress;
-  const qrValue = isDataAvailable ? `${site}/login?taniId=${taniId}` : '';
+  const qrValue = isDataAvailable
+    ? `${site}/login?taniId=${taniId}&mode=taniId&email=${email}&walletAddress=${walletAddress}`
+    : '';
   const cardRef = useRef<HTMLDivElement>(null);
 
   return (

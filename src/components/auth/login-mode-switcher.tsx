@@ -7,7 +7,7 @@ import React from 'react';
  */
 export interface LoginModeSwitcherProps {
   mode: string;
-  onModeChange: (mode: 'email' | 'taniId') => void;
+  onModeChange: (mode: 'email' | 'taniId' | 'qrcode') => void;
 }
 
 export const LoginModeSwitcher: React.FC<LoginModeSwitcherProps> = ({ mode, onModeChange }) => (
@@ -22,7 +22,7 @@ export const LoginModeSwitcher: React.FC<LoginModeSwitcherProps> = ({ mode, onMo
       aria-checked={mode === 'email'}
       onClick={() => onModeChange('email')}
     >
-      Email Login
+      Email
     </button>
     <button
       type="button"
@@ -30,7 +30,15 @@ export const LoginModeSwitcher: React.FC<LoginModeSwitcherProps> = ({ mode, onMo
       aria-checked={mode === 'taniId'}
       onClick={() => onModeChange('taniId')}
     >
-      TaniId Login
+      TaniId
+    </button>
+    <button
+      type="button"
+      className={`rounded px-4 py-2 ${mode === 'qrcode' ? 'bg-primary text-white' : 'bg-muted'}`}
+      aria-checked={mode === 'qrcode'}
+      onClick={() => onModeChange('qrcode')}
+    >
+      QR Code
     </button>
   </div>
 );

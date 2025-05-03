@@ -23,6 +23,8 @@ import LoginModeSwitcher from '@/components/auth/login-mode-switcher';
 import EmailLoginForm from '@/components/auth/email-login-form';
 import TaniIdLoginForm from '@/components/auth/taniid-login-form';
 import { clientEnv } from '@/lib/client-env-variables';
+import React from 'react';
+import { Scanner as QrScanner } from '@yudiel/react-qr-scanner';
 
 export default function Login() {
   // State for login mode and form fields (mode, email, taniId now managed by nuqs)
@@ -31,6 +33,8 @@ export default function Login() {
   const [mode, setMode] = useQueryState('mode', {
     defaultValue: taniId !== null ? 'taniId' : 'email',
   });
+  const [qrCodeRawValue, setQrCodeRawValue] = useState<string | null>(null);
+
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [showOtpInput, setShowOtpInput] = useState(false);
@@ -221,7 +225,7 @@ export default function Login() {
   return (
     <div className="flex min-h-screen flex-col overflow-hidden bg-gradient-to-br from-earth-pale-green to-white md:flex-row">
       {/* Left Section - Visual & Explanation */}
-      <div className="relative flex w-full items-center justify-center p-8 md:w-1/2">
+      <div className="relative hidden w-full items-center justify-center p-8 md:flex md:w-1/2">
         <div className="absolute -bottom-64 -left-64 h-96 w-96 rounded-full bg-earth-light-green/20 blur-3xl" />
         <div className="absolute -right-64 -top-64 h-96 w-96 rounded-full bg-earth-wheat/30 blur-3xl" />
         <div className="z-10 mx-auto max-w-md">
@@ -289,7 +293,7 @@ export default function Login() {
         </div>
       </div>
       {/* Right Section - Login Form */}
-      <div className="flex w-full items-center justify-center bg-white p-8 md:w-1/2 md:bg-transparent">
+      <div className="flex w-full flex-1 items-center justify-center bg-white p-8 md:w-1/2 md:bg-transparent">
         <Card className="w-full max-w-md overflow-hidden border-earth-light-brown/40 bg-white shadow-lg backdrop-blur-sm md:bg-white/95">
           <CardHeader className="bg-gradient-to-r from-earth-dark-green to-earth-medium-green py-6 text-white">
             <CardTitle className="text-center text-2xl text-white">
@@ -348,6 +352,50 @@ export default function Login() {
                 onVerifyOtp={verifyOtp}
                 onResendOtp={handleResendOTP}
               />
+            )}
+            {/* QR Code Login Mode */}
+            {mode === 'qrcode' && (
+              <div className="flex flex-col items-center gap-6 py-8">
+                <h2 className="text-xl font-semibold text-earth-dark-green">
+                  Scan QR Code Tani Card
+                </h2>
+                <div className="w-full max-w-xs overflow-hidden rounded-lg border-2 border-earth-medium-green">
+                  <QrScanner
+                    onScan={(detectedCodes) => {
+                      detectedCodes.forEach((code) => {
+                        // Parse taniId from QR value (expecting .../login?taniId=XXX&mode=taniId)
+                        const rawValue = code.rawValue;
+                        setQrCodeRawValue(rawValue);
+                        const url = new URL(rawValue);
+                        // check if card is for current host
+                        if (url.origin !== clientEnv.VITE_SITE_URL) {
+                          console.log('QR code host is not valid');
+                          return;
+                        }
+                        const taniIdParam = url.searchParams.get('taniId');
+                        const modeParam = url.searchParams.get('mode');
+                        const emailParam = url.searchParams.get('email');
+                        if (modeParam === 'taniId' && taniIdParam && emailParam) {
+                          setTaniId(parseInt(taniIdParam));
+                          setEmail(emailParam);
+                          setMode('taniId');
+                        }
+                      });
+                    }}
+                    onError={(error) => {
+                      console.log(error);
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-earth-brown">{qrCodeRawValue}</p>
+                <div className="text-center text-sm text-earth-dark-green">
+                  Arahkan kamera ke QR code pada Tani Card Anda.
+                  <br />
+                  <span className="text-xs text-earth-brown">
+                    QR code akan mengisi TaniId dan Email secara otomatis.
+                  </span>
+                </div>
+              </div>
             )}
           </CardContent>
           <CardFooter className="flex flex-col gap-4 px-8 py-8">
