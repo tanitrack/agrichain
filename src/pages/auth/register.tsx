@@ -1,12 +1,12 @@
 import { AuthLeftSection } from '@/components/auth/auth-left-section';
 import { AuthRightSection } from '@/components/auth/auth-right-section';
-import { useIsLoggedIn } from '@dynamic-labs/sdk-react-core';
+import { useAuthCheck } from '@/hooks/use-auth-check';
 import { Navigate } from 'react-router-dom';
 
 export default function Register() {
-  const isLoggedIn = useIsLoggedIn();
+  const { isSystemAuthenticated, userProfile } = useAuthCheck();
 
-  if (isLoggedIn) {
+  if (isSystemAuthenticated && userProfile) {
     return <Navigate to="/dashboard" replace />;
   }
 
