@@ -51,12 +51,23 @@ export const OTPInput = ({
         <p className="text-center font-medium text-earth-dark-green">
           {title || (language === 'id' ? 'Masukkan 6 Digit Kode OTP' : 'Enter 6 Digit OTP Code')}
         </p>
-        <p className="mb-4 text-center text-sm text-earth-dark-green">
-          {description ||
-            (language === 'id'
-              ? 'Kode dikirim ke email ' + email
-              : 'Code sent to the email ' + email)}
-        </p>
+        {!!email && (
+          <p className="mb-4 text-center text-sm text-earth-dark-green">
+            {description ||
+              (language === 'id'
+                ? 'Kode dikirim ke email ' + email
+                : 'Code sent to the email ' + email)}
+          </p>
+        )}
+        {!email && (
+          <p className="mb-4 text-center text-sm text-earth-dark-green">
+            {description ||
+              (language === 'id'
+                ? 'Kode dikirim ke email yang terdaftar'
+                : 'Code sent to the email that is registered')}
+          </p>
+        )}
+
         <div className="flex justify-center">
           <InputOTP maxLength={6} value={otp} onChange={setOtp}>
             <InputOTPGroup>

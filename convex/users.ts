@@ -39,9 +39,44 @@ export const taniIdLoginHttpHandler = httpAction(async (ctx, request) => {
       throw new Error('User not found');
     }
 
-    return new Response(JSON.stringify(user), {
-      headers: corsHeaders,
-    });
+    // const options = {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({ email: user.email }),
+    // };
+
+    // const response = await fetch(
+    //   `https://app.dynamicauth.com/api/v0/sdk/${DYNAMIC_ENVIRONMENT_ID}/emailVerifications/create`,
+    //   options
+    // );
+
+    //   const data = await response.json();
+
+    //   if (!data.verificationUUID) {
+    //     throw new Error(`Login failed for Tani ID: ${taniId}`);
+    //   }
+
+    //   return new Response(
+    //     JSON.stringify({
+    //       verificationUUID: data.verificationUUID,
+    //       taniId,
+    //     }),
+    //     {
+    //       headers: corsHeaders,
+    //     }
+    //   );
+
+    return new Response(
+      JSON.stringify({
+        email: user.email,
+        taniId: user.taniId,
+      }),
+      {
+        headers: corsHeaders,
+      }
+    );
   }
 
   return new Response(JSON.stringify({ error: 'Invalid request method' }), {

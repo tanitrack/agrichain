@@ -141,7 +141,38 @@ export default function Login() {
     }
   };
 
-  // TaniId login handler (placeholder)
+  const serverSideTaniIdLogin = async () => {
+    const result = await fetch(`${clientEnv.VITE_CONVEX_SITE_URL}/auth/tani-id-login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ taniId }),
+    });
+
+    if (!result.ok) {
+      throw new Error('Failed to login with TaniId');
+    }
+
+    const data = await result.json();
+
+    if (!data.taniId || !data.email) {
+      throw new Error('User not found');
+    }
+
+    await connectWithEmail(data.email);
+
+    toast({
+      title: language === 'id' ? 'Kode OTP telah dikirim!' : 'OTP code has been sent!',
+      description:
+        language === 'id'
+          ? 'Silakan masukkan kode OTP yang telah dikirim ke email Anda'
+          : 'Please enter the OTP code sent to your email',
+    });
+
+    setShowOtpInput(true);
+  };
+
   const handleTaniIdLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -154,25 +185,7 @@ export default function Login() {
     setError(undefined);
 
     try {
-      const result = await fetch(`${clientEnv.VITE_CONVEX_SITE_URL}/auth/tani-id-login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ taniId }),
-      });
-
-      if (!result.ok) {
-        throw new Error('Failed to login with TaniId');
-      }
-
-      const data = await result.json();
-
-      if (!data.user) {
-        throw new Error('User not found');
-      }
-
-      console.log({ data });
+      await serverSideTaniIdLogin();
     } catch (error) {
       setError(language === 'id' ? 'Gagal login dengan TaniId' : 'Failed to login with TaniId');
       toast({
@@ -180,8 +193,8 @@ export default function Login() {
         title: language === 'id' ? 'Gagal login dengan TaniId' : 'Failed to login with TaniId',
         description:
           language === 'id'
-            ? 'Terjadi kesalahan saat login dengan TaniId'
-            : 'An error occurred while logging in with TaniId',
+            ? 'Terjadi kesalahan saat login dengan TaniId, periksa kembali TaniId Anda. Atau gunakan login dengan email'
+            : 'An error occurred while logging in with TaniId, please check your TaniId or use email login',
       });
       console.error('TaniId login failed', error);
     } finally {
