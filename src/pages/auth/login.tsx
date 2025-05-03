@@ -31,7 +31,7 @@ export default function Login() {
   const [email, setEmail] = useQueryState('email');
   const [taniId, setTaniId] = useQueryState('taniId', parseAsInteger);
   const [mode, setMode] = useQueryState('mode', {
-    defaultValue: taniId !== null ? 'taniId' : 'email',
+    defaultValue: Number.isNaN(Number.parseInt(taniId?.toString())) ? 'email' : 'taniId',
   });
   const [qrCodeRawValue, setQrCodeRawValue] = useState<string | null>(null);
 
@@ -318,6 +318,10 @@ export default function Login() {
             <LoginModeSwitcher
               mode={mode}
               onModeChange={(m) => {
+                if (m === 'email') {
+                  setTaniId(null);
+                }
+
                 setMode(m);
                 setShowOtpInput(false);
                 setError(undefined);
