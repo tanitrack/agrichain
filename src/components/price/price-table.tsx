@@ -179,7 +179,7 @@ export const PriceTable = ({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border border-earth-light-green">
+        <div className="rounded-md ">
           <Table>
             <TableHeader className="bg-earth-light-green/30">
               <TableRow>

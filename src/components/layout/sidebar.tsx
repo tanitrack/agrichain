@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home,
-  Wallet,
   ShoppingCart,
   ClipboardList,
   TrendingUp,
@@ -37,24 +36,24 @@ interface SidebarProps {
 const farmerLinks = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Komoditas', href: '/komoditas', icon: Wheat },
-  { name: 'Saldo', href: '/saldo', icon: Wallet },
+  // { name: 'Saldo', href: '/saldo', icon: Wallet },
   { name: 'Transaksi', href: '/transaksi', icon: ShoppingCart },
   { name: 'Order Book', href: '/order-book', icon: ClipboardList },
   { name: 'Harga Komoditas', href: '/harga', icon: TrendingUp },
   // { name: 'Pengiriman', href: '/pengiriman', icon: Truck },
-  { name: 'Profil', href: '/profile', icon: User },
+  // { name: 'Profil', href: '/profile', icon: User },
 ];
 
 // New links specifically for buyers
 const buyerLinks = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
-  { name: 'Market', href: '/market', icon: Store },
+  { name: 'Pasar', href: '/market', icon: Store },
   { name: 'Order Book', href: '/order-book', icon: ClipboardList },
-  { name: 'Saldo', href: '/saldo', icon: Wallet },
+  // { name: 'Saldo', href: '/saldo', icon: Wallet },
   { name: 'Transaksi', href: '/transaksi', icon: ShoppingCart },
   // { name: 'Pengiriman', href: '/pengiriman', icon: Truck },
   { name: 'Harga Komoditas', href: '/harga', icon: TrendingUp },
-  { name: 'Profil', href: '/profile', icon: User },
+  // { name: 'Profil', href: '/profile', icon: User },
 ];
 
 export function Sidebar({ open, setOpen }: SidebarProps) {
