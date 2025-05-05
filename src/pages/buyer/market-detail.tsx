@@ -364,19 +364,14 @@ const MarketDetail = () => {
                     <p>
                       Harga: Rp {commodity.price.toLocaleString()} / {commodity.unit}
                     </p>
-                    <p>
-                      Harga Total: Rp {(commodity.price * 10).toLocaleString()} / {commodity.unit}
-                    </p>
+                    <p>Harga Total: Rp {(commodity.price * 10).toLocaleString()}</p>
                     {/* <p>{commodity.description}</p> */}
                   </TabsContent>
                   <TabsContent value="nutrition" className="space-y-4 p-4">
                     <p>
                       Harga: Rp {(commodity.price - 2000).toLocaleString()} / {commodity.unit}
                     </p>
-                    <p>
-                      Harga Total: Rp {((commodity.price - 2000) * 100).toLocaleString()} /{' '}
-                      {commodity.unit}
-                    </p>
+                    <p>Harga Total: Rp {((commodity.price - 2000) * 100).toLocaleString()}</p>
                     {/* <p>{commodity.nutritionalInfo}</p> */}
                   </TabsContent>
 
@@ -384,10 +379,7 @@ const MarketDetail = () => {
                     <p>
                       Harga: Rp {(commodity.price - 4000).toLocaleString()} / {commodity.unit}
                     </p>
-                    <p>
-                      Harga Total: Rp {((commodity.price - 4000) * 100).toLocaleString()} /{' '}
-                      {commodity.unit}
-                    </p>
+                    <p>Harga Total: Rp {((commodity.price - 4000) * 100).toLocaleString()}</p>
                     {/* <p>{commodity.storageInfo}</p> */}
                   </TabsContent>
                 </Tabs>
