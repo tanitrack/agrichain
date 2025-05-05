@@ -14,6 +14,12 @@ export type CommodityType =
 
 export type CommodityGrade = 'A' | 'B' | 'C' | 'Premium' | 'Standar' | 'Ekonomi';
 
+export interface BulkPrice {
+  id: string;
+  minQuantity: number;
+  price: number;
+}
+
 export type TransactionStatus =
   | 'menunggu_konfirmasi'
   | 'dikonfirmasi'

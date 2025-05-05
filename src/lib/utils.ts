@@ -15,6 +15,25 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+// Format number with thousand separator for price input
+export function formatPriceInput(value: string): string {
+  // Remove non-digit characters
+  const digits = value.replace(/\D/g, '');
+
+  // Format with thousand separators
+  if (digits) {
+    return new Intl.NumberFormat('id-ID').format(parseInt(digits));
+  }
+
+  return '';
+}
+
+// Parse formatted price input back to number
+export function parsePriceInput(value: string): number {
+  // Remove all non-digit characters
+  return parseInt(value.replace(/\D/g, '')) || 0;
+}
+
 // Format date to localized string
 export function formatDate(date: Date): string {
   return new Intl.DateTimeFormat('id-ID', {
