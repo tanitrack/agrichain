@@ -111,7 +111,7 @@ export const TransactionInfo = ({
           <Separator className="bg-earth-light-brown/30" />
 
           <div className="rounded-lg bg-earth-light-brown/20 p-4">
-            <h3 className="mb-2 text-sm font-medium text-earth-brown">Notes</h3>
+            <h3 className="mb-2 text-sm font-medium text-earth-brown">Deskripsi</h3>
             <p className="mb-4 text-earth-dark-green">{transaction.notes}</p>
           </div>
         </div>

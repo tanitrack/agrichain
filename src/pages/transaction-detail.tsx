@@ -19,11 +19,11 @@ import {
   Calendar,
   MessageCircle,
   CheckCircle2,
-  Camera,
-  UploadCloud,
   BookCheck,
+  UploadCloud,
+  Camera,
 } from 'lucide-react';
-import { formatDate, formatCurrency } from '@/lib/utils';
+import { formatCurrency, formatDate } from '@/lib/utils';
 import { TransactionStatus, ShippingStatus } from '@/lib/data/types';
 import TransactionHeader from '@/components/transaction/transaction-header';
 
@@ -77,13 +77,15 @@ const TransactionDetail = () => {
 
       const updated = {
         ...prev,
-        status: 'dikonfirmasi',
+        // status: 'dikonfirmasi',
+        status: 'sedang_dikirim',
         updatedAt: new Date(),
         history: [
           ...prev.history,
           {
             date: new Date(),
-            status: 'dikonfirmasi',
+            // status: 'dikonfirmasi',
+            status: 'sedang_dikirim',
             description:
               language === 'id'
                 ? 'Transaksi dikonfirmasi oleh penjual'
@@ -381,7 +383,7 @@ const TransactionDetail = () => {
       },
       sedang_dikirim: {
         label: t('status.shipping'),
-        className: 'bg-earth-medium-green/30 text-earth-dark-green font-medium',
+        className: 'bg-earth-clay text-earth-dark-green font-medium',
       },
       sudah_dikirim: {
         label: t('status.shipped'),
@@ -415,13 +417,13 @@ const TransactionDetail = () => {
   const calculateProgress = () => {
     const statusOrder = [
       'menunggu_konfirmasi',
-      'dikonfirmasi',
-      'negosiasi',
-      'dibayar',
-      'persiapan_pengiriman',
+      // 'dikonfirmasi',
+      // 'negosiasi',
+      // 'dibayar',
+      // 'persiapan_pengiriman',
       'sedang_dikirim',
-      'sudah_dikirim',
-      'diterima',
+      // 'sudah_dikirim',
+      // 'diterima',
       'selesai',
     ];
 
@@ -513,14 +515,14 @@ const TransactionDetail = () => {
 
               {/* Preparation Card */}
               {processingActive === 'preparation' && (
-                <Card className="earth-card-wheat overflow-hidden">
-                  <CardHeader className="earth-header-wheat pb-3">
+                <Card className=" overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-earth-dark-green to-earth-medium-green pb-3">
                     <CardTitle className="text-white">
                       {language === 'id' ? 'Persiapan Pengiriman' : 'Order Preparation'}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="mt-2 space-y-4">
-                    <div className="rounded-lg bg-earth-wheat/30 p-4">
+                    <div className="rounded-lg  p-4">
                       <div className="mb-3 flex items-center space-x-2">
                         <Package className="h-5 w-5 text-earth-brown" />
                         <h3 className="font-medium text-earth-dark-green">
@@ -628,14 +630,14 @@ const TransactionDetail = () => {
 
               {/* Delivery Card */}
               {processingActive === 'delivery' && (
-                <Card className="earth-card-clay overflow-hidden">
-                  <CardHeader className="earth-header-clay pb-3">
+                <Card className="overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-earth-dark-green to-earth-medium-green pb-3">
                     <CardTitle className="text-white">
                       {language === 'id' ? 'Informasi Pengiriman' : 'Delivery Information'}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="mt-2 space-y-4">
-                    <div className="rounded-lg bg-earth-clay/20 p-4">
+                    <div className="rounded-lg  p-4">
                       <div className="mb-3 flex items-center space-x-2">
                         <Truck className="h-5 w-5 text-earth-brown" />
                         <h3 className="font-medium text-earth-dark-green">
@@ -722,8 +724,7 @@ const TransactionDetail = () => {
                           </p>
 
                           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                            {/* Delivery Proof Upload */}
-                            <div className="rounded-lg border border-dashed border-earth-light-brown p-4">
+                            <div className="rounded-lg border border-dashed border-earth-light-brown p-6">
                               <div className="mb-2 flex items-center">
                                 <Camera className="mr-2 h-4 w-4 text-earth-brown" />
                                 <h4 className="font-medium text-earth-dark-green">
@@ -757,7 +758,6 @@ const TransactionDetail = () => {
                               </div>
                             </div>
 
-                            {/* Tracking Number */}
                             <div className="rounded-lg border border-earth-light-brown p-4">
                               <div className="mb-2 flex items-center">
                                 <BookCheck className="mr-2 h-4 w-4 text-earth-brown" />
@@ -829,14 +829,14 @@ const TransactionDetail = () => {
 
               {/* Documents Card */}
               {processingActive === 'documents' && (
-                <Card className="earth-card-forest overflow-hidden">
-                  <CardHeader className="earth-header-forest pb-3">
+                <Card className="overflow-hidden">
+                  <CardHeader className="bg-gradient-to-r from-earth-dark-green to-earth-medium-green pb-3">
                     <CardTitle className="text-white">
                       {language === 'id' ? 'Dokumen Transaksi' : 'Transaction Documents'}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="mt-2 space-y-4">
-                    <div className="rounded-lg bg-earth-pale-green/30 p-4">
+                    <div className="rounded-lg  p-6">
                       <div className="mb-3 flex items-center space-x-2">
                         <FileText className="h-5 w-5 text-earth-dark-green" />
                         <h3 className="font-medium text-earth-dark-green">

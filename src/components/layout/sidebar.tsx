@@ -72,7 +72,7 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
   // }, [userRole]);
 
   // Determine which links to show based on user role
-  const links = userProfile.userType === 'farmer' ? farmerLinks : buyerLinks;
+  const links = userProfile?.userType === 'farmer' ? farmerLinks : buyerLinks;
 
   // Check if mobile
   useEffect(() => {
@@ -213,9 +213,9 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
                     <AvatarFallback className="bg-[#588157]/30 text-white">PT</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col items-start text-sm">
-                    <span className="text-wrap text-start font-medium">{userProfile.name}</span>
+                    <span className="text-wrap text-start font-medium">{userProfile?.name}</span>
                     <span className="text-xs text-[#a3b18a]">
-                      {userProfile.userType === 'farmer' ? 'Petani' : 'Pembeli'}
+                      {userProfile?.userType === 'farmer' ? 'Petani' : 'Pembeli'}
                     </span>
                   </div>
                 </Button>

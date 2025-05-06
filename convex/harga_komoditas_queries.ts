@@ -1,4 +1,4 @@
-/* eslint-disable @eslint-react/naming-convention/filename */
+ 
 import { query } from './_generated/server';
 import { v } from 'convex/values';
 

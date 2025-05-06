@@ -40,8 +40,8 @@ export const TransactionTimeline = ({ history, currentStatus }: TransactionTimel
 
   if (timelineEvents.length === 0) {
     return (
-      <Card className="earth-card-clay overflow-hidden">
-        <CardHeader className="earth-header-clay pb-3">
+      <Card className=" overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-earth-dark-green to-earth-medium-green pb-3">
           <CardTitle className="text-white">
             {language === 'id' ? 'Linimasa Transaksi' : 'Transaction Timeline'}
           </CardTitle>
