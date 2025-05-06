@@ -11,7 +11,6 @@ import {
   LogOut,
   Wheat,
   Sprout,
-  ShoppingBasket,
   Store,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -22,10 +21,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/language-context';
+import { useAuthCheck } from '@/hooks/use-auth-check';
 
 interface SidebarProps {
   open: boolean;
@@ -60,20 +59,20 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(false);
   const { t } = useLanguage();
-
+  const { userProfile } = useAuthCheck();
   // Use localStorage to persist the user role
-  const [userRole, setUserRole] = useState<'farmer' | 'buyer'>(() => {
-    const savedRole = localStorage.getItem('userRole');
-    return savedRole === 'buyer' ? 'buyer' : 'farmer';
-  });
+  // const [userRole, setUserRole] = useState<'farmer' | 'buyer'>(() => {
+  //   const savedRole = localStorage.getItem('userRole');
+  //   return savedRole === 'buyer' ? 'buyer' : 'farmer';
+  // });
 
   // Save role to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('userRole', userRole);
-  }, [userRole]);
+  // useEffect(() => {
+  //   localStorage.setItem('userRole', userRole);
+  // }, [userRole]);
 
   // Determine which links to show based on user role
-  const links = userRole === 'farmer' ? farmerLinks : buyerLinks;
+  const links = userProfile.userType === 'farmer' ? farmerLinks : buyerLinks;
 
   // Check if mobile
   useEffect(() => {
@@ -141,7 +140,7 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
         </div>
 
         {/* Role Switcher - For demonstration purposes */}
-        {open && (
+        {/* {open && (
           <div className="px-3 py-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -172,7 +171,7 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        )}
+        )} */}
 
         <div className="flex-1 overflow-y-auto py-4">
           <nav className="space-y-1 px-2">
@@ -214,9 +213,9 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
                     <AvatarFallback className="bg-[#588157]/30 text-white">PT</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col items-start text-sm">
-                    <span className="font-medium">Pak Tani</span>
+                    <span className="text-wrap text-start font-medium">{userProfile.name}</span>
                     <span className="text-xs text-[#a3b18a]">
-                      {userRole === 'farmer' ? 'Petani' : 'Pembeli'}
+                      {userProfile.userType === 'farmer' ? 'Petani' : 'Pembeli'}
                     </span>
                   </div>
                 </Button>

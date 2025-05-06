@@ -5,6 +5,7 @@ import { MainLayout } from '@/components/layout/main-layout';
 import { transactions, commodities, commodityPrices, currentUser } from '@/lib/data/mock-data';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useLanguage } from '@/contexts/language-context';
+import { useAuthCheck } from '@/hooks/use-auth-check';
 
 export default function Dashboard() {
   const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month' | 'year'>('week');
@@ -34,6 +35,8 @@ export default function Dashboard() {
     .sort((a, b) => b.predictedChange - a.predictedChange)
     .slice(0, 3);
 
+  const { userProfile } = useAuthCheck();
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -42,7 +45,7 @@ export default function Dashboard() {
             <h1 className="text-2xl font-bold tracking-tight text-earth-dark-green">
               {t('dashboard.title')}
             </h1>
-            <h2>Selamat datang kembali ({'nama_user'})👋</h2>
+            <h2>Selamat datang kembali {userProfile.name}👋</h2>
           </div>
           {/* <Tabs
             value={timeframe}

@@ -5,22 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import {
-  ArrowLeft,
-  FileText,
-  CheckCircle,
-  XCircle,
-  Calendar,
-  Package,
-  User,
-  Clock,
-  ArrowRight,
-} from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, Calendar, Package, User, Clock } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import { formatDate } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import OrderBookAcceptDialog from '@/components/orderbook/order-book-accept-dialog';
 import { TransactionFlowExplorerDialog } from '@/components/transaction/transaction-flow-explorer-dialog'; // Add this import
+import { useAuthCheck } from '@/hooks/use-auth-check';
 
 // Mock order book data
 const orderBooks = [
@@ -143,6 +134,7 @@ const OrderBookDetail = () => {
   const [orderBook, setOrderBook] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
+  const { userProfile } = useAuthCheck();
 
   useEffect(() => {
     // Simulate API call with setTimeout
@@ -247,8 +239,8 @@ const OrderBookDetail = () => {
       <MainLayout>
         <div className="flex h-full items-center justify-center">
           <div className="animate-pulse text-center">
-            <div className="bg-earth-light-green mx-auto mb-4 h-8 w-32 rounded"></div>
-            <div className="bg-earth-light-green mx-auto h-4 w-64 rounded"></div>
+            <div className="mx-auto mb-4 h-8 w-32 rounded bg-earth-light-green"></div>
+            <div className="mx-auto h-4 w-64 rounded bg-earth-light-green"></div>
           </div>
         </div>
       </MainLayout>
@@ -259,10 +251,10 @@ const OrderBookDetail = () => {
     return (
       <MainLayout>
         <div className="py-12 text-center">
-          <h2 className="text-earth-dark-green mb-2 text-2xl font-bold">
+          <h2 className="mb-2 text-2xl font-bold text-earth-dark-green">
             {t('orderbook.notfound')}
           </h2>
-          <p className="text-earth-medium-green mb-6">
+          <p className="mb-6 text-earth-medium-green">
             {language === 'id'
               ? 'Entri order book yang diminta tidak dapat ditemukan.'
               : 'The requested order book entry could not be found.'}
@@ -287,20 +279,20 @@ const OrderBookDetail = () => {
           <Button
             variant="outline"
             size="sm"
-            className="border-earth-medium-green text-earth-dark-green hover:bg-earth-light-green/20 mb-4"
+            className="mb-4 border-earth-medium-green text-earth-dark-green hover:bg-earth-light-green/20"
             onClick={() => navigate('/order-book')}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             {t('action.back')}
           </Button>
-          <h1 className="text-earth-dark-green text-2xl font-bold">{t('orderbook.detail')}</h1>
+          <h1 className="text-2xl font-bold text-earth-dark-green">{t('orderbook.detail')}</h1>
           <p className="text-earth-medium-green">{orderBook.id}</p>
         </div>
         <div className="mt-4 flex space-x-2 md:mt-0">
           {/* Add Transaction Guide button */}
           <TransactionFlowExplorerDialog />
 
-          {orderBook.status === 'open' && (
+          {orderBook.status === 'open' && userProfile.userType === 'farmer' && (
             <>
               <Button
                 variant="outline"
@@ -311,7 +303,7 @@ const OrderBookDetail = () => {
                 {language === 'id' ? 'Tolak Pesanan' : 'Reject Order'}
               </Button>
               <Button
-                className="from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green gap-2 bg-gradient-to-r"
+                className="gap-2 bg-gradient-to-r from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green"
                 onClick={handleAccept}
               >
                 <CheckCircle className="h-4 w-4" />
@@ -327,8 +319,8 @@ const OrderBookDetail = () => {
         {/* Main content - 2/3 width on desktop */}
         <div className="space-y-6 md:col-span-2">
           {/* Order Details Card */}
-          <Card className="border-earth-light-green/70 overflow-hidden border-2 shadow-md">
-            <CardHeader className="from-earth-dark-green to-earth-medium-green bg-gradient-to-r pb-3">
+          <Card className="overflow-hidden border-2 border-earth-light-green/70 shadow-md">
+            <CardHeader className="bg-gradient-to-r from-earth-dark-green to-earth-medium-green pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-white">{t('orderbook.detail')}</CardTitle>
                 {getStatusBadge(orderBook.status)}
@@ -337,16 +329,16 @@ const OrderBookDetail = () => {
             <CardContent className="p-6">
               <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <h3 className="text-earth-medium-green mb-1 text-sm font-medium">
+                  <h3 className="mb-1 text-sm font-medium text-earth-medium-green">
                     {t('orderbook.commodity')}
                   </h3>
-                  <div className="bg-earth-pale-green/50 border-earth-light-green/30 hover:bg-earth-pale-green flex items-center rounded-lg border p-3 transition-colors">
-                    <div className="bg-earth-light-green/30 mr-3 flex h-10 w-10 items-center justify-center overflow-hidden rounded-full">
-                      <Package className="text-earth-dark-green h-5 w-5" />
+                  <div className="flex items-center rounded-lg border border-earth-light-green/30 bg-earth-pale-green/50 p-3 transition-colors hover:bg-earth-pale-green">
+                    <div className="mr-3 flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-earth-light-green/30">
+                      <Package className="h-5 w-5 text-earth-dark-green" />
                     </div>
                     <div>
-                      <p className="text-earth-dark-green font-medium">{orderBook.commodityType}</p>
-                      <p className="text-earth-medium-green text-sm">
+                      <p className="font-medium text-earth-dark-green">{orderBook.commodityType}</p>
+                      <p className="text-sm text-earth-medium-green">
                         {orderBook.quantity.toLocaleString()} {orderBook.unit}
                       </p>
                     </div>
@@ -354,10 +346,32 @@ const OrderBookDetail = () => {
                 </div>
 
                 <div>
-                  <h3 className="text-earth-medium-green mb-1 text-sm font-medium">
+                  <h3 className="mb-1 text-sm font-medium text-earth-medium-green">
+                    {language === 'id' ? 'Tanggal Penting' : 'Important Dates'}
+                  </h3>
+                  <div className="space-y-1 rounded-lg border border-earth-light-green/30 bg-earth-pale-green/50 p-4">
+                    <div className="flex items-center">
+                      <Calendar className="mr-2 h-4 w-4 text-earth-medium-green" />
+                      <span className="text-sm text-earth-dark-green">
+                        {language === 'id' ? 'Pengiriman: ' : 'Delivery: '}
+                        <strong>{formatDate(orderBook.requestedDeliveryDate)}</strong>
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <Clock className="mr-2 h-4 w-4 text-earth-medium-green" />
+                      <span className="text-sm text-earth-dark-green">
+                        {language === 'id' ? 'Kedaluwarsa: ' : 'Expires: '}
+                        <strong>{formatDate(orderBook.offerExpiryDate)}</strong>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* <div>
+                  <h3 className="mb-1 text-sm font-medium text-earth-medium-green">
                     {language === 'id' ? 'Grade yang Diminta' : 'Requested Grade'}
                   </h3>
-                  <div className="bg-earth-pale-green/50 border-earth-light-green/30 rounded-lg border p-3">
+                  <div className="rounded-lg border border-earth-light-green/30 bg-earth-pale-green/50 p-3">
                     <Badge
                       variant="outline"
                       className={
@@ -371,19 +385,19 @@ const OrderBookDetail = () => {
                       {orderBook.requestedGrade}
                     </Badge>
                   </div>
-                </div>
+                </div> */}
               </div>
 
-              <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+              {/* <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <h3 className="text-earth-medium-green mb-1 text-sm font-medium">
+                  <h3 className="mb-1 text-sm font-medium text-earth-medium-green">
                     {language === 'id' ? 'Penawaran Harga' : 'Price Offer'}
                   </h3>
-                  <div className="bg-earth-wheat/30 border-earth-wheat rounded-lg border p-4">
-                    <p className="text-earth-dark-green text-xl font-bold">
+                  <div className="rounded-lg border border-earth-wheat bg-earth-wheat/30 p-4">
+                    <p className="text-xl font-bold text-earth-dark-green">
                       Rp {orderBook.priceOffer.toLocaleString()}/{orderBook.unit}
                     </p>
-                    <p className="text-earth-medium-green text-sm">
+                    <p className="text-sm text-earth-medium-green">
                       {language === 'id' ? 'Total: ' : 'Total: '}
                       Rp {orderBook.totalValue.toLocaleString()}
                     </p>
@@ -391,32 +405,32 @@ const OrderBookDetail = () => {
                 </div>
 
                 <div>
-                  <h3 className="text-earth-medium-green mb-1 text-sm font-medium">
+                  <h3 className="mb-1 text-sm font-medium text-earth-medium-green">
                     {language === 'id' ? 'Tanggal Penting' : 'Important Dates'}
                   </h3>
-                  <div className="bg-earth-pale-green/50 border-earth-light-green/30 space-y-1 rounded-lg border p-4">
+                  <div className="space-y-1 rounded-lg border border-earth-light-green/30 bg-earth-pale-green/50 p-4">
                     <div className="flex items-center">
-                      <Calendar className="text-earth-medium-green mr-2 h-4 w-4" />
-                      <span className="text-earth-dark-green text-sm">
+                      <Calendar className="mr-2 h-4 w-4 text-earth-medium-green" />
+                      <span className="text-sm text-earth-dark-green">
                         {language === 'id' ? 'Pengiriman: ' : 'Delivery: '}
                         <strong>{formatDate(orderBook.requestedDeliveryDate)}</strong>
                       </span>
                     </div>
                     <div className="flex items-center">
-                      <Clock className="text-earth-medium-green mr-2 h-4 w-4" />
-                      <span className="text-earth-dark-green text-sm">
+                      <Clock className="mr-2 h-4 w-4 text-earth-medium-green" />
+                      <span className="text-sm text-earth-dark-green">
                         {language === 'id' ? 'Kedaluwarsa: ' : 'Expires: '}
                         <strong>{formatDate(orderBook.offerExpiryDate)}</strong>
                       </span>
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
-              <Separator className="bg-earth-light-green my-6" />
+              <Separator className="my-6 bg-earth-light-green" />
 
               <div className="mb-6">
-                <h3 className="text-earth-medium-green mb-2 text-sm font-medium">
+                <h3 className="mb-2 text-sm font-medium text-earth-medium-green">
                   {language === 'id' ? 'Informasi Pembeli' : 'Buyer Information'}
                 </h3>
                 <div className="flex items-start rounded-lg border border-blue-100 bg-blue-50 p-4">
@@ -424,36 +438,34 @@ const OrderBookDetail = () => {
                     <User className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
-                    <p className="text-earth-dark-green font-medium">{orderBook.buyerName}</p>
-                    <p className="text-earth-medium-green text-sm">
+                    <p className="font-medium text-earth-dark-green">{orderBook.buyerName}</p>
+                    <p className="text-sm text-earth-medium-green">
                       {orderBook.buyerDetails.email}
                     </p>
-                    <p className="text-earth-medium-green text-sm">
+                    <p className="text-sm text-earth-medium-green">
                       {orderBook.buyerDetails.phone}
                     </p>
-                    <p className="text-earth-medium-green mt-1 text-sm">
+                    <p className="mt-1 text-sm text-earth-medium-green">
                       {orderBook.buyerDetails.address}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <Separator className="bg-earth-light-green my-6" />
+              <Separator className="my-6 bg-earth-light-green" />
 
               <div>
-                <h3 className="text-earth-medium-green mb-2 text-sm font-medium">
+                {/* <h3 className="mb-2 text-sm font-medium text-earth-medium-green">
                   {language === 'id' ? 'Persyaratan' : 'Requirements'}
                 </h3>
-                <ul className="text-earth-dark-green bg-earth-pale-green/30 border-earth-light-green/20 mb-6 list-disc space-y-1 rounded-lg border p-4 pl-5">
+                <ul className="mb-6 list-disc space-y-1 rounded-lg border border-earth-light-green/20 bg-earth-pale-green/30 p-4 pl-5 text-earth-dark-green">
                   {orderBook.requirementDetails.map((req: string, index: number) => (
                     <li key={index}>{req}</li>
                   ))}
-                </ul>
+                </ul> */}
 
-                <h3 className="text-earth-medium-green mb-2 text-sm font-medium">
-                  {t('orderbook.terms')}
-                </h3>
-                <p className="text-earth-dark-green bg-earth-pale-green/30 border-earth-light-green/20 mb-4 rounded-lg border p-4">
+                <h3 className="mb-2 text-sm font-medium text-earth-medium-green">{'Deskripsi'}</h3>
+                <p className="mb-4 rounded-lg border border-earth-light-green/20 bg-earth-pale-green/30 p-4 text-earth-dark-green">
                   {orderBook.termsConditions}
                 </p>
               </div>
@@ -461,8 +473,8 @@ const OrderBookDetail = () => {
           </Card>
 
           {/* History Card */}
-          <Card className="border-earth-clay/70 overflow-hidden border-2 shadow-md">
-            <CardHeader className="from-earth-brown to-earth-light-brown bg-gradient-to-r pb-3">
+          <Card className="overflow-hidden border-2 border-earth-light-green/70 shadow-md">
+            <CardHeader className="bg-gradient-to-r from-earth-dark-green to-earth-medium-green pb-3">
               <CardTitle className="text-white">
                 {language === 'id' ? 'Riwayat' : 'History'}
               </CardTitle>
@@ -472,18 +484,18 @@ const OrderBookDetail = () => {
                 {orderBook.history.map((event: any, index: number) => (
                   <div key={index} className="flex">
                     <div className="mr-4 flex flex-col items-center">
-                      <div className="bg-earth-dark-green h-3 w-3 rounded-full"></div>
+                      <div className="h-3 w-3 rounded-full bg-earth-dark-green"></div>
                       {index < orderBook.history.length - 1 && (
-                        <div className="bg-earth-light-green mt-1 h-full w-0.5"></div>
+                        <div className="mt-1 h-full w-0.5 bg-earth-light-green"></div>
                       )}
                     </div>
                     <div className="pb-4">
                       <div className="flex flex-col">
-                        <p className="text-earth-dark-green font-medium">{event.action}</p>
-                        <p className="text-earth-medium-green text-sm">
+                        <p className="font-medium text-earth-dark-green">{event.action}</p>
+                        <p className="text-sm text-earth-medium-green">
                           {formatDate(new Date(event.date))}
                         </p>
-                        <p className="text-earth-dark-green mt-1">{event.notes}</p>
+                        <p className="mt-1 text-earth-dark-green">{event.notes}</p>
                       </div>
                     </div>
                   </div>
@@ -496,26 +508,26 @@ const OrderBookDetail = () => {
         {/* Sidebar - 1/3 width on desktop */}
         <div className="space-y-6">
           {/* Order Summary Card */}
-          <Card className="border-earth-wheat/70 overflow-hidden border-2 shadow-md">
-            <CardHeader className="bg-gradient-to-r from-[#d4b145] to-[#e6be70] pb-3">
+          {/* <Card className="overflow-hidden border-2 border-earth-light-green/70 shadow-md">
+            <CardHeader className="bg-gradient-to-r from-earth-dark-green to-earth-medium-green pb-3">
               <CardTitle className="text-white">
                 {language === 'id' ? 'Ringkasan Pesanan' : 'Order Summary'}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 p-6">
-              <div className="hover:bg-earth-pale-green/20 flex items-center justify-between rounded p-2 transition-colors">
+              <div className="flex items-center justify-between rounded p-2 transition-colors hover:bg-earth-pale-green/20">
                 <span className="text-earth-medium-green">
                   {language === 'id' ? 'ID Pesanan' : 'Order ID'}
                 </span>
-                <span className="text-earth-dark-green font-mono">{orderBook.id}</span>
+                <span className="font-mono text-earth-dark-green">{orderBook.id}</span>
               </div>
-              <div className="hover:bg-earth-pale-green/20 flex items-center justify-between rounded p-2 transition-colors">
+              <div className="flex items-center justify-between rounded p-2 transition-colors hover:bg-earth-pale-green/20">
                 <span className="text-earth-medium-green">
                   {language === 'id' ? 'Tanggal Dibuat' : 'Created Date'}
                 </span>
                 <span className="text-earth-dark-green">{formatDate(orderBook.createdAt)}</span>
               </div>
-              <div className="hover:bg-earth-pale-green/20 flex items-center justify-between rounded p-2 transition-colors">
+              <div className="flex items-center justify-between rounded p-2 transition-colors hover:bg-earth-pale-green/20">
                 <span className="text-earth-medium-green">
                   {language === 'id' ? 'Status' : 'Status'}
                 </span>
@@ -524,13 +536,13 @@ const OrderBookDetail = () => {
 
               <Separator className="bg-earth-light-green/50" />
 
-              <div className="hover:bg-earth-pale-green/20 flex items-center justify-between rounded p-2 transition-colors">
+              <div className="flex items-center justify-between rounded p-2 transition-colors hover:bg-earth-pale-green/20">
                 <span className="text-earth-medium-green">
                   {language === 'id' ? 'Komoditas' : 'Commodity'}
                 </span>
                 <span className="text-earth-dark-green">{orderBook.commodityType}</span>
               </div>
-              <div className="hover:bg-earth-pale-green/20 flex items-center justify-between rounded p-2 transition-colors">
+              <div className="flex items-center justify-between rounded p-2 transition-colors hover:bg-earth-pale-green/20">
                 <span className="text-earth-medium-green">
                   {language === 'id' ? 'Jumlah' : 'Quantity'}
                 </span>
@@ -538,7 +550,7 @@ const OrderBookDetail = () => {
                   {orderBook.quantity.toLocaleString()} {orderBook.unit}
                 </span>
               </div>
-              <div className="hover:bg-earth-pale-green/20 flex items-center justify-between rounded p-2 transition-colors">
+              <div className="flex items-center justify-between rounded p-2 transition-colors hover:bg-earth-pale-green/20">
                 <span className="text-earth-medium-green">
                   {language === 'id' ? 'Grade' : 'Grade'}
                 </span>
@@ -547,7 +559,7 @@ const OrderBookDetail = () => {
 
               <Separator className="bg-earth-light-green/50" />
 
-              <div className="hover:bg-earth-pale-green/20 flex items-center justify-between rounded p-2 transition-colors">
+              <div className="flex items-center justify-between rounded p-2 transition-colors hover:bg-earth-pale-green/20">
                 <span className="text-earth-medium-green">
                   {language === 'id' ? 'Harga Satuan' : 'Unit Price'}
                 </span>
@@ -555,7 +567,7 @@ const OrderBookDetail = () => {
                   Rp {orderBook.priceOffer.toLocaleString()}
                 </span>
               </div>
-              <div className="bg-earth-wheat/30 flex items-center justify-between rounded-lg p-2 font-bold">
+              <div className="flex items-center justify-between rounded-lg bg-earth-wheat/30 p-2 font-bold">
                 <span className="text-earth-dark-green">
                   {language === 'id' ? 'Total Nilai' : 'Total Value'}
                 </span>
@@ -564,46 +576,46 @@ const OrderBookDetail = () => {
                 </span>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Delivery Information Card */}
-          <Card className="border-earth-light-green/70 overflow-hidden border-2 shadow-md">
-            <CardHeader className="from-earth-medium-green to-earth-light-green bg-gradient-to-r pb-3">
+          <Card className="overflow-hidden border-2 border-earth-light-green/70 shadow-md">
+            <CardHeader className="bg-gradient-to-r from-earth-dark-green to-earth-medium-green pb-3">
               <CardTitle className="text-white">
                 {language === 'id' ? 'Informasi Pengiriman' : 'Delivery Information'}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
               <div className="space-y-4">
-                <div className="bg-earth-pale-green/40 border-earth-light-green/20 rounded-lg border p-3">
-                  <h3 className="text-earth-medium-green mb-1 text-sm font-medium">
+                <div className="rounded-lg border border-earth-light-green/20 bg-earth-pale-green/40 p-3">
+                  <h3 className="mb-1 text-sm font-medium text-earth-medium-green">
                     {language === 'id'
                       ? 'Tanggal Pengiriman yang Diminta'
                       : 'Requested Delivery Date'}
                   </h3>
                   <div className="flex items-center">
-                    <Calendar className="text-earth-medium-green mr-2 h-5 w-5" />
-                    <span className="text-earth-dark-green font-medium">
+                    <Calendar className="mr-2 h-5 w-5 text-earth-medium-green" />
+                    <span className="font-medium text-earth-dark-green">
                       {formatDate(orderBook.requestedDeliveryDate)}
                     </span>
                   </div>
                 </div>
-                <div className="bg-earth-pale-green/40 border-earth-light-green/20 rounded-lg border p-3">
-                  <h3 className="text-earth-medium-green mb-1 text-sm font-medium">
+                <div className="rounded-lg border border-earth-light-green/20 bg-earth-pale-green/40 p-3">
+                  <h3 className="mb-1 text-sm font-medium text-earth-medium-green">
                     {language === 'id' ? 'Alamat Pengiriman' : 'Delivery Address'}
                   </h3>
                   <p className="text-earth-dark-green">{orderBook.buyerDetails.address}</p>
                 </div>
-                <div className="bg-earth-pale-green/40 border-earth-light-green/20 rounded-lg border p-3">
-                  <h3 className="text-earth-medium-green mb-1 text-sm font-medium">
+                <div className="rounded-lg border border-earth-light-green/20 bg-earth-pale-green/40 p-3">
+                  <h3 className="mb-1 text-sm font-medium text-earth-medium-green">
                     {language === 'id' ? 'Kontak Perwakilan' : 'Contact Person'}
                   </h3>
                   <div className="flex flex-col">
-                    <p className="text-earth-dark-green font-medium">{orderBook.buyerName}</p>
-                    <p className="text-earth-medium-green text-sm">
+                    <p className="font-medium text-earth-dark-green">{orderBook.buyerName}</p>
+                    <p className="text-sm text-earth-medium-green">
                       {orderBook.buyerDetails.phone}
                     </p>
-                    <p className="text-earth-medium-green text-sm">
+                    <p className="text-sm text-earth-medium-green">
                       {orderBook.buyerDetails.email}
                     </p>
                   </div>
@@ -613,8 +625,8 @@ const OrderBookDetail = () => {
           </Card>
 
           {/* Quick Actions Card */}
-          <Card className="border-earth-clay/70 overflow-hidden border-2 shadow-md">
-            <CardHeader className="from-earth-brown to-earth-light-brown bg-gradient-to-r pb-3">
+          {/* <Card className="overflow-hidden border-2 border-earth-clay/70 shadow-md">
+            <CardHeader className="bg-gradient-to-r from-earth-brown to-earth-light-brown pb-3">
               <CardTitle className="text-white">
                 {language === 'id' ? 'Aksi Cepat' : 'Quick Actions'}
               </CardTitle>
@@ -623,7 +635,7 @@ const OrderBookDetail = () => {
               <div className="space-y-3">
                 <Button
                   variant="outline"
-                  className="border-earth-medium-green text-earth-dark-green hover:bg-earth-light-green/20 w-full justify-start gap-2"
+                  className="w-full justify-start gap-2 border-earth-medium-green text-earth-dark-green hover:bg-earth-light-green/20"
                 >
                   <FileText className="h-4 w-4" />
                   {language === 'id' ? 'Lihat Syarat & Ketentuan' : 'View Terms'}
@@ -631,7 +643,7 @@ const OrderBookDetail = () => {
                 {orderBook.status === 'open' && (
                   <>
                     <Button
-                      className="from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green w-full justify-start gap-2 bg-gradient-to-r"
+                      className="w-full justify-start gap-2 bg-gradient-to-r from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green"
                       onClick={handleAccept}
                     >
                       <CheckCircle className="h-4 w-4" />
@@ -649,7 +661,7 @@ const OrderBookDetail = () => {
                 )}
                 {orderBook.status === 'accepted' && (
                   <Button
-                    className="from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green w-full justify-start gap-2 bg-gradient-to-r"
+                    className="w-full justify-start gap-2 bg-gradient-to-r from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green"
                     onClick={() => navigate(`/transaction/${orderBook.id}`)}
                   >
                     <ArrowRight className="h-4 w-4" />
@@ -658,7 +670,7 @@ const OrderBookDetail = () => {
                 )}
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
       </div>
 

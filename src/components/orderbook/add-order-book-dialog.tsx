@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { CalendarIcon, Plus } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -22,6 +22,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
+import { id as localeID } from 'date-fns/locale';
 
 // Sample commodity types - replace with API data
 const commodityTypes = ['Padi', 'Jagung', 'Kedelai', 'Cabai'];
@@ -37,6 +42,8 @@ export function AddOrderBookDialog() {
     quantity: '',
     unit: '',
     termsFile: null as File | null,
+    description: '',
+    deliveryDate: undefined as Date | undefined,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -75,6 +82,8 @@ export function AddOrderBookDialog() {
       quantity: '',
       unit: '',
       termsFile: null,
+      description: '',
+      deliveryDate: undefined,
     });
   };
 
@@ -105,7 +114,7 @@ export function AddOrderBookDialog() {
               onValueChange={(value) => setFormData((prev) => ({ ...prev, commodityType: value }))}
               required
             >
-              <SelectTrigger>
+              <SelectTrigger className="border-earth-medium-green">
                 <SelectValue
                   placeholder={language === 'id' ? 'Pilih komoditas' : 'Select commodity'}
                 />
@@ -127,9 +136,11 @@ export function AddOrderBookDialog() {
                 id="quantity"
                 type="number"
                 value={formData.quantity}
+                placeholder="Masukkan jumlah"
                 onChange={(e) => setFormData((prev) => ({ ...prev, quantity: e.target.value }))}
                 required
                 min="1"
+                className="border-earth-medium-green focus:border-earth-dark-green"
               />
             </div>
             <div className="space-y-2">
@@ -139,7 +150,7 @@ export function AddOrderBookDialog() {
                 onValueChange={(value) => setFormData((prev) => ({ ...prev, unit: value }))}
                 required
               >
-                <SelectTrigger>
+                <SelectTrigger className="border-earth-medium-green">
                   <SelectValue placeholder={language === 'id' ? 'Pilih satuan' : 'Select unit'} />
                 </SelectTrigger>
                 <SelectContent>
@@ -154,6 +165,61 @@ export function AddOrderBookDialog() {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="deliveryDate">
+              {language === 'id' ? 'Tanggal Pengiriman' : 'Delivery Date'}
+            </Label>
+            <Popover>
+              <PopoverTrigger
+                asChild
+                className="border-earth-medium-green focus:border-earth-dark-green"
+              >
+                <Button
+                  id="deliveryDate"
+                  variant="outline"
+                  className={cn(
+                    'w-full justify-start text-left font-normal',
+                    !formData.deliveryDate && 'text-muted-foreground'
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {formData.deliveryDate ? (
+                    language === 'id' ? (
+                      format(formData.deliveryDate, 'd MMMM yyyy', { locale: localeID })
+                    ) : (
+                      format(formData.deliveryDate, 'PPP')
+                    )
+                  ) : (
+                    <span>{language === 'id' ? 'Pilih tanggal' : 'Pick a date'}</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={formData.deliveryDate}
+                  onSelect={(date) => setFormData((prev) => ({ ...prev, deliveryDate: date }))}
+                  initialFocus
+                  disabled={(date) => date < new Date()}
+                  className={cn('pointer-events-auto p-3')}
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description" className="text-earth-dark-green">
+              {t('commodities.description')}
+            </Label>
+            <Input
+              id="description"
+              placeholder="Deskripsi komoditas"
+              value={formData.description}
+              onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+              className="border-earth-medium-green focus:border-earth-dark-green"
+            />
+          </div>
+
+          {/* <div className="space-y-2">
             <Label htmlFor="terms">
               {language === 'id' ? 'Terms and Conditions' : 'Terms and Conditions'}
             </Label>
@@ -167,7 +233,7 @@ export function AddOrderBookDialog() {
               className="cursor-pointer"
               accept=".pdf,.doc,.docx"
             />
-          </div>
+          </div> */}
         </div>
         <DialogFooter>
           <Button
