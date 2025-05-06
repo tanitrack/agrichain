@@ -105,7 +105,7 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
           isMobile && open && 'w-64 translate-x-0'
         )}
       >
-        <div className="flex items-center justify-between border-b border-[#588157]/20 p-4">
+        <div className="flex items-center justify-between border-b border-[#588157]/20 px-4 py-3">
           {open && (
             <Link to="/dashboard" className="flex items-center gap-2">
               <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-md bg-white/90">

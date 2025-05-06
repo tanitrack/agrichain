@@ -299,16 +299,16 @@ const TransaksiDetail = () => {
             className="mb-4"
             onClick={() => navigate('/transaksi')}
           >
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="mr-2 h-4 w-4 " />
             {t('action.back')}
           </Button>
-          <h1 className="text-earth-dark-green text-2xl font-bold">{t('transactions.detail')}</h1>
-          <p className="text-earth-medium-green font-medium">{transaction.id}</p>
+          <h1 className="text-2xl font-bold text-earth-dark-green">{t('transactions.detail')}</h1>
+          <p className="font-medium text-earth-medium-green">{transaction.id}</p>
         </div>
         <div className="mt-4 flex space-x-2 md:mt-0">
           <Button
             variant="outline"
-            className="border-earth-light-brown/70 text-earth-dark-green hover:bg-earth-pale-green gap-2"
+            className="gap-2 border-earth-light-brown/70 text-earth-dark-green hover:bg-earth-pale-green"
           >
             <FileText className="h-4 w-4" />
             {t('action.print')}
@@ -327,8 +327,8 @@ const TransaksiDetail = () => {
             </CardHeader>
             <CardContent className="mt-4">
               <div className="mb-6">
-                <Progress value={calculateProgress()} className="bg-earth-pale-green h-2" />
-                <div className="text-earth-medium-green mt-1 flex justify-between text-xs">
+                <Progress value={calculateProgress()} className="h-2 bg-earth-pale-green" />
+                <div className="mt-1 flex justify-between text-xs text-earth-medium-green">
                   <span>{t('status.pending')}</span>
                   <span>{t('status.processing')}</span>
                   <span>{t('status.shipped')}</span>
@@ -338,32 +338,32 @@ const TransaksiDetail = () => {
 
               <div className="space-y-6">
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                  <div className="bg-earth-pale-green/50 rounded-lg p-4">
-                    <h3 className="text-earth-medium-green mb-1 text-sm font-medium">
+                  <div className="rounded-lg bg-earth-pale-green/50 p-4">
+                    <h3 className="mb-1 text-sm font-medium text-earth-medium-green">
                       {t('transactions.commodity')}
                     </h3>
                     <div className="flex items-center">
-                      <div className="bg-earth-medium-green/20 mr-3 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full">
-                        <Package className="text-earth-medium-green h-6 w-6" />
+                      <div className="mr-3 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-earth-medium-green/20">
+                        <Package className="h-6 w-6 text-earth-medium-green" />
                       </div>
                       <div>
-                        <p className="text-earth-dark-green font-bold">
+                        <p className="font-bold text-earth-dark-green">
                           {transaction.commodityName}
                         </p>
-                        <p className="text-earth-medium-green text-sm">
+                        <p className="text-sm text-earth-medium-green">
                           {transaction.quantity.toLocaleString()} {transaction.unit}
                         </p>
                       </div>
                     </div>
                   </div>
-                  <div className="bg-earth-wheat/30 rounded-lg p-4">
-                    <h3 className="text-earth-brown mb-1 text-sm font-medium">
+                  <div className="rounded-lg bg-earth-wheat/30 p-4">
+                    <h3 className="mb-1 text-sm font-medium text-earth-brown">
                       {t('transactions.total')}
                     </h3>
-                    <p className="text-earth-dark-green text-xl font-bold">
+                    <p className="text-xl font-bold text-earth-dark-green">
                       {formatCurrency(transaction.totalPrice)}
                     </p>
-                    <p className="text-earth-medium-green text-sm">
+                    <p className="text-sm text-earth-medium-green">
                       @{formatCurrency(transaction.price)}/{transaction.unit}
                     </p>
                   </div>
@@ -372,31 +372,31 @@ const TransaksiDetail = () => {
                 <Separator className="bg-earth-light-brown/30" />
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                  <div className="bg-earth-clay/20 rounded-lg p-4">
-                    <h3 className="text-earth-brown mb-2 text-sm font-medium">
+                  <div className="rounded-lg bg-earth-clay/20 p-4">
+                    <h3 className="mb-2 text-sm font-medium text-earth-brown">
                       {t('transactions.buyer')}
                     </h3>
                     <div className="flex items-start">
-                      <div className="bg-earth-clay/30 mr-3 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full">
-                        <User className="text-earth-brown h-6 w-6" />
+                      <div className="mr-3 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-earth-clay/30">
+                        <User className="h-6 w-6 text-earth-brown" />
                       </div>
                       <div>
-                        <p className="text-earth-dark-green font-bold">{transaction.buyerName}</p>
-                        <p className="text-earth-medium-green text-sm">{transaction.buyerId}</p>
+                        <p className="font-bold text-earth-dark-green">{transaction.buyerName}</p>
+                        <p className="text-sm text-earth-medium-green">{transaction.buyerId}</p>
                       </div>
                     </div>
                   </div>
-                  <div className="bg-earth-light-green/20 rounded-lg p-4">
-                    <h3 className="text-earth-medium-green mb-2 text-sm font-medium">
+                  <div className="rounded-lg bg-earth-light-green/20 p-4">
+                    <h3 className="mb-2 text-sm font-medium text-earth-medium-green">
                       {t('transactions.seller')}
                     </h3>
                     <div className="flex items-start">
-                      <div className="bg-earth-light-green/30 mr-3 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full">
-                        <User className="text-earth-medium-green h-6 w-6" />
+                      <div className="mr-3 flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-earth-light-green/30">
+                        <User className="h-6 w-6 text-earth-medium-green" />
                       </div>
                       <div>
-                        <p className="text-earth-dark-green font-bold">{transaction.sellerName}</p>
-                        <p className="text-earth-medium-green text-sm">{transaction.sellerId}</p>
+                        <p className="font-bold text-earth-dark-green">{transaction.sellerName}</p>
+                        <p className="text-sm text-earth-medium-green">{transaction.sellerId}</p>
                       </div>
                     </div>
                   </div>
@@ -404,16 +404,16 @@ const TransaksiDetail = () => {
 
                 <Separator className="bg-earth-light-brown/30" />
 
-                <div className="bg-earth-light-brown/20 rounded-lg p-4">
-                  <h3 className="text-earth-brown mb-2 text-sm font-medium">
+                <div className="rounded-lg bg-earth-light-brown/20 p-4">
+                  <h3 className="mb-2 text-sm font-medium text-earth-brown">
                     {t('transactions.terms')}
                   </h3>
-                  <p className="text-earth-dark-green mb-4">{transaction.notes || '-'}</p>
+                  <p className="mb-4 text-earth-dark-green">{transaction.notes || '-'}</p>
                   <div className="flex items-center gap-2">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-earth-light-brown/70 text-earth-dark-green hover:bg-earth-pale-green gap-1"
+                      className="gap-1 border-earth-light-brown/70 text-earth-dark-green hover:bg-earth-pale-green"
                     >
                       <FileText className="h-4 w-4" />
                       {t('transactions.documents')}
@@ -432,16 +432,16 @@ const TransaksiDetail = () => {
               {transaction.shippingStatus !== 'belum_dikirim' ? (
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div className="bg-earth-pale-green/50 rounded-lg p-3">
-                      <h3 className="text-earth-medium-green mb-1 text-sm font-medium">
+                    <div className="rounded-lg bg-earth-pale-green/50 p-3">
+                      <h3 className="mb-1 text-sm font-medium text-earth-medium-green">
                         {t('shipping.destination')}
                       </h3>
                       <p className="text-earth-dark-green">
                         {transaction.shippingDetails?.address || '-'}
                       </p>
                     </div>
-                    <div className="bg-earth-pale-green/50 rounded-lg p-3">
-                      <h3 className="text-earth-medium-green mb-1 text-sm font-medium">
+                    <div className="rounded-lg bg-earth-pale-green/50 p-3">
+                      <h3 className="mb-1 text-sm font-medium text-earth-medium-green">
                         {t('shipping.carrier')}
                       </h3>
                       <p className="text-earth-dark-green">
@@ -450,16 +450,16 @@ const TransaksiDetail = () => {
                     </div>
                   </div>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div className="bg-earth-light-green/20 rounded-lg p-3">
-                      <h3 className="text-earth-medium-green mb-1 text-sm font-medium">
+                    <div className="rounded-lg bg-earth-light-green/20 p-3">
+                      <h3 className="mb-1 text-sm font-medium text-earth-medium-green">
                         {t('shipping.tracking')}
                       </h3>
-                      <p className="text-earth-dark-green font-mono">
+                      <p className="font-mono text-earth-dark-green">
                         {transaction.shippingDetails?.trackingNumber || '-'}
                       </p>
                     </div>
-                    <div className="bg-earth-light-green/20 rounded-lg p-3">
-                      <h3 className="text-earth-medium-green mb-1 text-sm font-medium">
+                    <div className="rounded-lg bg-earth-light-green/20 p-3">
+                      <h3 className="mb-1 text-sm font-medium text-earth-medium-green">
                         {t('shipping.arrivalDate')}
                       </h3>
                       <p className="text-earth-dark-green">
@@ -469,8 +469,8 @@ const TransaksiDetail = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="bg-earth-wheat/30 rounded-lg p-3">
-                    <h3 className="text-earth-brown mb-1 text-sm font-medium">
+                  <div className="rounded-lg bg-earth-wheat/30 p-3">
+                    <h3 className="mb-1 text-sm font-medium text-earth-brown">
                       {t('shipping.departureDate')}
                     </h3>
                     <p className="text-earth-dark-green">
@@ -482,7 +482,7 @@ const TransaksiDetail = () => {
                   <div className="flex justify-end">
                     <Button
                       variant="outline"
-                      className="border-earth-light-brown text-earth-dark-green hover:bg-earth-pale-green gap-2"
+                      className="gap-2 border-earth-light-brown text-earth-dark-green hover:bg-earth-pale-green"
                     >
                       <Truck className="h-4 w-4" />
                       {t('shipping.trackShipment')}
@@ -490,12 +490,12 @@ const TransaksiDetail = () => {
                   </div>
                 </div>
               ) : (
-                <div className="bg-earth-pale-green/30 rounded-lg py-8 text-center">
-                  <Truck className="text-earth-light-green mx-auto mb-2 h-12 w-12" />
-                  <p className="text-earth-medium-green mb-4 font-medium">
+                <div className="rounded-lg bg-earth-pale-green/30 py-8 text-center">
+                  <Truck className="mx-auto mb-2 h-12 w-12 text-earth-light-green" />
+                  <p className="mb-4 font-medium text-earth-medium-green">
                     {t('shipping.notfound')}
                   </p>
-                  <p className="text-earth-medium-green text-sm">{t('status.notshipped')}</p>
+                  <p className="text-sm text-earth-medium-green">{t('status.notshipped')}</p>
                 </div>
               )}
             </CardContent>
@@ -512,22 +512,22 @@ const TransaksiDetail = () => {
             </CardHeader>
             <CardContent className="mt-4">
               <div className="space-y-4">
-                <div className="bg-earth-light-brown/20 flex items-center justify-between rounded p-2">
+                <div className="flex items-center justify-between rounded bg-earth-light-brown/20 p-2">
                   <span className="text-earth-brown">{t('transactions.type')}</span>
                   <Badge
                     variant="outline"
-                    className="border-earth-brown text-earth-brown capitalize"
+                    className="border-earth-brown capitalize text-earth-brown"
                   >
                     {transaction.type === 'order_book' ? 'Order Book' : t('transactions.regular')}
                   </Badge>
                 </div>
-                <div className="bg-earth-light-brown/10 flex items-center justify-between rounded p-2">
+                <div className="flex items-center justify-between rounded bg-earth-light-brown/10 p-2">
                   <span className="text-earth-brown">{t('transactions.date')}</span>
                   <span className="text-earth-dark-green">
                     {formatDate(new Date(transaction.createdAt))}
                   </span>
                 </div>
-                <div className="bg-earth-light-brown/20 flex items-center justify-between rounded p-2">
+                <div className="flex items-center justify-between rounded bg-earth-light-brown/20 p-2">
                   <span className="text-earth-brown">{t('transactions.updatedAt')}</span>
                   <span className="text-earth-dark-green">
                     {formatDate(new Date(transaction.updatedAt))}
@@ -536,17 +536,17 @@ const TransaksiDetail = () => {
 
                 <Separator className="bg-earth-light-brown/30" />
 
-                <div className="bg-earth-light-brown/10 flex items-center justify-between rounded p-2">
+                <div className="flex items-center justify-between rounded bg-earth-light-brown/10 p-2">
                   <span className="text-earth-brown">{t('transactions.commodity')}</span>
                   <span className="text-earth-dark-green">{transaction.commodityName}</span>
                 </div>
-                <div className="bg-earth-light-brown/20 flex items-center justify-between rounded p-2">
+                <div className="flex items-center justify-between rounded bg-earth-light-brown/20 p-2">
                   <span className="text-earth-brown">{t('transactions.quantity')}</span>
                   <span className="text-earth-dark-green">
                     {transaction.quantity.toLocaleString()} {transaction.unit}
                   </span>
                 </div>
-                <div className="bg-earth-light-brown/10 flex items-center justify-between rounded p-2">
+                <div className="flex items-center justify-between rounded bg-earth-light-brown/10 p-2">
                   <span className="text-earth-brown">{t('transactions.price')}</span>
                   <span className="text-earth-dark-green">
                     {formatCurrency(transaction.price)}/{transaction.unit}
@@ -555,7 +555,7 @@ const TransaksiDetail = () => {
 
                 <Separator className="bg-earth-light-brown/30" />
 
-                <div className="bg-earth-wheat/40 flex items-center justify-between rounded p-3 font-bold">
+                <div className="flex items-center justify-between rounded bg-earth-wheat/40 p-3 font-bold">
                   <span className="text-earth-dark-green">{t('transactions.total')}</span>
                   <span className="text-earth-dark-green">
                     {formatCurrency(transaction.totalPrice)}
@@ -574,17 +574,17 @@ const TransaksiDetail = () => {
                 {transaction.history?.map((event: any, index: number) => (
                   <div key={index} className="flex">
                     <div className="mr-4 flex flex-col items-center">
-                      <div className="bg-earth-brown flex h-4 w-4 items-center justify-center rounded-full">
-                        <div className="bg-earth-clay h-2 w-2 rounded-full"></div>
+                      <div className="flex h-4 w-4 items-center justify-center rounded-full bg-earth-brown">
+                        <div className="h-2 w-2 rounded-full bg-earth-clay"></div>
                       </div>
                       {index < (transaction.history?.length || 0) - 1 && (
-                        <div className="bg-earth-light-brown mt-1 h-full w-0.5"></div>
+                        <div className="mt-1 h-full w-0.5 bg-earth-light-brown"></div>
                       )}
                     </div>
                     <div className="pb-4">
                       <div className="flex flex-col">
-                        <p className="text-earth-dark-green font-medium">{event.description}</p>
-                        <p className="text-earth-brown text-sm">
+                        <p className="font-medium text-earth-dark-green">{event.description}</p>
+                        <p className="text-sm text-earth-brown">
                           {formatDate(new Date(event.date))}
                         </p>
                       </div>
@@ -608,21 +608,21 @@ const TransaksiDetail = () => {
               <div className="space-y-3">
                 <Button
                   variant="outline"
-                  className="border-earth-light-brown/50 text-earth-dark-green hover:bg-earth-pale-green/50 w-full justify-start gap-2"
+                  className="w-full justify-start gap-2 border-earth-light-brown/50 text-earth-dark-green hover:bg-earth-pale-green/50"
                 >
                   <FileText className="h-4 w-4" />
                   {t('transactions.invoice')}
                 </Button>
                 <Button
                   variant="outline"
-                  className="border-earth-light-brown/50 text-earth-dark-green hover:bg-earth-pale-green/50 w-full justify-start gap-2"
+                  className="w-full justify-start gap-2 border-earth-light-brown/50 text-earth-dark-green hover:bg-earth-pale-green/50"
                 >
                   <ShoppingCart className="h-4 w-4" />
                   {t('transactions.commodity')}
                 </Button>
                 <Button
                   variant="outline"
-                  className="border-earth-light-brown/50 text-earth-dark-green hover:bg-earth-pale-green/50 w-full justify-start gap-2"
+                  className="w-full justify-start gap-2 border-earth-light-brown/50 text-earth-dark-green hover:bg-earth-pale-green/50"
                 >
                   <PackageCheck className="h-4 w-4" />
                   {t('shipping.updateStatus')}
