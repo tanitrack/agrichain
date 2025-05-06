@@ -21,7 +21,7 @@ export function AuthLeftSection({ userType }: AuthLeftSectionProps) {
 
         {!!userType && (
           <>
-            <h2 className="mb-6 text-2xl font-bold text-earth-dark-green">
+            {/* <h2 className="mb-6 text-2xl font-bold text-earth-dark-green">
               {userType === 'petani'
                 ? language === 'id'
                   ? 'Daftar sebagai Petani'
@@ -29,9 +29,9 @@ export function AuthLeftSection({ userType }: AuthLeftSectionProps) {
                 : language === 'id'
                   ? 'Daftar sebagai Konsumen'
                   : 'Register as Buyer'}
-            </h2>
+            </h2> */}
 
-            <AuthBenefits userType={userType} />
+            <AuthBenefits />
             <AuthCardDisplay />
           </>
         )}
