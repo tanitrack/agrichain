@@ -4,12 +4,10 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -18,16 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  CheckCircle,
-  Package,
-  Plus,
-  Info,
-  AlertTriangle,
-  FileCheck,
-  Search,
-  SlidersHorizontal,
-} from 'lucide-react';
+import { CheckCircle, Package, Plus, AlertTriangle, Search, SlidersHorizontal } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import { useToast } from '@/hooks/use-toast';
 import { CommodityType, CommodityGrade } from '@/lib/data/types';
@@ -167,7 +156,7 @@ const OrderBookAcceptDialog = ({
   const handleAddNewCommodity = () => {
     // Close dialog and navigate to add commodity page
     onOpenChange(false);
-    navigate('/komoditas/add');
+    navigate('/komoditas');
   };
 
   const handleNext = () => {
@@ -186,17 +175,17 @@ const OrderBookAcceptDialog = ({
   };
 
   const handleConfirm = () => {
-    if (!termsAccepted) {
-      toast({
-        title: language === 'id' ? 'Terima syarat dan ketentuan' : 'Accept terms and conditions',
-        description:
-          language === 'id'
-            ? 'Anda harus menerima syarat dan ketentuan untuk melanjutkan'
-            : 'You must accept the terms and conditions to proceed',
-        variant: 'destructive',
-      });
-      return;
-    }
+    // if (!termsAccepted) {
+    //   toast({
+    //     title: language === 'id' ? 'Terima syarat dan ketentuan' : 'Accept terms and conditions',
+    //     description:
+    //       language === 'id'
+    //         ? 'Anda harus menerima syarat dan ketentuan untuk melanjutkan'
+    //         : 'You must accept the terms and conditions to proceed',
+    //     variant: 'destructive',
+    //   });
+    //   return;
+    // }
 
     // Process the order book acceptance
     toast({
@@ -221,9 +210,9 @@ const OrderBookAcceptDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
-        <DialogHeader>
-          <DialogTitle className="text-earth-dark-green text-xl">
+      <DialogContent className="max-w-3xl pb-6">
+        <DialogHeader className="earth-header-moss">
+          <DialogTitle className="text-xl text-white">
             {step === 'select-commodity'
               ? language === 'id'
                 ? 'Pilih Komoditas'
@@ -232,7 +221,7 @@ const OrderBookAcceptDialog = ({
                 ? 'Konfirmasi Order Book'
                 : 'Confirm Order Book'}
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-gray-100">
             {step === 'select-commodity'
               ? language === 'id'
                 ? 'Pilih komoditas yang sesuai dengan permintaan pembeli'
@@ -245,21 +234,21 @@ const OrderBookAcceptDialog = ({
 
         {step === 'select-commodity' && (
           <>
-            <div className="grid grid-cols-1 gap-4 p-1 md:grid-cols-2">
-              <div className="bg-earth-pale-green/30 rounded-lg p-4">
-                <h3 className="text-earth-medium-green mb-2 text-sm font-medium">
+            <div className="grid grid-cols-1 gap-4 p-1 px-6 md:grid-cols-2">
+              <div className="rounded-lg bg-earth-pale-green/30 p-4">
+                <h3 className="mb-2 text-sm font-medium text-earth-medium-green">
                   {language === 'id' ? 'Permintaan Komoditas' : 'Commodity Request'}
                 </h3>
                 <div className="flex items-center">
-                  <div className="bg-earth-medium-green/20 mr-3 flex h-10 w-10 items-center justify-center overflow-hidden rounded-full">
-                    <Package className="text-earth-medium-green h-5 w-5" />
+                  <div className="mr-3 flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-earth-medium-green/20">
+                    <Package className="h-5 w-5 text-earth-medium-green" />
                   </div>
                   <div>
-                    <p className="text-earth-dark-green font-bold">{orderBook?.commodityType}</p>
-                    <p className="text-earth-medium-green text-sm">
+                    <p className="font-bold text-earth-dark-green">{orderBook?.commodityType}</p>
+                    <p className="text-sm text-earth-medium-green">
                       {orderBook?.quantity.toLocaleString()} {orderBook?.unit}
                     </p>
-                    <p className="text-earth-medium-green text-sm">
+                    <p className="text-sm text-earth-medium-green">
                       {language === 'id' ? 'Grade: ' : 'Grade: '}
                       {orderBook?.requestedGrade}
                     </p>
@@ -267,28 +256,28 @@ const OrderBookAcceptDialog = ({
                 </div>
               </div>
 
-              <div className="bg-earth-wheat/20 rounded-lg p-4">
-                <h3 className="text-earth-brown mb-2 text-sm font-medium">
+              <div className="rounded-lg bg-earth-wheat/20 p-4">
+                <h3 className="mb-2 text-sm font-medium text-earth-brown">
                   {language === 'id' ? 'Info Pengiriman' : 'Delivery Info'}
                 </h3>
-                <p className="text-earth-dark-green font-medium">
+                <p className="font-medium text-earth-dark-green">
                   {language === 'id' ? 'Tanggal Pengiriman: ' : 'Delivery Date: '}
                   {orderBook?.requestedDeliveryDate &&
                     new Date(orderBook.requestedDeliveryDate).toLocaleDateString()}
                 </p>
-                <p className="text-earth-medium-green mt-1 text-sm">
+                <p className="mt-1 text-sm text-earth-medium-green">
                   {language === 'id' ? 'Buyer: ' : 'Buyer: '}
                   {orderBook?.buyerName}
                 </p>
-                <p className="text-earth-medium-green text-sm">
+                <p className="text-sm text-earth-medium-green">
                   {language === 'id' ? 'Lokasi: ' : 'Location: '}
                   {orderBook?.buyerLocation}
                 </p>
               </div>
             </div>
 
-            <div className="my-4">
-              <h3 className="text-md text-earth-dark-green mb-3 font-medium">
+            <div className="my-4 px-6">
+              <h3 className="text-md mb-3 font-medium text-earth-dark-green">
                 {language === 'id' ? 'Komoditas Anda yang Tersedia' : 'Your Available Commodities'}
               </h3>
 
@@ -297,20 +286,20 @@ const OrderBookAcceptDialog = ({
                   {/* Search and Filter UI */}
                   <div className="flex flex-col gap-3 sm:flex-row">
                     <div className="relative flex-1">
-                      <Search className="text-earth-medium-green absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-earth-medium-green" />
                       <Input
                         placeholder={
                           language === 'id' ? 'Cari komoditas...' : 'Search commodities...'
                         }
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="border-earth-light-green focus-visible:ring-earth-medium-green pl-9"
+                        className="border-earth-light-green pl-9 focus-visible:ring-earth-medium-green"
                       />
                     </div>
                     <Button
                       variant="outline"
                       onClick={toggleFilter}
-                      className={`gap-2 ${isFilterOpen ? 'bg-earth-pale-green border-earth-medium-green text-earth-dark-green' : 'border-earth-light-green text-earth-medium-green'}`}
+                      className={`gap-2 ${isFilterOpen ? 'border-earth-medium-green bg-earth-pale-green text-earth-dark-green' : 'border-earth-light-green text-earth-medium-green'}`}
                     >
                       <SlidersHorizontal className="h-4 w-4" />
                       {language === 'id' ? 'Filter' : 'Filter'}
@@ -319,13 +308,13 @@ const OrderBookAcceptDialog = ({
 
                   {/* Filter Section */}
                   {isFilterOpen && (
-                    <div className="bg-earth-pale-green/20 border-earth-light-green/30 mb-2 grid grid-cols-1 gap-3 rounded-lg border p-3 sm:grid-cols-2">
+                    <div className="mb-2 grid grid-cols-1 gap-3 rounded-lg border border-earth-light-green/30 bg-earth-pale-green/20 p-3 sm:grid-cols-2">
                       <div>
-                        <p className="text-earth-medium-green mb-1 text-sm font-medium">
+                        <p className="mb-1 text-sm font-medium text-earth-medium-green">
                           {language === 'id' ? 'Filter Grade' : 'Filter by Grade'}
                         </p>
                         <Select value={selectedGrade} onValueChange={setSelectedGrade}>
-                          <SelectTrigger className="border-earth-light-green focus:ring-earth-medium-green w-full">
+                          <SelectTrigger className="w-full border-earth-light-green focus:ring-earth-medium-green">
                             <SelectValue
                               placeholder={language === 'id' ? 'Semua Grade' : 'All Grades'}
                             />
@@ -343,11 +332,11 @@ const OrderBookAcceptDialog = ({
                         </Select>
                       </div>
                       <div>
-                        <p className="text-earth-medium-green mb-1 text-sm font-medium">
+                        <p className="mb-1 text-sm font-medium text-earth-medium-green">
                           {language === 'id' ? 'Filter Lokasi' : 'Filter by Location'}
                         </p>
                         <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                          <SelectTrigger className="border-earth-light-green focus:ring-earth-medium-green w-full">
+                          <SelectTrigger className="w-full border-earth-light-green focus:ring-earth-medium-green">
                             <SelectValue
                               placeholder={language === 'id' ? 'Semua Lokasi' : 'All Locations'}
                             />
@@ -376,7 +365,7 @@ const OrderBookAcceptDialog = ({
                           className={`cursor-pointer rounded-lg border p-3 transition-colors ${
                             selectedCommodity === commodity.id
                               ? 'border-earth-medium-green bg-earth-pale-green'
-                              : 'hover:bg-earth-pale-green/30 border-gray-200'
+                              : 'border-gray-200 hover:bg-earth-pale-green/30'
                           }`}
                           onClick={() => handleSelectCommodity(commodity.id)}
                         >
@@ -385,7 +374,7 @@ const OrderBookAcceptDialog = ({
                               <div
                                 className={`mr-3 flex h-5 w-5 items-center justify-center rounded-full border ${
                                   selectedCommodity === commodity.id
-                                    ? 'bg-earth-medium-green border-earth-dark-green'
+                                    ? 'border-earth-dark-green bg-earth-medium-green'
                                     : 'border-earth-medium-green'
                                 }`}
                               >
@@ -394,10 +383,10 @@ const OrderBookAcceptDialog = ({
                                 )}
                               </div>
                               <div>
-                                <p className="text-earth-dark-green font-medium">
+                                <p className="font-medium text-earth-dark-green">
                                   {commodity.name}
                                 </p>
-                                <div className="text-earth-medium-green flex text-sm">
+                                <div className="flex text-sm text-earth-medium-green">
                                   <p className="mr-4">
                                     {commodity.type} - Grade {commodity.grade}
                                   </p>
@@ -405,7 +394,7 @@ const OrderBookAcceptDialog = ({
                                     {commodity.quantity.toLocaleString()} {commodity.unit}
                                   </p>
                                 </div>
-                                <p className="text-earth-medium-green/80 text-xs">
+                                <p className="text-xs text-earth-medium-green/80">
                                   {commodity.location}
                                 </p>
                               </div>
@@ -414,14 +403,14 @@ const OrderBookAcceptDialog = ({
                         </div>
                       ))
                     ) : (
-                      <div className="bg-earth-pale-green/20 border-earth-light-green/30 rounded-lg border p-6 text-center">
+                      <div className="rounded-lg border border-earth-light-green/30 bg-earth-pale-green/20 p-6 text-center">
                         <AlertTriangle className="mx-auto mb-2 h-8 w-8 text-amber-500" />
-                        <p className="text-earth-dark-green mb-1 font-medium">
+                        <p className="mb-1 font-medium text-earth-dark-green">
                           {language === 'id'
                             ? 'Tidak ditemukan hasil yang sesuai'
                             : 'No matching results found'}
                         </p>
-                        <p className="text-earth-medium-green text-sm">
+                        <p className="text-sm text-earth-medium-green">
                           {language === 'id'
                             ? 'Coba ubah pencarian atau filter Anda'
                             : 'Try changing your search or filters'}
@@ -433,12 +422,12 @@ const OrderBookAcceptDialog = ({
               ) : (
                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-6 text-center">
                   <AlertTriangle className="mx-auto mb-2 h-10 w-10 text-amber-500" />
-                  <p className="text-earth-dark-green mb-2 font-medium">
+                  <p className="mb-2 font-medium text-earth-dark-green">
                     {language === 'id'
                       ? 'Tidak ada komoditas yang sesuai'
                       : 'No matching commodities found'}
                   </p>
-                  <p className="text-earth-medium-green mb-4 text-sm">
+                  <p className="mb-4 text-sm text-earth-medium-green">
                     {language === 'id'
                       ? 'Anda belum memiliki komoditas yang sesuai dengan permintaan.'
                       : "You don't have any commodities that match the requirements."}
@@ -446,7 +435,7 @@ const OrderBookAcceptDialog = ({
                   <Button
                     variant="outline"
                     onClick={handleAddNewCommodity}
-                    className="border-earth-medium-green text-earth-dark-green gap-2"
+                    className="gap-2 border-earth-medium-green text-earth-dark-green"
                   >
                     <Plus className="h-4 w-4" />
                     {language === 'id' ? 'Tambah Komoditas Baru' : 'Add New Commodity'}
@@ -459,57 +448,66 @@ const OrderBookAcceptDialog = ({
                   <Button
                     variant="outline"
                     onClick={handleAddNewCommodity}
-                    className="border-earth-medium-green text-earth-dark-green gap-2"
+                    className="gap-2 border-earth-medium-green text-earth-dark-green"
                   >
                     <Plus className="h-4 w-4" />
                     {language === 'id' ? 'Tambah Komoditas Baru' : 'Add New Commodity'}
                   </Button>
 
                   <Button
+                    onClick={handleConfirm}
+                    className="gap-2 bg-gradient-to-r from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green"
+                    disabled={!selectedCommodity}
+                  >
+                    <CheckCircle className="mr-1 h-4 w-4" />
+                    {language === 'id' ? 'Konfirmasi & Kirim' : 'Confirm & Submit'}
+                  </Button>
+
+                  {/* <Button
                     onClick={handleNext}
-                    className="from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green gap-2 bg-gradient-to-r"
+                    className="gap-2 bg-gradient-to-r from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green"
                     disabled={!selectedCommodity}
                   >
                     {language === 'id' ? 'Lanjutkan' : 'Continue'}
-                  </Button>
+                  </Button> */}
                 </div>
               )}
             </div>
           </>
         )}
 
-        {step === 'confirm' && (
+        {/* {step === 'confirm' && (
           <>
             <div className="space-y-4">
-              <div className="bg-earth-wheat/20 rounded-lg p-4">
-                <h3 className="text-md text-earth-dark-green mb-2 font-medium">
+              <div className="rounded-lg bg-earth-wheat/20 p-4">
+                <h3 className="text-md mb-2 font-medium text-earth-dark-green">
                   {language === 'id' ? 'Ringkasan Pesanan' : 'Order Summary'}
                 </h3>
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <p className="text-earth-medium-green text-sm">
+                    <p className="text-sm text-earth-medium-green">
                       {language === 'id' ? 'ID Pesanan:' : 'Order ID:'}
                     </p>
-                    <p className="text-earth-dark-green font-medium">{orderBook?.id}</p>
+                    <p className="font-medium text-earth-dark-green">{orderBook?.id}</p>
 
-                    <p className="text-earth-medium-green mt-2 text-sm">
+                    <p className="mt-2 text-sm text-earth-medium-green">
                       {language === 'id' ? 'Pembeli:' : 'Buyer:'}
                     </p>
-                    <p className="text-earth-dark-green font-medium">{orderBook?.buyerName}</p>
+                    <p className="font-medium text-earth-dark-green">{orderBook?.buyerName}</p>
                   </div>
                   <div>
-                    <p className="text-earth-medium-green text-sm">
+                    <p className="text-sm text-earth-medium-green">
                       {language === 'id' ? 'Komoditas:' : 'Commodity:'}
                     </p>
-                    <p className="text-earth-dark-green font-medium">
+                    <p className="font-medium text-earth-dark-green">
                       {orderBook?.commodityType} - {orderBook?.quantity.toLocaleString()}{' '}
                       {orderBook?.unit}
                     </p>
 
-                    <p className="text-earth-medium-green mt-2 text-sm">
+                    <p className="mt-2 text-sm text-earth-medium-green">
                       {language === 'id' ? 'Pengiriman:' : 'Delivery:'}
                     </p>
-                    <p className="text-earth-dark-green font-medium">
+                    <p className="font-medium text-earth-dark-green">
                       {orderBook?.requestedDeliveryDate &&
                         new Date(orderBook.requestedDeliveryDate).toLocaleDateString()}
                     </p>
@@ -519,13 +517,13 @@ const OrderBookAcceptDialog = ({
 
               <Separator className="my-2" />
 
-              <div className="bg-earth-pale-green/30 rounded-lg p-4">
-                <h3 className="text-md text-earth-dark-green mb-2 flex items-center font-medium">
-                  <FileCheck className="text-earth-medium-green mr-2 h-5 w-5" />
+              <div className="rounded-lg bg-earth-pale-green/30 p-4">
+                <h3 className="text-md mb-2 flex items-center font-medium text-earth-dark-green">
+                  <FileCheck className="mr-2 h-5 w-5 text-earth-medium-green" />
                   {language === 'id' ? 'Syarat & Ketentuan' : 'Terms & Conditions'}
                 </h3>
-                <div className="border-earth-light-green/30 mb-4 max-h-40 overflow-y-auto rounded-md border bg-white p-3">
-                  <p className="text-earth-dark-green whitespace-pre-line">
+                <div className="mb-4 max-h-40 overflow-y-auto rounded-md border border-earth-light-green/30 bg-white p-3">
+                  <p className="whitespace-pre-line text-earth-dark-green">
                     {orderBook?.termsConditions ||
                       (language === 'id'
                         ? 'Kualitas premium, kadar air maksimal 14%, bebas hama dan penyakit. Pengiriman dilakukan sesuai jadwal yang telah disepakati. Pembayaran akan dilakukan dalam 7 hari kerja setelah barang diterima.'
@@ -541,7 +539,7 @@ const OrderBookAcceptDialog = ({
                     onChange={() => setTermsAccepted(!termsAccepted)}
                     className="mr-2 mt-1"
                   />
-                  <label htmlFor="accept-terms" className="text-earth-dark-green text-sm">
+                  <label htmlFor="accept-terms" className="text-sm text-earth-dark-green">
                     {language === 'id'
                       ? 'Saya menyetujui syarat dan ketentuan yang berlaku untuk order book ini dan berkomitmen untuk memenuhi pesanan dengan komoditas yang dipilih.'
                       : 'I agree to the terms and conditions applicable to this order book and commit to fulfilling the order with the selected commodity.'}
@@ -568,7 +566,7 @@ const OrderBookAcceptDialog = ({
 
               <Button
                 onClick={handleConfirm}
-                className="from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green gap-2 bg-gradient-to-r"
+                className="gap-2 bg-gradient-to-r from-earth-dark-green to-earth-medium-green hover:from-earth-medium-green hover:to-earth-dark-green"
                 disabled={!termsAccepted}
               >
                 <CheckCircle className="mr-1 h-4 w-4" />
@@ -576,7 +574,7 @@ const OrderBookAcceptDialog = ({
               </Button>
             </DialogFooter>
           </>
-        )}
+        )} */}
       </DialogContent>
     </Dialog>
   );

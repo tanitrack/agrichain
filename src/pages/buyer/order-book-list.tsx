@@ -23,6 +23,7 @@ import {
 import TransactionFlowExplorerDialog from '@/components/transaction/transaction-flow-explorer-dialog';
 import { AddOrderBookDialog } from '@/components/orderbook/add-order-book-dialog';
 import { formatDate } from '@/lib/utils';
+import { useAuthCheck } from '@/hooks/use-auth-check';
 
 // Sample order book data for buyer view
 const orderBooks: OrderBook[] = [
@@ -198,6 +199,8 @@ const OrderBookList = () => {
       ? searchResults.map(mapToKomoditasItem)
       : komoditasData.page.map(mapToKomoditasItem);
 
+  const { userProfile } = useAuthCheck();
+
   return (
     <MainLayout>
       <div className="flex items-start justify-between">
@@ -208,7 +211,7 @@ const OrderBookList = () => {
 
         <div className="flex gap-2">
           <TransactionFlowExplorerDialog />
-          <AddOrderBookDialog />
+          {userProfile.userType === 'consumer' && <AddOrderBookDialog />}
         </div>
       </div>
       <Card className="">
@@ -250,9 +253,9 @@ const OrderBookList = () => {
                   <TableHead className="text-earth-dark-green">
                     {language === 'id' ? 'Jumlah' : 'Quantity'}
                   </TableHead>
-                  <TableHead className="text-earth-dark-green">
+                  {/* <TableHead className="text-earth-dark-green">
                     {language === 'id' ? 'Grade' : 'Grade'}
-                  </TableHead>
+                  </TableHead> */}
                   <TableHead className="text-earth-dark-green">
                     {language === 'id' ? 'Tanggal Pengiriman' : 'Delivery Date'}
                   </TableHead>
@@ -276,7 +279,7 @@ const OrderBookList = () => {
                       <TableCell>
                         {orderBook.quantity} {orderBook.unit}
                       </TableCell>
-                      <TableCell>{orderBook.requestedGrade}</TableCell>
+                      {/* <TableCell>{orderBook.requestedGrade}</TableCell> */}
                       <TableCell>{formatDate(orderBook.requestedDeliveryDate)}</TableCell>
                       <TableCell>{formatDate(orderBook.offerExpiryDate)}</TableCell>
                       <TableCell>{getStatusBadge(orderBook.status)}</TableCell>

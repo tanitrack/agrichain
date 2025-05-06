@@ -10,6 +10,7 @@ interface TaniCardProps {
   email?: string;
   walletAddress?: string;
   showDownloadBtn?: boolean;
+  userType?: 'farmer' | 'consumer';
 }
 
 const TaniCard: React.FC<TaniCardProps> = ({
@@ -18,6 +19,7 @@ const TaniCard: React.FC<TaniCardProps> = ({
   email = 'petani@tanitrack.id',
   walletAddress = '123456789',
   showDownloadBtn,
+  userType,
 }) => {
   const site = window.location.origin;
 
@@ -36,7 +38,7 @@ const TaniCard: React.FC<TaniCardProps> = ({
       <div
         ref={cardRef}
         className={cn(
-          'relative flex h-[220px] w-[350px] overflow-hidden rounded-2xl bg-gradient-to-br from-[#224c2a] via-[#356d3a] to-[#193c1e] text-white shadow-xl md:h-[250px] md:w-[400px]',
+          `relative flex h-[220px] w-[350px] overflow-hidden rounded-2xl bg-gradient-to-br ${userType === 'farmer' ? 'from-[#224c2a] via-[#356d3a] to-[#193c1e]' : 'from-[#d79c08] via-[#e9b934] to-[#d79d08]'} text-white shadow-xl md:h-[250px] md:w-[400px]`,
           'items-stretch'
         )}
         style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}
@@ -51,7 +53,7 @@ const TaniCard: React.FC<TaniCardProps> = ({
               </div>
               <div>
                 <span className="text-[11px] font-semibold uppercase tracking-wider opacity-80">
-                  FARMER ID
+                  {userType?.toUpperCase()} ID
                 </span>
                 <h2 className="-mt-1 text-lg font-bold leading-tight text-white">TANI CARD</h2>
               </div>

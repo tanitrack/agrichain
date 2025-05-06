@@ -40,8 +40,8 @@ export const TransactionTimeline = ({ history, currentStatus }: TransactionTimel
 
   if (timelineEvents.length === 0) {
     return (
-      <Card className="earth-card-clay overflow-hidden">
-        <CardHeader className="earth-header-clay pb-3">
+      <Card className=" overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-earth-dark-green to-earth-medium-green pb-3">
           <CardTitle className="text-white">
             {language === 'id' ? 'Linimasa Transaksi' : 'Transaction Timeline'}
           </CardTitle>
@@ -58,13 +58,13 @@ export const TransactionTimeline = ({ history, currentStatus }: TransactionTimel
   }
 
   return (
-    <Card className="earth-card-clay overflow-hidden">
-      <CardHeader className="earth-header-clay pb-3">
+    <Card className=" overflow-hidden ">
+      <CardHeader className="bg-gradient-to-r from-earth-dark-green to-earth-medium-green pb-3">
         <CardTitle className="text-white">
           {language === 'id' ? 'Linimasa Transaksi' : 'Transaction Timeline'}
         </CardTitle>
       </CardHeader>
-      <CardContent className="mt-4">
+      <CardContent className="mt-4 p-6">
         <div className="space-y-4">
           {timelineEvents.map((event, index) => {
             // Check if this status is past, current, or future based on the current status
@@ -105,7 +105,7 @@ export const TransactionTimeline = ({ history, currentStatus }: TransactionTimel
                     <div className="flex items-center">
                       <p className={`font-medium ${textColorClass}`}>{event.description}</p>
                       {isCurrent && (
-                        <span className="bg-earth-wheat text-earth-brown ml-2 inline-block rounded-full px-2 py-0.5 text-xs">
+                        <span className="ml-2 inline-block rounded-full bg-earth-wheat px-2 py-0.5 text-xs text-earth-brown">
                           {language === 'id' ? 'Saat ini' : 'Current'}
                         </span>
                       )}

@@ -43,7 +43,11 @@ const mockCommodities = [
     harvestDate: '2023-03-15',
     grade: 'Premium',
     certifications: ['Organik', 'SNI'],
-    images: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'],
+    images: [
+      'https://i0.wp.com/prolegal.id/wp-content/uploads/2024/03/22.jpg?fit=1600%2C1066&ssl=1',
+      '/placeholder.svg',
+      '/placeholder.svg',
+    ],
     description:
       'Beras organik premium hasil panen terbaru, bebas pestisida dan bahan kimia berbahaya. Ditanam dengan metode pertanian organik yang ramah lingkungan dan berkelanjutan. Memiliki tekstur pulen dan aroma yang khas.',
     nutritionalInfo: 'Karbohidrat: 78g/100g, Protein: 7g/100g, Lemak: 0.5g/100g, Serat: 0.3g/100g',
@@ -229,14 +233,14 @@ const MarketDetail = () => {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Left side - Images */}
           <div className="space-y-4">
-            <div className="border-earth-light-brown/30 aspect-square overflow-hidden rounded-lg border bg-white">
+            <div className="aspect-square overflow-hidden rounded-lg border border-earth-light-brown/30 bg-white">
               <img
                 src={commodity.images[selectedImage]}
                 alt={commodity.name}
                 className="h-full w-full object-cover"
               />
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-2">
+            {/* <div className="flex gap-2 overflow-x-auto pb-2">
               {commodity.images.map((img, index) => (
                 <div
                   key={index}
@@ -254,15 +258,15 @@ const MarketDetail = () => {
                   />
                 </div>
               ))}
-            </div>
+            </div> */}
           </div>
 
           {/* Right side - Details */}
           <div className="space-y-6">
-            <div className="border-earth-light-brown/30 rounded-lg border bg-white p-6">
+            <div className="rounded-lg border border-earth-light-brown/30 bg-white p-6">
               <div className="mb-4">
                 <div className="flex items-start justify-between">
-                  <h1 className="text-earth-dark-green text-2xl font-bold">{commodity.name}</h1>
+                  <h1 className="text-2xl font-bold text-earth-dark-green">{commodity.name}</h1>
                   <div className="flex gap-2">
                     <Button variant="ghost" size="icon" className="text-earth-medium-green">
                       <Heart className="h-5 w-5" />
@@ -273,12 +277,12 @@ const MarketDetail = () => {
                   </div>
                 </div>
                 <div className="mt-1 flex items-center gap-2">
-                  <Wheat className="text-earth-medium-green h-4 w-4" />
-                  <span className="text-earth-medium-green font-medium">{commodity.variety}</span>
+                  <Wheat className="h-4 w-4 text-earth-medium-green" />
+                  <span className="font-medium text-earth-medium-green">{commodity.variety}</span>
                 </div>
 
                 <div className="mt-4 flex items-center">
-                  <Badge className="text-earth-brown border-earth-clay/50 border bg-[#FEF7CD] px-3 py-1">
+                  <Badge className="border border-earth-clay/50 bg-[#FEF7CD] px-3 py-1 text-earth-brown">
                     <CircleDollarSign className="mr-1 h-3.5 w-3.5" />
                     Rp {commodity.price.toLocaleString()} / {commodity.unit}
                   </Badge>
@@ -290,27 +294,27 @@ const MarketDetail = () => {
               {/* Key info section */}
               <div className="mb-6 grid grid-cols-2 gap-4">
                 <div className="flex items-start gap-2">
-                  <User className="text-earth-medium-green mt-0.5 h-5 w-5" />
+                  <User className="mt-0.5 h-5 w-5 text-earth-medium-green" />
                   <div>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       {language === 'id' ? 'Petani' : 'Farmer'}
                     </p>
                     <p className="font-medium">{commodity.farmer}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <MapPin className="text-earth-medium-green mt-0.5 h-5 w-5" />
+                  <MapPin className="mt-0.5 h-5 w-5 text-earth-medium-green" />
                   <div>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       {language === 'id' ? 'Lokasi' : 'Location'}
                     </p>
                     <p className="font-medium">{commodity.location}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Package className="text-earth-medium-green mt-0.5 h-5 w-5" />
+                  <Package className="mt-0.5 h-5 w-5 text-earth-medium-green" />
                   <div>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       {language === 'id' ? 'Stok' : 'Stock'}
                     </p>
                     <p className="font-medium">
@@ -319,18 +323,18 @@ const MarketDetail = () => {
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
-                  <Calendar className="text-earth-medium-green mt-0.5 h-5 w-5" />
+                  <Calendar className="mt-0.5 h-5 w-5 text-earth-medium-green" />
                   <div>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       {language === 'id' ? 'Tanggal Panen' : 'Harvest Date'}
                     </p>
                     <p className="font-medium">{commodity.harvestDate}</p>
                   </div>
                 </div>
                 <div className="col-span-2 flex items-start gap-2">
-                  <BadgeCheck className="text-earth-medium-green mt-0.5 h-5 w-5" />
+                  <BadgeCheck className="mt-0.5 h-5 w-5 text-earth-medium-green" />
                   <div>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       {language === 'id' ? 'Sertifikasi' : 'Certifications'}
                     </p>
                     <div className="mt-1 flex flex-wrap gap-2">
@@ -343,24 +347,61 @@ const MarketDetail = () => {
                   </div>
                 </div>
               </div>
+              <div className="overflow-hidden rounded-lg border border-earth-light-brown/30 bg-white">
+                <Tabs defaultValue="description" className="w-full">
+                  <TabsList className="w-full bg-earth-pale-green">
+                    <TabsTrigger value="description" className="flex-1">
+                      {`10 ${commodity.unit}`}
+                    </TabsTrigger>
+                    <TabsTrigger value="nutrition" className="flex-1">
+                      {`100 ${commodity.unit}`}
+                    </TabsTrigger>
+                    <TabsTrigger value="storage" className="flex-1">
+                      {`1000 ${commodity.unit}`}
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="description" className="space-y-4 p-4">
+                    <p>
+                      Harga: Rp {commodity.price.toLocaleString()} / {commodity.unit}
+                    </p>
+                    <p>Harga Total: Rp {(commodity.price * 10).toLocaleString()}</p>
+                    {/* <p>{commodity.description}</p> */}
+                  </TabsContent>
+                  <TabsContent value="nutrition" className="space-y-4 p-4">
+                    <p>
+                      Harga: Rp {(commodity.price - 2000).toLocaleString()} / {commodity.unit}
+                    </p>
+                    <p>Harga Total: Rp {((commodity.price - 2000) * 100).toLocaleString()}</p>
+                    {/* <p>{commodity.nutritionalInfo}</p> */}
+                  </TabsContent>
+
+                  <TabsContent value="storage" className="space-y-4 p-4">
+                    <p>
+                      Harga: Rp {(commodity.price - 4000).toLocaleString()} / {commodity.unit}
+                    </p>
+                    <p>Harga Total: Rp {((commodity.price - 4000) * 100).toLocaleString()}</p>
+                    {/* <p>{commodity.storageInfo}</p> */}
+                  </TabsContent>
+                </Tabs>
+              </div>
 
               <Button
-                className="bg-earth-medium-green hover:bg-earth-dark-green w-full text-white"
+                className="w-full bg-earth-medium-green text-white hover:bg-earth-dark-green"
                 onClick={handleBuy}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 {language === 'id' ? 'Beli Sekarang' : 'Buy Now'}
               </Button>
 
-              <p className="text-muted-foreground mt-2 text-center text-xs">
+              {/* <p className="mt-2 text-center text-xs text-muted-foreground">
                 {language === 'id'
                   ? `Pembelian minimum ${commodity.minOrder} ${commodity.unit}`
                   : `Minimum order ${commodity.minOrder} ${commodity.unit}`}
-              </p>
+              </p> */}
             </div>
 
             {/* Additional Information */}
-            <div className="border-earth-light-brown/30 overflow-hidden rounded-lg border bg-white">
+            {/* <div className="border-earth-light-brown/30 overflow-hidden rounded-lg border bg-white">
               <Tabs defaultValue="description" className="w-full">
                 <TabsList className="bg-earth-pale-green w-full">
                   <TabsTrigger value="description" className="flex-1">
@@ -383,7 +424,7 @@ const MarketDetail = () => {
                   <p>{commodity.storageInfo}</p>
                 </TabsContent>
               </Tabs>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -397,12 +438,12 @@ const MarketDetail = () => {
           <CardContent className="p-6">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div className="flex items-center gap-4">
-                <div className="bg-earth-light-green/30 flex h-16 w-16 items-center justify-center rounded-full">
-                  <User className="text-earth-medium-green h-8 w-8" />
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-earth-light-green/30">
+                  <User className="h-8 w-8 text-earth-medium-green" />
                 </div>
                 <div>
                   <h3 className="font-semibold">{commodity.farmerInfo.name}</h3>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-sm text-muted-foreground">
                     {language === 'id' ? 'Bergabung sejak' : 'Member since'}{' '}
                     {commodity.farmerInfo.since}
                   </p>
@@ -410,7 +451,7 @@ const MarketDetail = () => {
                     <span className="font-medium text-amber-600">
                       ★ {commodity.farmerInfo.rating}
                     </span>
-                    <span className="text-muted-foreground text-sm">
+                    <span className="text-sm text-muted-foreground">
                       ({commodity.farmerInfo.transactions}{' '}
                       {language === 'id' ? 'transaksi' : 'transactions'})
                     </span>
@@ -420,7 +461,7 @@ const MarketDetail = () => {
               <div className="flex flex-col justify-center">
                 <Button
                   variant="outline"
-                  className="border-earth-medium-green/50 text-earth-dark-green mb-2"
+                  className="mb-2 border-earth-medium-green/50 text-earth-dark-green"
                 >
                   {language === 'id' ? 'Hubungi Petani' : 'Contact Farmer'}
                 </Button>
@@ -446,13 +487,13 @@ const MarketDetail = () => {
             {commodity.reviews.length > 0 ? (
               <div className="space-y-4">
                 {commodity.reviews.map((review, index) => (
-                  <div key={index} className="border-earth-light-brown/30 rounded-lg border p-4">
+                  <div key={index} className="rounded-lg border border-earth-light-brown/30 p-4">
                     <div className="flex items-start justify-between">
                       <div>
                         <h4 className="font-medium">{review.user}</h4>
                         <div className="mt-1 flex items-center gap-1">
                           <span className="text-amber-500">{'★'.repeat(review.rating)}</span>
-                          <span className="text-muted-foreground text-sm">{review.date}</span>
+                          <span className="text-sm text-muted-foreground">{review.date}</span>
                         </div>
                       </div>
                     </div>
@@ -461,7 +502,7 @@ const MarketDetail = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-muted-foreground py-4 text-center">
+              <p className="py-4 text-center text-muted-foreground">
                 {language === 'id' ? 'Belum ada ulasan' : 'No reviews yet'}
               </p>
             )}

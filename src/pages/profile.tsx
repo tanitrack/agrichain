@@ -99,6 +99,7 @@ const Profile = () => {
                   email={userProfile.email}
                   walletAddress={wallet?.address}
                   showDownloadBtn
+                  userType={userProfile.userType}
                 />
               )}
             </TabsContent>

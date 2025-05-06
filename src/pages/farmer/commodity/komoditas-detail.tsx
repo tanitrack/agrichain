@@ -5,21 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import {
-  ArrowLeft,
-  QrCode,
-  Edit,
-  Trash2,
-  MapPin,
-  Scale,
-  Calendar,
-  PackageOpen,
-} from 'lucide-react';
+import { ArrowLeft, QrCode, Edit, Trash2, Scale, Calendar, PackageOpen } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import { formatDate } from '@/lib/utils';
 import { useQuery } from 'convex/react';
 import { api } from '@/lib/convex';
 import { Id } from 'convex/_generated/dataModel';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Mock data for demo purposes - to be replaced with API calls
 const komoditasData = [
@@ -119,35 +111,20 @@ const komoditasData = [
 const KomoditasDetail = () => {
   const { id } = useParams<{ id: string }>();
 
-  console.log('====================================');
-  console.log('ID ====>>> ', id);
-  console.log('====================================');
-
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const [komoditas, setKomoditas] = useState<any | null>(null);
+
   const [loading, setLoading] = useState(true);
 
-  const komoditasData = useQuery(api.komoditas_queries.get, {
+  const komoditas = useQuery(api.komoditas_queries.get, {
     id: id as Id<'komoditas'>,
   });
 
-  console.log('====================================');
-  console.log('DATA ---<> ', komoditasData);
-  console.log('====================================');
-
-  // const getCommodity = query({
-  //   args: { id: v.id('komoditas') },
-  //   handler: async (ctx, args) => {
-  //     const data = await ctx.db.get(args.id);
-  //     if (data !== undefined) {
-  //       setKomoditas(data);
-  //       setLoading(false);
-  //     }
-  //   },
-  // });
-
-  useEffect(() => {}, [komoditasData]);
+  useEffect(() => {
+    if (komoditas) {
+      setLoading(false);
+    }
+  }, [komoditas]);
 
   if (loading) {
     return (
@@ -218,16 +195,9 @@ const KomoditasDetail = () => {
             {t('action.back')}
           </Button>
           <h1 className="text-2xl font-bold text-earth-dark-green">{t('commodities.detail')}</h1>
-          <p className="text-earth-medium-green">{komoditas.id}</p>
+          <p className="text-earth-medium-green">{komoditas._id}</p>
         </div>
         <div className="mt-4 flex space-x-2 md:mt-0">
-          <Button
-            variant="outline"
-            className="gap-2 border-earth-medium-green text-earth-dark-green hover:bg-earth-light-green/20"
-          >
-            <QrCode className="h-4 w-4" />
-            {t('commodities.qrcode')}
-          </Button>
           <Button
             variant="outline"
             className="gap-2 border-earth-medium-green text-earth-dark-green hover:bg-earth-light-green/20"
@@ -268,30 +238,79 @@ const KomoditasDetail = () => {
                   <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
                     <div>
                       <p className="text-sm text-earth-medium-green">{t('commodities.type')}</p>
-                      <p className="font-medium text-earth-dark-green">{komoditas.type}</p>
+                      <p className="font-medium text-earth-dark-green">{komoditas.category}</p>
                     </div>
-                    <div>
+                    {/* <div>
                       <p className="text-sm text-earth-medium-green">{t('commodities.grade')}</p>
                       <div>{renderGradeBadge(komoditas.grade)}</div>
-                    </div>
+                    </div> */}
                     <div>
                       <p className="text-sm text-earth-medium-green">{t('commodities.quantity')}</p>
                       <p className="font-medium text-earth-dark-green">
-                        {komoditas.quantity.toLocaleString()} {komoditas.unit}
+                        {komoditas.stock.toLocaleString()} {komoditas.unit}
                       </p>
                     </div>
                     <div>
                       <p className="text-sm text-earth-medium-green">{t('commodities.created')}</p>
                       <p className="font-medium text-earth-dark-green">
-                        {formatDate(new Date(komoditas.createdAt))}
+                        {formatDate(new Date(komoditas._creationTime))}
                       </p>
                     </div>
-                    <div className="md:col-span-2">
+                    {/* <div className="md:col-span-2">
                       <p className="text-sm text-earth-medium-green">{t('commodities.location')}</p>
                       <p className="flex items-center font-medium text-earth-dark-green">
                         <MapPin className="mr-1 h-4 w-4 text-earth-medium-green" />
                         {komoditas.location}
                       </p>
+                    </div> */}
+                  </div>
+
+                  <div className="mt-4">
+                    <p className="mb-2 text-sm text-earth-medium-green">{'Harga Grosir'}</p>
+                    <div className=" overflow-hidden rounded-lg border border-earth-light-brown/30 bg-white">
+                      <Tabs defaultValue="description" className="w-full">
+                        <TabsList className="w-full bg-earth-pale-green">
+                          <TabsTrigger value="description" className="flex-1">
+                            {`10 ${komoditas.unit}`}
+                          </TabsTrigger>
+                          <TabsTrigger value="nutrition" className="flex-1">
+                            {`100 ${komoditas.unit}`}
+                          </TabsTrigger>
+                          <TabsTrigger value="storage" className="flex-1">
+                            {`1000 ${komoditas.unit}`}
+                          </TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="description" className="space-y-4 p-4">
+                          <p>
+                            Harga: Rp {komoditas.pricePerUnit.toLocaleString()} / {komoditas.unit}
+                          </p>
+                          <p>Harga Total: Rp {(komoditas.pricePerUnit * 10).toLocaleString()}</p>
+                          {/* <p>{komoditas.description}</p> */}
+                        </TabsContent>
+                        <TabsContent value="nutrition" className="space-y-4 p-4">
+                          <p>
+                            Harga: Rp {(komoditas.pricePerUnit - 2000).toLocaleString()} /{' '}
+                            {komoditas.unit}
+                          </p>
+                          <p>
+                            Harga Total: Rp{' '}
+                            {((komoditas.pricePerUnit - 2000) * 100).toLocaleString()}
+                          </p>
+                          {/* <p>{komoditas.nutritionalInfo}</p> */}
+                        </TabsContent>
+
+                        <TabsContent value="storage" className="space-y-4 p-4">
+                          <p>
+                            Harga: Rp {(komoditas.pricePerUnit - 4000).toLocaleString()} /{' '}
+                            {komoditas.unit}
+                          </p>
+                          <p>
+                            Harga Total: Rp{' '}
+                            {((komoditas.pricePerUnit - 4000) * 100).toLocaleString()}
+                          </p>
+                          {/* <p>{komoditas.storageInfo}</p> */}
+                        </TabsContent>
+                      </Tabs>
                     </div>
                   </div>
                 </div>
@@ -307,7 +326,7 @@ const KomoditasDetail = () => {
           </Card>
 
           {/* History Card */}
-          <Card className="overflow-hidden border-2 border-earth-clay/70 shadow-md">
+          {/* <Card className="overflow-hidden border-2 border-earth-clay/70 shadow-md">
             <CardHeader className="bg-gradient-to-r from-earth-brown to-earth-light-brown pb-3">
               <CardTitle className="text-white">History & Activity</CardTitle>
             </CardHeader>
@@ -335,14 +354,14 @@ const KomoditasDetail = () => {
                 ))}
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         {/* Sidebar area - 1/3 width on desktop */}
         <div className="space-y-6">
           {/* QR Code Card */}
-          <Card className="overflow-hidden border-2 border-earth-wheat/70 shadow-md">
-            <CardHeader className="bg-gradient-to-r from-[#d4b145] to-[#e6be70] pb-3">
+          <Card className="border-earth-/70 overflow-hidden border-2 shadow-md">
+            <CardHeader className="bg-gradient-to-r from-earth-dark-green to-earth-medium-green pb-3">
               <CardTitle className="text-white">{t('commodities.qrcode')}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center p-6">
@@ -352,10 +371,10 @@ const KomoditasDetail = () => {
               <p className="text-center text-sm text-earth-dark-green">
                 {t('commodities.name')}: <span className="font-medium">{komoditas.name}</span>
                 <br />
-                ID: <span className="font-medium">{komoditas.id}</span>
+                ID: <span className="font-medium">{komoditas._id}</span>
                 <br />
                 {t('commodities.created')}:{' '}
-                <span className="font-medium">{formatDate(new Date(komoditas.createdAt))}</span>
+                <span className="font-medium">{formatDate(new Date(komoditas._creationTime))}</span>
               </p>
               <Button className="mt-4 w-full bg-gradient-to-r from-earth-dark-green to-earth-medium-green transition-all duration-300 hover:from-earth-medium-green hover:to-earth-dark-green">
                 Download QR Code
@@ -364,8 +383,8 @@ const KomoditasDetail = () => {
           </Card>
 
           {/* Quick Info Card */}
-          <Card className="overflow-hidden border-2 border-earth-light-green/70 shadow-md">
-            <CardHeader className="bg-gradient-to-r from-earth-medium-green to-earth-light-green pb-3">
+          <Card className="overflow-hidden border-2  border-earth-light-green/70 shadow-md">
+            <CardHeader className="bg-gradient-to-r from-earth-dark-green to-earth-medium-green pb-3">
               <CardTitle className="text-white">Quick Info</CardTitle>
             </CardHeader>
             <CardContent className="p-6">
@@ -376,7 +395,7 @@ const KomoditasDetail = () => {
                   </div>
                   <div>
                     <p className="text-sm text-earth-medium-green">{t('commodities.type')}</p>
-                    <p className="font-medium text-earth-dark-green">{komoditas.type}</p>
+                    <p className="font-medium text-earth-dark-green">{komoditas.category}</p>
                   </div>
                 </div>
                 <div className="flex items-center rounded-lg border border-green-100 bg-green-50 p-3 transition-colors hover:bg-green-100">
@@ -386,11 +405,11 @@ const KomoditasDetail = () => {
                   <div>
                     <p className="text-sm text-earth-medium-green">{t('commodities.quantity')}</p>
                     <p className="font-medium text-earth-dark-green">
-                      {komoditas.quantity.toLocaleString()} {komoditas.unit}
+                      {komoditas.stock.toLocaleString()} {komoditas.unit}
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center rounded-lg border border-purple-100 bg-purple-50 p-3 transition-colors hover:bg-purple-100">
+                {/* <div className="flex items-center rounded-lg border border-purple-100 bg-purple-50 p-3 transition-colors hover:bg-purple-100">
                   <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
                     <MapPin className="h-5 w-5 text-purple-600" />
                   </div>
@@ -398,7 +417,7 @@ const KomoditasDetail = () => {
                     <p className="text-sm text-earth-medium-green">{t('commodities.location')}</p>
                     <p className="font-medium text-earth-dark-green">{komoditas.location}</p>
                   </div>
-                </div>
+                </div> */}
                 <div className="flex items-center rounded-lg border border-amber-100 bg-amber-50 p-3 transition-colors hover:bg-amber-100">
                   <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
                     <Calendar className="h-5 w-5 text-amber-600" />
@@ -406,7 +425,7 @@ const KomoditasDetail = () => {
                   <div>
                     <p className="text-sm text-earth-medium-green">{t('commodities.created')}</p>
                     <p className="font-medium text-earth-dark-green">
-                      {formatDate(new Date(komoditas.createdAt))}
+                      {formatDate(new Date(komoditas._creationTime))}
                     </p>
                   </div>
                 </div>

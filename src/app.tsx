@@ -186,7 +186,7 @@ const App = () => (
 
               {/* Buyer routes */}
               <Route
-                path="/buyer/market"
+                path="/market"
                 element={
                   <ProtectedRoute>
                     <Market />
@@ -194,7 +194,7 @@ const App = () => (
                 }
               />
               <Route
-                path="/buyer/market/:id"
+                path="/market/:id"
                 element={
                   <ProtectedRoute>
                     <MarketDetail />

@@ -11,8 +11,6 @@ import { useLanguage } from '@/contexts/language-context';
 import { PriceRow, type PriceItem } from './price-row';
 import { Filter, Search, TrendingUp } from 'lucide-react';
 import { Input } from '../ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { useState } from 'react';
 import { CommodityPrice } from '@/lib/data/types';
 import { Button } from '../ui/button';
 
@@ -118,10 +116,10 @@ export const PriceTable = ({
 }: PriceTableProps) => {
   const { t } = useLanguage();
 
-  const [regionFilter, setRegionFilter] = useState('all');
-  const [trendFilter, setTrendFilter] = useState('all');
-  // Get unique regions for filter
-  const regions = ['all', ...new Set(commodityPrices.map((price) => price.region))];
+  // const [regionFilter, setRegionFilter] = useState('all');
+  // const [trendFilter, setTrendFilter] = useState('all');
+  // // Get unique regions for filter
+  // const regions = ['all', ...new Set(commodityPrices.map((price) => price.region))];
 
   return (
     <Card className="">
@@ -142,7 +140,7 @@ export const PriceTable = ({
             />
           </div>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Select value={regionFilter} onValueChange={setRegionFilter}>
+            {/* <Select value={regionFilter} onValueChange={setRegionFilter}>
               <SelectTrigger className="w-full border-earth-medium-green bg-white text-earth-dark-green sm:w-[180px]">
                 <SelectValue placeholder="Pilih Wilayah" />
               </SelectTrigger>
@@ -156,8 +154,8 @@ export const PriceTable = ({
                     </SelectItem>
                   ))}
               </SelectContent>
-            </Select>
-            <Select value={trendFilter} onValueChange={setTrendFilter}>
+            </Select> */}
+            {/* <Select value={trendFilter} onValueChange={setTrendFilter}>
               <SelectTrigger className="w-full border-earth-medium-green bg-white text-earth-dark-green sm:w-[180px]">
                 <SelectValue placeholder="Filter Tren" />
               </SelectTrigger>
@@ -167,7 +165,7 @@ export const PriceTable = ({
                 <SelectItem value="falling">Turun</SelectItem>
                 <SelectItem value="stable">Stabil</SelectItem>
               </SelectContent>
-            </Select>
+            </Select> */}
             <Button
               variant="outline"
               className="flex gap-2 border-earth-medium-green bg-earth-pale-green text-earth-dark-green hover:bg-earth-light-green/40"
@@ -179,7 +177,7 @@ export const PriceTable = ({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border border-earth-light-green">
+        <div className="rounded-md ">
           <Table>
             <TableHeader className="bg-earth-light-green/30">
               <TableRow>
@@ -212,7 +210,7 @@ export const PriceTable = ({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="py-8 text-center text-earth-medium-green">
+                  <TableCell colSpan={7} className="py-8 text-center text-earth-medium-green">
                     {searchQuery
                       ? `${t('prices.notfound')} "${searchQuery}"`
                       : `${t('prices.notfound')}.`}

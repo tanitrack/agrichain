@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home,
-  Wallet,
   ShoppingCart,
   ClipboardList,
   TrendingUp,
@@ -12,7 +11,6 @@ import {
   LogOut,
   Wheat,
   Sprout,
-  ShoppingBasket,
   Store,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -23,10 +21,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/language-context';
+import { useAuthCheck } from '@/hooks/use-auth-check';
 
 interface SidebarProps {
   open: boolean;
@@ -37,44 +35,44 @@ interface SidebarProps {
 const farmerLinks = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Komoditas', href: '/komoditas', icon: Wheat },
-  { name: 'Saldo', href: '/saldo', icon: Wallet },
+  // { name: 'Saldo', href: '/saldo', icon: Wallet },
   { name: 'Transaksi', href: '/transaksi', icon: ShoppingCart },
   { name: 'Order Book', href: '/order-book', icon: ClipboardList },
   { name: 'Harga Komoditas', href: '/harga', icon: TrendingUp },
   // { name: 'Pengiriman', href: '/pengiriman', icon: Truck },
-  { name: 'Profil', href: '/profile', icon: User },
+  // { name: 'Profil', href: '/profile', icon: User },
 ];
 
 // New links specifically for buyers
 const buyerLinks = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
-  { name: 'Market', href: '/market', icon: Store },
+  { name: 'Pasar', href: '/market', icon: Store },
   { name: 'Order Book', href: '/order-book', icon: ClipboardList },
-  { name: 'Saldo', href: '/saldo', icon: Wallet },
+  // { name: 'Saldo', href: '/saldo', icon: Wallet },
   { name: 'Transaksi', href: '/transaksi', icon: ShoppingCart },
   // { name: 'Pengiriman', href: '/pengiriman', icon: Truck },
   { name: 'Harga Komoditas', href: '/harga', icon: TrendingUp },
-  { name: 'Profil', href: '/profile', icon: User },
+  // { name: 'Profil', href: '/profile', icon: User },
 ];
 
 export function Sidebar({ open, setOpen }: SidebarProps) {
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(false);
   const { t } = useLanguage();
-
+  const { userProfile } = useAuthCheck();
   // Use localStorage to persist the user role
-  const [userRole, setUserRole] = useState<'farmer' | 'buyer'>(() => {
-    const savedRole = localStorage.getItem('userRole');
-    return savedRole === 'buyer' ? 'buyer' : 'farmer';
-  });
+  // const [userRole, setUserRole] = useState<'farmer' | 'buyer'>(() => {
+  //   const savedRole = localStorage.getItem('userRole');
+  //   return savedRole === 'buyer' ? 'buyer' : 'farmer';
+  // });
 
   // Save role to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('userRole', userRole);
-  }, [userRole]);
+  // useEffect(() => {
+  //   localStorage.setItem('userRole', userRole);
+  // }, [userRole]);
 
   // Determine which links to show based on user role
-  const links = userRole === 'farmer' ? farmerLinks : buyerLinks;
+  const links = userProfile?.userType === 'farmer' ? farmerLinks : buyerLinks;
 
   // Check if mobile
   useEffect(() => {
@@ -107,7 +105,7 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
           isMobile && open && 'w-64 translate-x-0'
         )}
       >
-        <div className="flex items-center justify-between border-b border-[#588157]/20 p-4">
+        <div className="flex items-center justify-between border-b border-[#588157]/20 px-4 py-3">
           {open && (
             <Link to="/dashboard" className="flex items-center gap-2">
               <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-md bg-white/90">
@@ -142,7 +140,7 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
         </div>
 
         {/* Role Switcher - For demonstration purposes */}
-        {open && (
+        {/* {open && (
           <div className="px-3 py-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -173,7 +171,7 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        )}
+        )} */}
 
         <div className="flex-1 overflow-y-auto py-4">
           <nav className="space-y-1 px-2">
@@ -215,9 +213,9 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
                     <AvatarFallback className="bg-[#588157]/30 text-white">PT</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col items-start text-sm">
-                    <span className="font-medium">Pak Tani</span>
+                    <span className="text-wrap text-start font-medium">{userProfile?.name}</span>
                     <span className="text-xs text-[#a3b18a]">
-                      {userRole === 'farmer' ? 'Petani' : 'Pembeli'}
+                      {userProfile?.userType === 'farmer' ? 'Petani' : 'Pembeli'}
                     </span>
                   </div>
                 </Button>

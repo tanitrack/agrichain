@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { QrCode, Smartphone } from 'lucide-react';
+import { QrCode } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/language-context';
 import TaniTrackCard from '@/components/tani-card/tani-card';
@@ -254,8 +254,8 @@ export default function Login() {
                 <p className="text-sm text-earth-medium-green">
                   1.{' '}
                   {language === 'id'
-                    ? 'Masukkan email yang terdaftar di TaniTrack'
-                    : 'Enter your registered email in TaniTrack'}
+                    ? `${mode === 'email' ? 'Masukkan Email' : mode === 'taniId' ? 'Masukkan TaniId' : 'Scan Tani Card'} yang terdaftar di TaniTrack`
+                    : `${mode === 'email' ? 'Enter your registered Email in TaniTrack' : mode === 'taniId' ? 'Enter your registered TaniId in TaniTrack' : 'Scan your registered Tani Card in TaniTrack'} yang terdaftar di TaniTrack`}
                 </p>
                 <p className="mt-1 text-sm text-earth-medium-green">
                   2.{' '}
@@ -265,7 +265,7 @@ export default function Login() {
                 </p>
               </div>
             </div>
-            <div className="flex items-start rounded-lg border border-earth-light-green/50 bg-white p-4 shadow-md">
+            {/* <div className="flex items-start rounded-lg border border-earth-light-green/50 bg-white p-4 shadow-md">
               <Smartphone className="mr-3 mt-1 h-6 w-6 flex-shrink-0 text-earth-medium-green" />
               <div>
                 <h3 className="mb-1 font-semibold text-earth-dark-green">
@@ -277,12 +277,17 @@ export default function Login() {
                     : 'TaniTrack ensures your account security with protected OTP system.'}
                 </p>
               </div>
-            </div>
+            </div> */}
             {/* Stacked cards in perspective view */}
             <div className="mt-8 flex justify-center">
               <div className="relative mx-auto h-60 w-72">
                 {/* Front card (Farmer card) */}
-                <TaniTrackCard />
+                <div className="absolute -left-32 rotate-6">
+                  <TaniTrackCard userType="consumer" />
+                </div>
+                <div className="absolute -rotate-6">
+                  <TaniTrackCard userType="farmer" />
+                </div>
               </div>
             </div>
           </div>

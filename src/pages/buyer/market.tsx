@@ -125,19 +125,19 @@ const Market = () => {
         </div>
 
         {/* Search and filter section */}
-        <div className="border-earth-light-green/50 flex flex-col gap-4 rounded-lg border bg-[#F2FCE2] p-4 sm:flex-row">
+        <div className="flex flex-col gap-4 rounded-lg border border-earth-light-green/50 bg-[#F2FCE2] p-4 sm:flex-row">
           <div className="relative flex-1">
-            <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder={language === 'id' ? 'Cari komoditas...' : 'Search commodities...'}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="border-earth-light-green/50 focus-visible:ring-earth-medium-green pl-9"
+              className="border-earth-light-green/50 pl-9 focus-visible:ring-earth-medium-green"
             />
           </div>
           <Button
             variant="outline"
-            className="border-earth-light-green/50 text-earth-dark-green bg-white"
+            className="border-earth-light-green/50 bg-white text-earth-dark-green"
           >
             <Filter className="mr-2 h-4 w-4" />
             {language === 'id' ? 'Filter' : 'Filter'}
@@ -148,7 +148,7 @@ const Market = () => {
           {mockCommodities.map((commodity) => (
             <Card
               key={commodity.id}
-              className="border-earth-light-brown/30 group overflow-hidden border transition-shadow hover:shadow-md"
+              className="group overflow-hidden border border-earth-light-brown/30 transition-shadow hover:shadow-md"
             >
               <div className="relative h-40 overflow-hidden bg-gray-100">
                 <img
@@ -162,20 +162,20 @@ const Market = () => {
                   Rp {commodity.price.toLocaleString()} / {commodity.unit}
                 </Badge>
               </div>
-              <CardHeader className="from-earth-pale-green bg-gradient-to-r to-white pb-2">
+              <CardHeader className="bg-gradient-to-r from-earth-pale-green to-white pb-2">
                 <div className="flex items-start justify-between">
                   <div>
-                    <CardTitle className="text-earth-dark-green text-lg">
+                    <CardTitle className="text-lg text-earth-dark-green">
                       {commodity.name}
                     </CardTitle>
-                    <CardDescription className="text-earth-medium-green flex items-center gap-1">
+                    <CardDescription className="flex items-center gap-1 text-earth-medium-green">
                       <Wheat className="h-3.5 w-3.5" />
                       <span>{commodity.variety}</span>
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="pt-4">
+              <CardContent className="p-4">
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">
@@ -200,7 +200,7 @@ const Market = () => {
                   <p className="mt-2 line-clamp-2 text-sm">{commodity.description}</p>
                 </div>
               </CardContent>
-              <CardFooter className="border-earth-light-brown/20 flex justify-between gap-2 border-t bg-white">
+              <CardFooter className="flex justify-between gap-2 border-t border-earth-light-brown/20 bg-white">
                 <Button
                   variant="outline"
                   size="sm"

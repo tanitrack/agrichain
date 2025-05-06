@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { BarChart3, ShoppingCart, Wallet, Leaf, Sun } from 'lucide-react';
+import { BarChart3, ShoppingCart, Wallet, Sun, Leaf } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MainLayout } from '@/components/layout/main-layout';
 import { transactions, commodities, commodityPrices, currentUser } from '@/lib/data/mock-data';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useLanguage } from '@/contexts/language-context';
+import { useAuthCheck } from '@/hooks/use-auth-check';
 
 export default function Dashboard() {
   const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month' | 'year'>('week');
@@ -34,6 +35,8 @@ export default function Dashboard() {
     .sort((a, b) => b.predictedChange - a.predictedChange)
     .slice(0, 3);
 
+  const { userProfile } = useAuthCheck();
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -42,7 +45,7 @@ export default function Dashboard() {
             <h1 className="text-2xl font-bold tracking-tight text-earth-dark-green">
               {t('dashboard.title')}
             </h1>
-            <h2>Selamat datang kembali ({'nama_user'})👋</h2>
+            <h2>Selamat datang kembali {userProfile?.name}👋</h2>
           </div>
           {/* <Tabs
             value={timeframe}
@@ -85,7 +88,9 @@ export default function Dashboard() {
             </div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-bold text-earth-dark-green">
-                {t('dashboard.summary')}
+                {userProfile.userType === 'farmer'
+                  ? t('dashboard.summary')
+                  : 'Ringkasan Pengeluaran'}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -104,25 +109,27 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card className="earth-card-brown shadow-md">
-            <div className="absolute right-0 top-0 p-3">
-              <Leaf className="h-6 w-6 text-earth-brown opacity-60" />
-            </div>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-bold text-earth-brown">
-                {t('commodities.title')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-earth-brown">{totalCommodities} kg</div>
-              <p className="mt-1 text-sm font-medium text-earth-brown">
-                {commodities.length} {t('commodities.type').toLowerCase()}
-              </p>
-              <div className="mt-3 h-2 w-full rounded-full bg-earth-light-brown">
-                <div className="h-2 rounded-full bg-earth-brown" style={{ width: '60%' }}></div>
+          {userProfile.userType === 'farmer' && (
+            <Card className="earth-card-brown shadow-md">
+              <div className="absolute right-0 top-0 p-3">
+                <Leaf className="h-6 w-6 text-earth-brown opacity-60" />
               </div>
-            </CardContent>
-          </Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-bold text-earth-brown">
+                  {t('commodities.title')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-earth-brown">{totalCommodities} kg</div>
+                <p className="mt-1 text-sm font-medium text-earth-brown">
+                  {commodities.length} {t('commodities.type').toLowerCase()}
+                </p>
+                <div className="mt-3 h-2 w-full rounded-full bg-earth-light-brown">
+                  <div className="h-2 rounded-full bg-earth-brown" style={{ width: '60%' }}></div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Card className="earth-card-wheat shadow-md">
             <div className="absolute right-0 top-0 p-3">
@@ -137,7 +144,7 @@ export default function Dashboard() {
               <div className="text-2xl font-bold text-yellow-800">{pendingTransactions.length}</div>
               <p className="mt-1 text-sm font-medium text-yellow-700">
                 {pendingTransactions.filter((t) => t.status === 'negosiasi').length}{' '}
-                {language === 'id' ? 'dalam negosiasi' : 'in negotiation'}
+                {language === 'id' ? 'Sedang dikirim' : 'in delivered'}
               </p>
               <div className="mt-3 h-2 w-full rounded-full bg-yellow-100">
                 <div className="h-2 rounded-full bg-yellow-600" style={{ width: '40%' }}></div>
