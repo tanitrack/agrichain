@@ -113,19 +113,19 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-earth-dark-green flex items-center gap-2 text-2xl font-bold">
+        <h2 className="flex items-center gap-2 text-2xl font-bold text-earth-dark-green">
           {commodity.name}
           <Badge
             className={`${
               commodity.predictedChange >= 0
-                ? 'bg-earth-pale-green text-earth-dark-green border-earth-medium-green/30 border'
-                : 'bg-earth-light-brown text-earth-brown border-earth-brown/30 border'
+                ? 'border border-earth-medium-green/30 bg-earth-pale-green text-earth-dark-green'
+                : 'border border-earth-brown/30 bg-earth-light-brown text-earth-brown'
             }`}
           >
             {trendDirection} {trendPercentage}%
           </Badge>
         </h2>
-        <div className="text-earth-medium-green mt-1 flex items-center">
+        <div className="mt-1 flex items-center text-earth-medium-green">
           <Map className="mr-1 h-4 w-4" />
           <span>{commodity.region}</span>
           {commodity.grade && (
@@ -148,12 +148,12 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <Card className="from-earth-pale-green border-earth-medium-green/30 bg-gradient-to-br to-white">
+        <Card className="border-earth-medium-green/30 bg-gradient-to-br from-earth-pale-green to-white">
           <CardHeader className="pb-2">
-            <CardTitle className="text-earth-dark-green text-lg">Harga Saat Ini</CardTitle>
+            <CardTitle className="text-lg text-earth-dark-green">Harga Saat Ini</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-earth-dark-green text-3xl font-bold">
+            <div className="text-3xl font-bold text-earth-dark-green">
               {formatCurrency(commodity.price)}/{commodity.unit}
             </div>
             <div
@@ -166,17 +166,17 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
               )}
               <span>{formatCurrency(Math.abs(priceChange))}</span>
               <span className="ml-1">({Math.abs(priceChangePercent).toFixed(1)}%)</span>
-              <span className="text-earth-medium-green ml-1 text-sm">dari bulan lalu</span>
+              <span className="ml-1 text-sm text-earth-medium-green">dari bulan lalu</span>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="from-earth-light-brown/30 border-earth-medium-green/30 bg-gradient-to-br to-white">
+        <Card className="border-earth-medium-green/30 bg-gradient-to-br from-earth-light-brown/30 to-white">
           <CardHeader className="pb-2">
-            <CardTitle className="text-earth-dark-green text-lg">Prediksi 3 Bulan</CardTitle>
+            <CardTitle className="text-lg text-earth-dark-green">Prediksi 3 Bulan</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-earth-dark-green text-3xl font-bold">
+            <div className="text-3xl font-bold text-earth-dark-green">
               {formatCurrency(
                 forecastData.length ? forecastData[forecastData.length - 1].price : commodity.price
               )}
@@ -195,15 +195,15 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
           </CardContent>
         </Card>
 
-        <Card className="from-earth-wheat/30 border-earth-medium-green/30 bg-gradient-to-br to-white">
+        <Card className="border-earth-medium-green/30 bg-gradient-to-br from-earth-wheat/30 to-white">
           <CardHeader className="pb-2">
-            <CardTitle className="text-earth-dark-green text-lg">Volatilitas Harga</CardTitle>
+            <CardTitle className="text-lg text-earth-dark-green">Volatilitas Harga</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-earth-dark-green text-3xl font-bold">
+            <div className="text-3xl font-bold text-earth-dark-green">
               {stats.volatility.toFixed(1)}%
             </div>
-            <div className="text-earth-medium-green mt-2 flex items-center">
+            <div className="mt-2 flex items-center text-earth-medium-green">
               <Percent className="mr-1 h-4 w-4" />
               <span>
                 {stats.volatility < 5 ? 'Stabil' : stats.volatility < 10 ? 'Moderat' : 'Tinggi'}
@@ -220,7 +220,7 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
         onValueChange={setActiveTab}
         className="w-full"
       >
-        <TabsList className="bg-earth-pale-green/50 mb-6 grid grid-cols-3">
+        <TabsList className="mb-6 grid grid-cols-3 bg-earth-pale-green/50">
           <TabsTrigger
             value="overview"
             className="data-[state=active]:bg-earth-medium-green data-[state=active]:text-white"
@@ -245,9 +245,9 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
         </TabsList>
 
         <TabsContent value="overview" className="mt-0">
-          <Card className="from-earth-pale-green/20 border-earth-medium-green/30 bg-gradient-to-br to-white">
+          <Card className="border-earth-medium-green/30 bg-gradient-to-br from-earth-pale-green/20 to-white">
             <CardHeader>
-              <CardTitle className="text-earth-dark-green text-xl">
+              <CardTitle className="text-xl text-earth-dark-green">
                 Tren Harga 6 Bulan Terakhir & Proyeksi 3 Bulan
               </CardTitle>
               <CardDescription>
@@ -315,25 +315,25 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
               <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
                 <div className="rounded-md bg-gray-50 p-3">
                   <div className="text-sm text-gray-500">Harga Tertinggi</div>
-                  <div className="text-earth-dark-green text-lg font-semibold">
+                  <div className="text-lg font-semibold text-earth-dark-green">
                     {formatCurrency(stats.max)}
                   </div>
                 </div>
                 <div className="rounded-md bg-gray-50 p-3">
                   <div className="text-sm text-gray-500">Harga Terendah</div>
-                  <div className="text-earth-dark-green text-lg font-semibold">
+                  <div className="text-lg font-semibold text-earth-dark-green">
                     {formatCurrency(stats.min)}
                   </div>
                 </div>
                 <div className="rounded-md bg-gray-50 p-3">
                   <div className="text-sm text-gray-500">Harga Rata-rata</div>
-                  <div className="text-earth-dark-green text-lg font-semibold">
+                  <div className="text-lg font-semibold text-earth-dark-green">
                     {formatCurrency(stats.avg)}
                   </div>
                 </div>
                 <div className="rounded-md bg-gray-50 p-3">
                   <div className="text-sm text-gray-500">Volatilitas</div>
-                  <div className="text-earth-dark-green text-lg font-semibold">
+                  <div className="text-lg font-semibold text-earth-dark-green">
                     {stats.volatility.toFixed(1)}%
                   </div>
                 </div>
@@ -351,7 +351,7 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
               </div>
               <Button
                 variant="outline"
-                className="border-earth-medium-green text-earth-dark-green w-full sm:w-auto"
+                className="w-full border-earth-medium-green text-earth-dark-green sm:w-auto"
               >
                 <Bookmark className="mr-2 h-4 w-4" />
                 Simpan Data Harga
@@ -361,9 +361,9 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
         </TabsContent>
 
         <TabsContent value="regional" className="mt-0">
-          <Card className="from-earth-light-brown/20 border-earth-medium-green/30 bg-gradient-to-br to-white">
+          <Card className="border-earth-medium-green/30 bg-gradient-to-br from-earth-light-brown/20 to-white">
             <CardHeader>
-              <CardTitle className="text-earth-dark-green text-xl">
+              <CardTitle className="text-xl text-earth-dark-green">
                 Perbandingan Harga Antar Wilayah
               </CardTitle>
               <CardDescription>
@@ -414,7 +414,7 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
               </div>
 
               <div className="mt-4">
-                <h4 className="text-earth-dark-green mb-2 font-medium">
+                <h4 className="mb-2 font-medium text-earth-dark-green">
                   Analisis Perbedaan Harga Regional
                 </h4>
                 <p className="mb-4 text-gray-600">
@@ -423,8 +423,8 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
                   umumnya memiliki biaya transportasi lebih besar atau pasokan yang lebih terbatas.
                 </p>
 
-                <div className="bg-earth-pale-green/50 rounded-md p-4">
-                  <h5 className="text-earth-dark-green mb-1 font-medium">
+                <div className="rounded-md bg-earth-pale-green/50 p-4">
+                  <h5 className="mb-1 font-medium text-earth-dark-green">
                     Rekomendasi untuk Petani:
                   </h5>
                   <ul className="list-inside list-disc space-y-1 text-gray-600">
@@ -447,7 +447,7 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
               </div>
               <Button
                 variant="outline"
-                className="border-earth-medium-green text-earth-dark-green w-full sm:w-auto"
+                className="w-full border-earth-medium-green text-earth-dark-green sm:w-auto"
               >
                 <Bookmark className="mr-2 h-4 w-4" />
                 Simpan Perbandingan
@@ -457,9 +457,9 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
         </TabsContent>
 
         <TabsContent value="market" className="mt-0">
-          <Card className="from-earth-wheat/20 border-earth-medium-green/30 bg-gradient-to-br to-white">
+          <Card className="border-earth-medium-green/30 bg-gradient-to-br from-earth-wheat/20 to-white">
             <CardHeader>
-              <CardTitle className="text-earth-dark-green text-xl">
+              <CardTitle className="text-xl text-earth-dark-green">
                 Informasi Pasar {commodity.name}
               </CardTitle>
               <CardDescription>
@@ -469,14 +469,14 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
             <CardContent>
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
-                  <h4 className="text-earth-dark-green mb-3 flex items-center text-lg font-medium">
-                    <Truck className="text-earth-medium-green mr-2 h-5 w-5" />
+                  <h4 className="mb-3 flex items-center text-lg font-medium text-earth-dark-green">
+                    <Truck className="mr-2 h-5 w-5 text-earth-medium-green" />
                     Informasi untuk Petani
                   </h4>
 
                   <div className="space-y-4">
-                    <div className="bg-earth-pale-green/30 rounded-md p-4">
-                      <h5 className="text-earth-dark-green mb-2 font-medium">Outlook Pasar</h5>
+                    <div className="rounded-md bg-earth-pale-green/30 p-4">
+                      <h5 className="mb-2 font-medium text-earth-dark-green">Outlook Pasar</h5>
                       <p className="mb-2 text-gray-600">
                         {commodity.predictedChange >= 0
                           ? `Harga ${commodity.name} diprediksi akan terus ${trendDirection} dalam 3 bulan ke depan. Ini merupakan momentum yang baik untuk para petani.`
@@ -491,7 +491,7 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
                     </div>
 
                     <div>
-                      <h5 className="text-earth-dark-green mb-2 font-medium">
+                      <h5 className="mb-2 font-medium text-earth-dark-green">
                         Rekomendasi Penjualan
                       </h5>
                       <ul className="list-inside list-disc space-y-2 text-gray-600">
@@ -515,7 +515,7 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
                     </div>
 
                     <div>
-                      <h5 className="text-earth-dark-green mb-2 font-medium">
+                      <h5 className="mb-2 font-medium text-earth-dark-green">
                         Musim Panen Optimal
                       </h5>
                       <p className="text-gray-600">
@@ -531,14 +531,14 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
                 </div>
 
                 <div>
-                  <h4 className="text-earth-dark-green mb-3 flex items-center text-lg font-medium">
-                    <Store className="text-earth-medium-green mr-2 h-5 w-5" />
+                  <h4 className="mb-3 flex items-center text-lg font-medium text-earth-dark-green">
+                    <Store className="mr-2 h-5 w-5 text-earth-medium-green" />
                     Informasi untuk Pembeli
                   </h4>
 
                   <div className="space-y-4">
-                    <div className="bg-earth-pale-green/30 rounded-md p-4">
-                      <h5 className="text-earth-dark-green mb-2 font-medium">Outlook Pembelian</h5>
+                    <div className="rounded-md bg-earth-pale-green/30 p-4">
+                      <h5 className="mb-2 font-medium text-earth-dark-green">Outlook Pembelian</h5>
                       <p className="mb-2 text-gray-600">
                         {commodity.predictedChange >= 0
                           ? `Harga ${commodity.name} diprediksi akan ${trendDirection} dalam beberapa bulan kedepan. Pertimbangkan untuk melakukan pembelian segera atau mengamankan kontrak jangka panjang.`
@@ -553,7 +553,7 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
                     </div>
 
                     <div>
-                      <h5 className="text-earth-dark-green mb-2 font-medium">
+                      <h5 className="mb-2 font-medium text-earth-dark-green">
                         Rekomendasi Pembelian
                       </h5>
                       <ul className="list-inside list-disc space-y-2 text-gray-600">
@@ -576,7 +576,7 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
                     </div>
 
                     <div>
-                      <h5 className="text-earth-dark-green mb-2 font-medium">
+                      <h5 className="mb-2 font-medium text-earth-dark-green">
                         Perkiraan Ketersediaan
                       </h5>
                       <p className="text-gray-600">
@@ -601,7 +601,7 @@ export const CommodityPriceDetail: React.FC<CommodityPriceDetailProps> = ({
                   <Bookmark className="mr-2 h-4 w-4" />
                   Simpan Analisis Pasar
                 </Button>
-                <Button className="bg-earth-dark-green hover:bg-earth-medium-green text-white">
+                <Button className="bg-earth-dark-green text-white hover:bg-earth-medium-green">
                   Lihat Produk {commodity.name} di Marketplace
                 </Button>
               </div>

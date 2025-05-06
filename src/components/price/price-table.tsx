@@ -11,7 +11,6 @@ import { useLanguage } from '@/contexts/language-context';
 import { PriceRow, type PriceItem } from './price-row';
 import { Filter, Search, TrendingUp } from 'lucide-react';
 import { Input } from '../ui/input';
-import { useState } from 'react';
 import { CommodityPrice } from '@/lib/data/types';
 import { Button } from '../ui/button';
 
@@ -117,10 +116,10 @@ export const PriceTable = ({
 }: PriceTableProps) => {
   const { t } = useLanguage();
 
-  const [regionFilter, setRegionFilter] = useState('all');
-  const [trendFilter, setTrendFilter] = useState('all');
-  // Get unique regions for filter
-  const regions = ['all', ...new Set(commodityPrices.map((price) => price.region))];
+  // const [regionFilter, setRegionFilter] = useState('all');
+  // const [trendFilter, setTrendFilter] = useState('all');
+  // // Get unique regions for filter
+  // const regions = ['all', ...new Set(commodityPrices.map((price) => price.region))];
 
   return (
     <Card className="">

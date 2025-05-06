@@ -4,12 +4,9 @@ import { MainLayout } from '@/components/layout/main-layout';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/language-context';
 import { useToast } from '@/hooks/use-toast';
-import { TransactionHeader } from '@/components/transaction/transaction-header';
 import { TransactionInfo } from '@/components/transaction/transaction-info';
-import { StatusCard } from '@/components/transaction/status-card';
 import { TransactionTimeline } from '@/components/transaction/transaction-timeline';
 import { TransactionSummary } from '@/components/transaction/transaction-summary';
-import { TransactionGuideDialog } from '@/components/transaction/transaction-guide-dialog';
 import { PriceInputForm } from '@/components/transaction/price-input-form';
 import { transactions } from '@/lib/data/mock-data'; // Import directly from mockData
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,6 +25,7 @@ import {
 } from 'lucide-react';
 import { formatDate, formatCurrency } from '@/lib/utils';
 import { TransactionStatus, ShippingStatus } from '@/lib/data/types';
+import TransactionHeader from '@/components/transaction/transaction-header';
 
 const TransactionDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -140,7 +138,7 @@ const TransactionDetail = () => {
     setTransaction((prev) => {
       if (!prev) return null;
 
-      const totalPrice = price * prev.quantity;
+      const totalPrice = price * prev.antity;
 
       return {
         ...prev,
@@ -349,7 +347,7 @@ const TransactionDetail = () => {
           </p>
           <button
             onClick={() => navigate('/transaksi')}
-            className="bg-earth-dark-green hover:bg-earth-medium-green rounded px-4 py-2 text-white transition-colors"
+            className="rounded bg-earth-dark-green px-4 py-2 text-white transition-colors hover:bg-earth-medium-green"
           >
             {language === 'id' ? 'Kembali ke Transaksi' : 'Back to Transactions'}
           </button>
@@ -456,14 +454,6 @@ const TransactionDetail = () => {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="space-y-6 md:col-span-2">
-          <div className="flex items-center justify-between">
-            <h2 className="text-earth-dark-green text-xl font-semibold">
-              {language === 'id' ? 'Detail Transaksi' : 'Transaction Details'}
-            </h2>
-            {/* Transaction Guide button for better accessibility */}
-            <TransactionGuideDialog currentStep={transaction.status} />
-          </div>
-
           <TransactionInfo
             transaction={transaction}
             handleProceedToNegotiation={handleProceedToNegotiation}
@@ -471,7 +461,7 @@ const TransactionDetail = () => {
             calculateProgress={calculateProgress}
           />
 
-          {(transaction.status === 'menunggu_konfirmasi' ||
+          {/* {(transaction.status === 'menunggu_konfirmasi' ||
             transaction.status === 'dikonfirmasi') && (
             <StatusCard
               status={transaction.status}
@@ -479,7 +469,7 @@ const TransactionDetail = () => {
               onDeclineTransaction={handleDeclineTransaction}
               onProceedToNegotiation={handleProceedToNegotiation}
             />
-          )}
+          )} */}
 
           {shouldShowPriceInput && (
             <div id="price-input-form">
@@ -530,26 +520,26 @@ const TransactionDetail = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="mt-2 space-y-4">
-                    <div className="bg-earth-wheat/30 rounded-lg p-4">
+                    <div className="rounded-lg bg-earth-wheat/30 p-4">
                       <div className="mb-3 flex items-center space-x-2">
-                        <Package className="text-earth-brown h-5 w-5" />
-                        <h3 className="text-earth-dark-green font-medium">
+                        <Package className="h-5 w-5 text-earth-brown" />
+                        <h3 className="font-medium text-earth-dark-green">
                           {language === 'id' ? 'Persiapan Komoditas' : 'Commodity Preparation'}
                         </h3>
                       </div>
 
-                      <p className="text-earth-medium-green mb-4">
+                      <p className="mb-4 text-earth-medium-green">
                         {language === 'id'
                           ? `Siapkan ${transaction.quantity} ${transaction.unit} ${transaction.commodityName} sesuai dengan pesanan.`
                           : `Prepare ${transaction.quantity} ${transaction.unit} of ${transaction.commodityName} as per order.`}
                       </p>
 
-                      <div className="bg-earth-pale-green/40 mb-4 rounded-lg p-3">
+                      <div className="mb-4 rounded-lg bg-earth-pale-green/40 p-3">
                         <div className="flex items-center justify-between">
                           <span className="text-earth-brown">
                             {language === 'id' ? 'Jumlah' : 'Quantity'}:
                           </span>
-                          <span className="text-earth-dark-green font-medium">
+                          <span className="font-medium text-earth-dark-green">
                             {transaction.quantity.toLocaleString()} {transaction.unit}
                           </span>
                         </div>
@@ -557,7 +547,7 @@ const TransactionDetail = () => {
                           <span className="text-earth-brown">
                             {language === 'id' ? 'Harga' : 'Price'}:
                           </span>
-                          <span className="text-earth-dark-green font-medium">
+                          <span className="font-medium text-earth-dark-green">
                             {formatCurrency(transaction.price)} / {transaction.unit}
                           </span>
                         </div>
@@ -565,31 +555,31 @@ const TransactionDetail = () => {
                           <span className="text-earth-brown">
                             {language === 'id' ? 'Total' : 'Total'}:
                           </span>
-                          <span className="text-earth-dark-green font-medium">
+                          <span className="font-medium text-earth-dark-green">
                             {formatCurrency(transaction.totalPrice)}
                           </span>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                        <div className="bg-earth-light-green/20 rounded-lg p-3">
-                          <h4 className="text-earth-dark-green mb-1 font-medium">
+                        <div className="rounded-lg bg-earth-light-green/20 p-3">
+                          <h4 className="mb-1 font-medium text-earth-dark-green">
                             {language === 'id' ? 'Checklist Persiapan' : 'Preparation Checklist'}
                           </h4>
                           <ul className="space-y-2 text-sm">
-                            <li className="text-earth-medium-green flex items-center">
+                            <li className="flex items-center text-earth-medium-green">
                               <ClipboardCheck className="mr-2 h-4 w-4" />
                               {language === 'id'
                                 ? 'Periksa kualitas komoditas'
                                 : 'Check commodity quality'}
                             </li>
-                            <li className="text-earth-medium-green flex items-center">
+                            <li className="flex items-center text-earth-medium-green">
                               <ClipboardCheck className="mr-2 h-4 w-4" />
                               {language === 'id'
                                 ? 'Siapkan kemasan yang sesuai'
                                 : 'Prepare appropriate packaging'}
                             </li>
-                            <li className="text-earth-medium-green flex items-center">
+                            <li className="flex items-center text-earth-medium-green">
                               <ClipboardCheck className="mr-2 h-4 w-4" />
                               {language === 'id'
                                 ? 'Pastikan jumlah sesuai pesanan'
@@ -597,15 +587,15 @@ const TransactionDetail = () => {
                             </li>
                           </ul>
                         </div>
-                        <div className="bg-earth-light-green/10 rounded-lg p-3">
-                          <h4 className="text-earth-dark-green mb-1 font-medium">
+                        <div className="rounded-lg bg-earth-light-green/10 p-3">
+                          <h4 className="mb-1 font-medium text-earth-dark-green">
                             {language === 'id' ? 'Tenggat Waktu' : 'Timeline'}
                           </h4>
-                          <div className="text-earth-medium-green mb-2 flex items-center text-sm">
+                          <div className="mb-2 flex items-center text-sm text-earth-medium-green">
                             <Calendar className="mr-2 h-4 w-4" />
                             {language === 'id' ? 'Siapkan dalam 3 hari' : 'Prepare within 3 days'}
                           </div>
-                          <div className="text-earth-medium-green flex items-center text-sm">
+                          <div className="flex items-center text-sm text-earth-medium-green">
                             <MessageCircle className="mr-2 h-4 w-4" />
                             {language === 'id'
                               ? 'Hubungi pembeli untuk konfirmasi'
@@ -645,20 +635,20 @@ const TransactionDetail = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="mt-2 space-y-4">
-                    <div className="bg-earth-clay/20 rounded-lg p-4">
+                    <div className="rounded-lg bg-earth-clay/20 p-4">
                       <div className="mb-3 flex items-center space-x-2">
-                        <Truck className="text-earth-brown h-5 w-5" />
-                        <h3 className="text-earth-dark-green font-medium">
+                        <Truck className="h-5 w-5 text-earth-brown" />
+                        <h3 className="font-medium text-earth-dark-green">
                           {language === 'id' ? 'Status Pengiriman' : 'Delivery Status'}
                         </h3>
                       </div>
 
-                      <div className="bg-earth-wheat/30 mb-4 rounded-lg p-3">
+                      <div className="mb-4 rounded-lg bg-earth-wheat/30 p-3">
                         <div className="flex items-center justify-between">
                           <span className="text-earth-brown">
                             {language === 'id' ? 'Alamat' : 'Address'}:
                           </span>
-                          <span className="text-earth-dark-green font-medium">
+                          <span className="font-medium text-earth-dark-green">
                             {transaction.buyerLocation || 'Jakarta Utara, DKI Jakarta'}
                           </span>
                         </div>
@@ -666,7 +656,7 @@ const TransactionDetail = () => {
                           <span className="text-earth-brown">
                             {language === 'id' ? 'Kurir' : 'Courier'}:
                           </span>
-                          <span className="text-earth-dark-green font-medium">
+                          <span className="font-medium text-earth-dark-green">
                             {transaction.courier || 'Pengiriman Sendiri'}
                           </span>
                         </div>
@@ -677,7 +667,7 @@ const TransactionDetail = () => {
                               <span className="text-earth-brown">
                                 {language === 'id' ? 'Tanggal Mulai' : 'Start Date'}:
                               </span>
-                              <span className="text-earth-dark-green font-medium">
+                              <span className="font-medium text-earth-dark-green">
                                 {transaction.deliveryStartedAt
                                   ? formatDate(transaction.deliveryStartedAt)
                                   : formatDate(new Date())}
@@ -687,7 +677,7 @@ const TransactionDetail = () => {
                               <span className="text-earth-brown">
                                 {language === 'id' ? 'Estimasi Tiba' : 'Est. Arrival'}:
                               </span>
-                              <span className="text-earth-dark-green font-medium">
+                              <span className="font-medium text-earth-dark-green">
                                 {transaction.estimatedDeliveryDate
                                   ? formatDate(transaction.estimatedDeliveryDate)
                                   : language === 'id'
@@ -703,7 +693,7 @@ const TransactionDetail = () => {
                             <span className="text-earth-brown">
                               {language === 'id' ? 'Tanggal Kirim' : 'Delivery Date'}:
                             </span>
-                            <span className="text-earth-dark-green font-medium">
+                            <span className="font-medium text-earth-dark-green">
                               {transaction.actualDeliveryDate
                                 ? formatDate(transaction.actualDeliveryDate)
                                 : formatDate(new Date())}
@@ -716,7 +706,7 @@ const TransactionDetail = () => {
                             <span className="text-earth-brown">
                               {language === 'id' ? 'No. Pelacakan' : 'Tracking No.'}:
                             </span>
-                            <span className="text-earth-dark-green font-medium">
+                            <span className="font-medium text-earth-dark-green">
                               {transaction.trackingNumber}
                             </span>
                           </div>
@@ -725,7 +715,7 @@ const TransactionDetail = () => {
 
                       {transaction.status === 'sedang_dikirim' && (
                         <div className="space-y-4">
-                          <p className="text-earth-medium-green mb-2">
+                          <p className="mb-2 text-earth-medium-green">
                             {language === 'id'
                               ? 'Pastikan komoditas dikemas dengan baik dan aman selama pengiriman. Hubungi pembeli untuk koordinasi waktu pengiriman.'
                               : 'Ensure commodities are well-packaged and safe during delivery. Contact the buyer to coordinate delivery time.'}
@@ -733,10 +723,10 @@ const TransactionDetail = () => {
 
                           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             {/* Delivery Proof Upload */}
-                            <div className="border-earth-light-brown rounded-lg border border-dashed p-4">
+                            <div className="rounded-lg border border-dashed border-earth-light-brown p-4">
                               <div className="mb-2 flex items-center">
-                                <Camera className="text-earth-brown mr-2 h-4 w-4" />
-                                <h4 className="text-earth-dark-green font-medium">
+                                <Camera className="mr-2 h-4 w-4 text-earth-brown" />
+                                <h4 className="font-medium text-earth-dark-green">
                                   {language === 'id' ? 'Bukti Pengiriman' : 'Delivery Proof'}
                                 </h4>
                               </div>
@@ -750,7 +740,7 @@ const TransactionDetail = () => {
                                   accept="image/*"
                                 />
                                 <label htmlFor="delivery-proof" className="cursor-pointer">
-                                  <UploadCloud className="text-earth-medium-green mx-auto mb-2 h-10 w-10" />
+                                  <UploadCloud className="mx-auto mb-2 h-10 w-10 text-earth-medium-green" />
                                   <p className="text-earth-medium-green">
                                     {language === 'id'
                                       ? 'Unggah foto bukti pengiriman'
@@ -759,7 +749,7 @@ const TransactionDetail = () => {
                                 </label>
 
                                 {uploadedPhoto && (
-                                  <div className="text-earth-dark-green bg-earth-light-green/20 mt-2 rounded-lg p-2">
+                                  <div className="mt-2 rounded-lg bg-earth-light-green/20 p-2 text-earth-dark-green">
                                     <CheckCircle2 className="mr-1 inline-block h-4 w-4" />
                                     {uploadedPhoto.name}
                                   </div>
@@ -768,17 +758,17 @@ const TransactionDetail = () => {
                             </div>
 
                             {/* Tracking Number */}
-                            <div className="border-earth-light-brown rounded-lg border p-4">
+                            <div className="rounded-lg border border-earth-light-brown p-4">
                               <div className="mb-2 flex items-center">
-                                <BookCheck className="text-earth-brown mr-2 h-4 w-4" />
-                                <h4 className="text-earth-dark-green font-medium">
+                                <BookCheck className="mr-2 h-4 w-4 text-earth-brown" />
+                                <h4 className="font-medium text-earth-dark-green">
                                   {language === 'id' ? 'Nomor Pelacakan' : 'Tracking Number'}
                                 </h4>
                               </div>
 
                               <input
                                 type="text"
-                                className="border-earth-light-brown/70 mb-2 w-full rounded-lg border p-2"
+                                className="mb-2 w-full rounded-lg border border-earth-light-brown/70 p-2"
                                 placeholder={
                                   language === 'id'
                                     ? 'Masukkan nomor resi/pelacakan'
@@ -788,7 +778,7 @@ const TransactionDetail = () => {
                                 onChange={(e) => setTrackingNumber(e.target.value)}
                               />
 
-                              <p className="text-earth-medium-green text-xs">
+                              <p className="text-xs text-earth-medium-green">
                                 {language === 'id'
                                   ? 'Opsional: Isi jika menggunakan jasa kurir'
                                   : 'Optional: Fill if using courier service'}
@@ -811,7 +801,7 @@ const TransactionDetail = () => {
 
                       {transaction.status === 'persiapan_pengiriman' && (
                         <div className="mt-6">
-                          <p className="text-earth-medium-green mb-4">
+                          <p className="mb-4 text-earth-medium-green">
                             {language === 'id'
                               ? 'Pastikan komoditas sudah disiapkan dengan baik dan siap untuk dikirim ke pembeli.'
                               : 'Make sure the commodity is well prepared and ready to be shipped to the buyer.'}
@@ -824,8 +814,8 @@ const TransactionDetail = () => {
                       )}
 
                       {transaction.status === 'sudah_dikirim' && (
-                        <div className="bg-earth-light-green/20 rounded-lg p-3 text-center">
-                          <p className="text-earth-dark-green font-medium">
+                        <div className="rounded-lg bg-earth-light-green/20 p-3 text-center">
+                          <p className="font-medium text-earth-dark-green">
                             {language === 'id'
                               ? 'Pengiriman telah selesai. Menunggu konfirmasi penerimaan dari pembeli.'
                               : 'Delivery completed. Waiting for receipt confirmation from buyer.'}
@@ -846,20 +836,20 @@ const TransactionDetail = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="mt-2 space-y-4">
-                    <div className="bg-earth-pale-green/30 rounded-lg p-4">
+                    <div className="rounded-lg bg-earth-pale-green/30 p-4">
                       <div className="mb-3 flex items-center space-x-2">
-                        <FileText className="text-earth-dark-green h-5 w-5" />
-                        <h3 className="text-earth-dark-green font-medium">
+                        <FileText className="h-5 w-5 text-earth-dark-green" />
+                        <h3 className="font-medium text-earth-dark-green">
                           {language === 'id' ? 'Dokumen Penting' : 'Important Documents'}
                         </h3>
                       </div>
 
                       <div className="space-y-4">
-                        <div className="border-earth-light-green rounded-lg border bg-white p-3">
+                        <div className="rounded-lg border border-earth-light-green bg-white p-3">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center">
-                              <FileText className="text-earth-dark-green mr-2 h-5 w-5" />
-                              <span className="text-earth-dark-green font-medium">
+                              <FileText className="mr-2 h-5 w-5 text-earth-dark-green" />
+                              <span className="font-medium text-earth-dark-green">
                                 {language === 'id' ? 'Syarat & Ketentuan' : 'Terms & Conditions'}
                               </span>
                             </div>
@@ -873,11 +863,11 @@ const TransactionDetail = () => {
                           </div>
                         </div>
 
-                        <div className="border-earth-light-green rounded-lg border bg-white p-3">
+                        <div className="rounded-lg border border-earth-light-green bg-white p-3">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center">
-                              <FileText className="text-earth-dark-green mr-2 h-5 w-5" />
-                              <span className="text-earth-dark-green font-medium">
+                              <FileText className="mr-2 h-5 w-5 text-earth-dark-green" />
+                              <span className="font-medium text-earth-dark-green">
                                 {language === 'id' ? 'Invoice Transaksi' : 'Transaction Invoice'}
                               </span>
                             </div>
@@ -891,11 +881,11 @@ const TransactionDetail = () => {
                           </div>
                         </div>
 
-                        <div className="border-earth-light-green rounded-lg border bg-white p-3">
+                        <div className="rounded-lg border border-earth-light-green bg-white p-3">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center">
-                              <FileText className="text-earth-dark-green mr-2 h-5 w-5" />
-                              <span className="text-earth-dark-green font-medium">
+                              <FileText className="mr-2 h-5 w-5 text-earth-dark-green" />
+                              <span className="font-medium text-earth-dark-green">
                                 {language === 'id' ? 'Tanda Terima' : 'Receipt'}
                               </span>
                             </div>
@@ -910,7 +900,7 @@ const TransactionDetail = () => {
                         </div>
                       </div>
 
-                      <p className="text-earth-medium-green mt-4">
+                      <p className="mt-4 text-earth-medium-green">
                         {language === 'id'
                           ? 'Semua dokumen transaksi dapat diakses dan diunduh dari halaman ini untuk referensi Anda.'
                           : 'All transaction documents can be accessed and downloaded from this page for your reference.'}

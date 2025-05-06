@@ -45,7 +45,7 @@ export default function Dashboard() {
             <h1 className="text-2xl font-bold tracking-tight text-earth-dark-green">
               {t('dashboard.title')}
             </h1>
-            <h2>Selamat datang kembali {userProfile.name}👋</h2>
+            <h2>Selamat datang kembali {userProfile?.name}👋</h2>
           </div>
           {/* <Tabs
             value={timeframe}
