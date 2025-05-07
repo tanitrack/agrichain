@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { cn } from '@/lib/utils';
-import { Leaf } from 'lucide-react';
+import { Leaf, ShoppingBasket } from 'lucide-react';
 import { TaniCardDownloadBtn } from './tani-card-download-btn';
 
 interface TaniCardProps {
@@ -38,7 +38,7 @@ const TaniCard: React.FC<TaniCardProps> = ({
       <div
         ref={cardRef}
         className={cn(
-          `relative flex h-[220px] w-[350px] overflow-hidden rounded-2xl bg-gradient-to-br ${userType === 'farmer' ? 'from-[#224c2a] via-[#356d3a] to-[#193c1e]' : 'from-[#d79c08] via-[#e9b934] to-[#d79d08]'} text-white shadow-xl md:h-[250px] md:w-[400px]`,
+          `relative flex h-[220px] w-[350px] overflow-hidden rounded-2xl bg-gradient-to-br ${userType === 'farmer' ? 'from-[#224c2a] via-[#356d3a] to-[#193c1e]' : 'from-[#d79c08] via-[#e1c169] to-[#d79d08]'} text-white shadow-xl md:h-[250px] md:w-[400px]`,
           'items-stretch'
         )}
         style={{ perspective: '1000px', transformStyle: 'preserve-3d' }}
@@ -49,7 +49,11 @@ const TaniCard: React.FC<TaniCardProps> = ({
           <div className="mb-2 flex items-center justify-between">
             <div className="flex items-center">
               <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
-                <Leaf className="h-4 w-4 text-white" />
+                {userType === 'farmer' ? (
+                  <Leaf className="h-4 w-4 text-white" />
+                ) : (
+                  <ShoppingBasket className="h-4 w-4 text-white" />
+                )}
               </div>
               <div>
                 <span className="text-[11px] font-semibold uppercase tracking-wider opacity-80">
