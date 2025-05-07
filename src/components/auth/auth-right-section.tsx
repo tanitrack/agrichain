@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/language-context';
 import { UserProfileForm } from '@/components/auth/user-profile-form';
 import { EmailRegistrationForm } from '@/components/auth/email-registration-form';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Leaf, ShoppingBasket } from 'lucide-react';
 
 interface AuthRightSectionProps {
   userType?: string;
@@ -75,12 +75,17 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
               <button
                 type="button"
                 onClick={() => handleUserTypeSelection('petani')}
-                className="rounded-lg border border-earth-light-brown p-4 transition-colors hover:bg-earth-pale-green"
+                className="relative rounded-lg border border-earth-light-brown bg-gradient-to-br from-[#224c2a] via-[#356d3a] to-[#193c1e] p-4  transition duration-300 hover:-translate-y-4 hover:bg-earth-pale-green"
               >
-                <h4 className="font-medium text-earth-dark-green">
+                <div className="absolute left-2 top-2 mr-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
+                  <Leaf className="h-4 w-4 text-white" />
+                </div>
+                {/* <h4 className="font-medium text-earth-dark-green"> */}
+                <h4 className="font-medium text-white">
                   {language === 'id' ? 'Petani' : 'Farmer'}
                 </h4>
-                <p className="mt-1 text-sm text-gray-600">
+                {/* <p className="mt-1 text-sm text-gray-600"> */}
+                <p className="mt-1 text-sm text-gray-200">
                   {language === 'id'
                     ? 'Daftar sebagai petani untuk menjual produk pertanian'
                     : 'Register as a farmer to sell agricultural products'}
@@ -89,12 +94,15 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
               <button
                 type="button"
                 onClick={() => handleUserTypeSelection('konsumen')}
-                className="rounded-lg border border-earth-light-brown p-4 transition-colors hover:bg-earth-pale-green"
+                className="relative rounded-lg border border-earth-light-brown bg-gradient-to-br from-[#d79c08] via-[#e1c169] to-[#d79d08] p-4 transition duration-300 hover:-translate-y-4 hover:bg-earth-pale-green"
               >
-                <h4 className="font-medium text-earth-dark-green">
+                <div className="absolute left-2 top-2 mr-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
+                  <ShoppingBasket className="h-4 w-4 text-white" />
+                </div>
+                <h4 className="font-medium text-white">
                   {language === 'id' ? 'Konsumen' : 'Buyer'}
                 </h4>
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-sm text-gray-200">
                   {language === 'id'
                     ? 'Daftar sebagai konsumen untuk membeli produk pertanian'
                     : 'Register as a buyer to purchase agricultural products'}

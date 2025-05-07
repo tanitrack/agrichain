@@ -119,11 +119,11 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
             </Link>
           )}
           {!open && !isMobile && (
-            <div className="mx-auto flex h-10 w-10 items-center justify-center overflow-hidden rounded-md bg-white/90">
+            <div className="mx-auto flex h-10 w-10 items-center justify-center overflow-hidden rounded-md">
               <img
                 src="/lovable-uploads/f7fb75ca-ee07-4d12-a8ab-4e5152e13679.png"
                 alt="TaniTrack Logo"
-                className="h-full w-full object-contain"
+                className=" w-full rounded-md object-cover"
               />
             </div>
           )}
@@ -131,7 +131,7 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="rounded-full text-white hover:bg-[#588157]/20"
+              className="absolute -right-4 h-6 w-6 rounded-full border bg-white hover:bg-[#588157] hover:text-white"
               onClick={() => setOpen(!open)}
             >
               {open ? <ChevronLeft /> : <ChevronRight />}

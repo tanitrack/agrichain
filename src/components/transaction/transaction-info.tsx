@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
-import { Package, DollarSign, MessageCircle } from 'lucide-react';
+import { Package, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/language-context';
 import { formatCurrency } from '@/lib/utils';
@@ -154,7 +154,7 @@ export const BuyerInfo = ({ transaction }: BuyerInfoProps) => {
             <p className="mt-1 flex items-center gap-1 text-sm text-earth-medium-green">
               <span className="h-3 w-3" /> {transaction.buyerPhone}
             </p>
-            <Button
+            {/* <Button
               variant="outline"
               size="sm"
               className="mt-2 gap-1 border-earth-light-brown/70 text-earth-dark-green hover:bg-earth-pale-green"
@@ -162,7 +162,7 @@ export const BuyerInfo = ({ transaction }: BuyerInfoProps) => {
             >
               <MessageCircle className="h-3 w-3" />
               Chat via WhatsApp
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>

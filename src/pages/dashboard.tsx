@@ -88,7 +88,7 @@ export default function Dashboard() {
             </div>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-bold text-earth-dark-green">
-                {userProfile.userType === 'farmer'
+                {userProfile?.userType === 'farmer'
                   ? t('dashboard.summary')
                   : 'Ringkasan Pengeluaran'}
               </CardTitle>
@@ -109,7 +109,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          {userProfile.userType === 'farmer' && (
+          {userProfile?.userType === 'farmer' && (
             <Card className="earth-card-brown shadow-md">
               <div className="absolute right-0 top-0 p-3">
                 <Leaf className="h-6 w-6 text-earth-brown opacity-60" />
