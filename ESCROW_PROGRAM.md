@@ -2,7 +2,9 @@
 
 ## Overview
 
-````mermaid
+The Solana Escrow Program is a smart contract that facilitates the secure exchange of assets between a buyer and a seller. It ensures that the buyer's funds are held in escrow until the seller fulfills their part of the agreement. The program allows for the following states:
+
+```mermaid
 stateDiagram-v2
     [*] --> Initialized: initialize(amount, details)
     Initialized --> Confirmed: confirm_order()
@@ -32,5 +34,4 @@ stateDiagram-v2
     note right of Failed
       Either party cancels the order
     end note
-    ```
-````
+```
