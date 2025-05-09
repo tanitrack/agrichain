@@ -19,7 +19,7 @@
     "pre-commit": "lint-staged"
   },
   "dependencies": {
-    "@coral-xyz/anchor": "^0.31.1",
+    "@coral-xyz/anchor": "^v0.31.1",
     "@dynamic-labs/sdk-react": "^0.18.30",
     "@dynamic-labs/sdk-react-core": "^4.12.3",
     "@dynamic-labs/solana": "^4.12.3",

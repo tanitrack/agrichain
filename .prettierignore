@@ -18,3 +18,12 @@ node_modules/
 .DS_Store
 *.log
 coverage/
+
+# Anchor
+.anchor
+.DS_Store
+target
+node_modules
+dist
+build
+test-ledger

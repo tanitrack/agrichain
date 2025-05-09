@@ -3,7 +3,6 @@
 
 use anchor_lang::prelude::*;
 use anchor_lang::system_program;
-
 declare_id!("coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF");
 
 #[program]
@@ -11,7 +10,8 @@ pub mod escrow {
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>, order_details: String, amount: u64) -> Result<()> {
-        require!(order_details.len() <= 100, EscrowError::OrderDetailsTooLong);
+        require!(order_details.len() <= 32, EscrowError::OrderDetailsTooLong);
+        require!(amount > 0, EscrowError::ZeroAmount);
 
         let escrow_account = &mut ctx.accounts.escrow_account;
 
@@ -25,7 +25,7 @@ pub mod escrow {
         // Transfer funds to the vault PDA
         let cpi_accounts = system_program::Transfer {
             from: ctx.accounts.buyer.to_account_info(),
-            to: ctx.accounts.vault_account.to_account_info(),
+            to: ctx.accounts.escrow_account.to_account_info(),
         };
         let cpi_ctx = CpiContext::new(ctx.accounts.system_program.to_account_info(), cpi_accounts);
         system_program::transfer(cpi_ctx, amount)?;
@@ -39,25 +39,28 @@ pub mod escrow {
     }
 
     pub fn refund_order(ctx: Context<RefundOrder>) -> Result<()> {
-        let escrow = &ctx.accounts.escrow_account;
+        let escrow = &mut ctx.accounts.escrow_account;
+
         require!(
             escrow.status == EscrowStatus::Initialized,
             EscrowError::InvalidStatusForRefund
         );
+        require!(escrow.amount > 0, EscrowError::ZeroAmount);
 
-        // Transfer funds from vault back to buyer
+        // Transfer funds from escrow back to buyer
         transfer_lamports(
-            &ctx.accounts.vault_account,
-            &ctx.accounts.buyer,
+            &escrow.to_account_info(),
+            &ctx.accounts.buyer.to_account_info(),
             escrow.amount,
         )?;
 
-        ctx.accounts.escrow_account.status = EscrowStatus::Refunded;
+        escrow.status = EscrowStatus::Refunded;
+        escrow.amount = 0; // Set amount to zero after refund
         Ok(())
     }
 
     pub fn fail_order(ctx: Context<FailOrder>) -> Result<()> {
-        let escrow = &ctx.accounts.escrow_account;
+        let escrow = &mut ctx.accounts.escrow_account;
         let authority_key = ctx.accounts.authority.key();
 
         require!(
@@ -68,19 +71,25 @@ pub mod escrow {
             escrow.status == EscrowStatus::Initialized,
             EscrowError::InvalidStatusForFailure
         );
+        require!(escrow.amount > 0, EscrowError::ZeroAmount);
 
         transfer_lamports(
-            &ctx.accounts.vault_account,
+            &escrow.to_account_info(),
             &ctx.accounts.buyer,
             escrow.amount,
         )?;
 
-        ctx.accounts.escrow_account.status = EscrowStatus::Failed;
+        escrow.status = EscrowStatus::Failed;
+        escrow.amount = 0; // Set amount to zero after failure
         Ok(())
     }
 
     pub fn withdraw_funds(ctx: Context<WithdrawFunds>) -> Result<()> {
-        let escrow = &ctx.accounts.escrow_account;
+        let escrow = &mut ctx.accounts.escrow_account;
+        require!(
+            escrow.status == EscrowStatus::Confirmed,
+            EscrowError::InvalidStatusForWithdrawal
+        );
         require!(
             escrow.status == EscrowStatus::Confirmed,
             EscrowError::InvalidStatusForWithdrawal
@@ -89,13 +98,13 @@ pub mod escrow {
         require!(escrow.amount > 0, EscrowError::AlreadyWithdrawn);
 
         transfer_lamports(
-            &ctx.accounts.vault_account,
+            &escrow.to_account_info(),
             &ctx.accounts.seller,
             escrow.amount,
         )?;
 
-        ctx.accounts.escrow_account.status = EscrowStatus::Completed;
-        ctx.accounts.escrow_account.amount = 0;
+        escrow.status = EscrowStatus::Completed;
+        escrow.amount = 0;
         Ok(())
     }
 
@@ -111,16 +120,16 @@ pub mod escrow {
             EscrowError::InvalidStatusForClose
         );
 
-        **ctx.accounts.receiver.try_borrow_mut_lamports()? +=
-            **ctx.accounts.vault_account.try_borrow_lamports()?;
-        **ctx.accounts.vault_account.try_borrow_mut_lamports()? = 0;
-
         Ok(())
     }
 }
 
 // Helper to transfer lamports from a PDA
 fn transfer_lamports(from: &AccountInfo, to: &AccountInfo, amount: u64) -> Result<()> {
+    let from_lamports = **from.try_borrow_lamports()?;
+
+    require!(from_lamports >= amount, EscrowError::InsufficientFunds);
+
     **from.try_borrow_mut_lamports()? -= amount;
     **to.try_borrow_mut_lamports()? += amount;
     Ok(())
@@ -131,7 +140,7 @@ fn transfer_lamports(from: &AccountInfo, to: &AccountInfo, amount: u64) -> Resul
 pub struct EscrowAccount {
     pub buyer: Pubkey,
     pub seller: Pubkey,
-    #[max_len(100)]
+    #[max_len(32)]
     pub order_details: String,
     pub amount: u64,
     pub status: EscrowStatus,
@@ -150,17 +159,11 @@ pub struct Initialize<'info> {
     )]
     pub escrow_account: Account<'info, EscrowAccount>,
 
-    #[account(
-        seeds = [b"vault", escrow_account.key().as_ref()],
-        bump,
-    )]
-    pub vault_account: SystemAccount<'info>,
-
     #[account(mut)]
     pub buyer: Signer<'info>,
 
-    /// CHECK: Only needed for the address
-    #[account(mut)]
+    /// CHECK: This is the seller's account, only need address
+    #[account()]
     pub seller: AccountInfo<'info>,
 
     pub system_program: Program<'info, System>,
@@ -168,15 +171,13 @@ pub struct Initialize<'info> {
 
 #[derive(Accounts)]
 pub struct RefundOrder<'info> {
-    #[account(mut)]
-    pub escrow_account: Account<'info, EscrowAccount>,
-
     #[account(
-        mut,
-        seeds = [b"vault", escrow_account.key().as_ref()],
-        bump
+        mut, // Escrow account state and lamports will change
+        seeds = [b"escrow", escrow_account.buyer.as_ref(), escrow_account.seller.as_ref(), escrow_account.order_details.as_bytes()],
+        bump = escrow_account.bump,
+        // Constraint for buyer already exists if needed, but signer implies authority
     )]
-    pub vault_account: SystemAccount<'info>,
+    pub escrow_account: Account<'info, EscrowAccount>,
 
     #[account(
         mut,
@@ -199,25 +200,22 @@ pub struct ConfirmOrder<'info> {
 
 #[derive(Accounts)]
 pub struct FailOrder<'info> {
-    #[account(mut)]
+    #[account(
+        mut,
+        seeds = [b"escrow", escrow_account.buyer.as_ref(), escrow_account.seller.as_ref(), escrow_account.order_details.as_bytes()],
+        bump = escrow_account.bump
+    )]
     pub escrow_account: Account<'info, EscrowAccount>,
 
+    /// CHECK: Destination for lamports refund
     #[account(
         mut,
-        seeds = [b"vault", escrow_account.key().as_ref()],
-        bump
-    )]
-    pub vault_account: SystemAccount<'info>,
-
-    /// CHECK: based on constraint
-    #[account(
-        mut,
-        constraint = buyer.key() == escrow_account.buyer
+        constraint = buyer.key() == escrow_account.buyer @ EscrowError::OnlyBuyerAllowed
     )]
     pub buyer: AccountInfo<'info>,
 
     #[account(
-        constraint = authority.key() == escrow_account.buyer || authority.key() == escrow_account.seller
+        constraint = authority.key() == escrow_account.buyer || authority.key() == escrow_account.seller @ EscrowError::Unauthorized
     )]
     pub authority: Signer<'info>,
 }
@@ -226,18 +224,13 @@ pub struct FailOrder<'info> {
 pub struct WithdrawFunds<'info> {
     #[account(
         mut,
-        has_one = seller @ EscrowError::Unauthorized
+        has_one = seller @ EscrowError::Unauthorized, // Ensures only the correct seller can call
+        seeds = [b"escrow", escrow_account.buyer.as_ref(), escrow_account.seller.as_ref(), escrow_account.order_details.as_bytes()],
+        bump = escrow_account.bump
     )]
     pub escrow_account: Account<'info, EscrowAccount>,
 
-    #[account(
-        mut,
-        seeds = [b"vault", escrow_account.key().as_ref()],
-        bump
-    )]
-    pub vault_account: SystemAccount<'info>,
-
-    #[account(mut)]
+    #[account(mut)] // Seller receives the funds
     pub seller: Signer<'info>,
 }
 
@@ -245,25 +238,15 @@ pub struct WithdrawFunds<'info> {
 pub struct CloseEscrow<'info> {
     #[account(
         mut,
-        close = receiver,
+        close = receiver, // Closes escrow_account and sends its lamports to receiver
         seeds = [b"escrow", escrow_account.buyer.as_ref(), escrow_account.seller.as_ref(), escrow_account.order_details.as_bytes()],
         bump = escrow_account.bump
     )]
     pub escrow_account: Account<'info, EscrowAccount>,
 
-    #[account(
-        mut,
-        seeds = [b"vault", escrow_account.key().as_ref()],
-        bump
-    )]
-    /// CHECK: We'll send rent lamports back, so manual cleanup is needed
-    pub vault_account: AccountInfo<'info>,
-
     /// Can be buyer or a refund receiver
     #[account(mut)]
     pub receiver: Signer<'info>,
-
-    pub system_program: Program<'info, System>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, PartialEq, Eq, InitSpace)]
@@ -278,7 +261,7 @@ pub enum EscrowStatus {
 #[error_code]
 pub enum EscrowError {
     // Input validation errors
-    #[msg("Order details exceed maximum length of 100 characters")]
+    #[msg("Order details exceed maximum length of 32 characters")]
     OrderDetailsTooLong,
 
     #[msg("Escrow amount must be greater than zero")]
