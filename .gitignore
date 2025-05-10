@@ -17,10 +17,8 @@ dist-ssr
 
 .env
 
-# anchor
+target
 .anchor
 .DS_Store
-target
 **/*.rs.bk
-node_modules
 test-ledger

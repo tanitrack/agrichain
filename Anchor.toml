@@ -8,6 +8,9 @@ skip-lint = false
 [programs.localnet]
 agrichain = "coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF"
 
+[programs.devnet]
+agrichain = "49BKpDeZKKAGt6cRn5fGb3DizL64XSyHpbta3xdbSEKq"
+
 [registry]
 url = "https://api.apr.dev"
 
