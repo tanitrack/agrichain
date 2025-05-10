@@ -56,4 +56,21 @@ export default defineSchema({
       searchField: 'trxId',
       filterFields: ['status'],
     }),
+  orderBook: defineTable({
+    id: v.string(),
+    commodityName: v.string(),
+    totalUnit: v.number(),
+    unit: v.string(),
+    sendDate: v.number(),
+    expiredDate: v.number(),
+    status: v.string(),
+    createdBy: v.string(),
+    updatedAt: v.number(),
+  })
+    .index('by_commodityName', ['commodityName'])
+    .index('by_id', ['id'])
+    .searchIndex('search', {
+      searchField: 'id',
+      filterFields: ['commodityName'],
+    }),
 });
