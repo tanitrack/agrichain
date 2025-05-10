@@ -40,7 +40,7 @@ export const BuyModalButton = ({ commodity, selectedQuantity }: BuyModalButtonPr
     const signature = await handleCreateEscrowTransaction(
       'Gcqeu4rwojtwiNBXeHnfqZp4nrmMdr72DBXiojqJdbTe',
       'a',
-      0.001
+      0.01
     );
     // const signature = await sendFund();
     console.log(`Transaction signature: ${signature}`);

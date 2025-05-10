@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +7,6 @@ import { useLanguage } from '@/contexts/language-context';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   Wheat,
-  ShoppingCart,
   MapPin,
   User,
   Calendar,
@@ -20,6 +18,7 @@ import {
   CircleDollarSign,
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { BuyModalButton } from './buy-modal-button';
 
 // Mock data for commodity details
 const mockCommodities = [
@@ -188,9 +187,8 @@ const mockCommodities = [
 
 const MarketDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const navigate = useNavigate();
-  const [selectedImage, setSelectedImage] = useState(0);
 
   // Find the selected commodity by ID
   const commodity = mockCommodities.find((item) => item.id === id);
@@ -209,11 +207,6 @@ const MarketDetail = () => {
       </MainLayout>
     );
   }
-
-  const handleBuy = () => {
-    // Navigate to buy transaction page
-    navigate(`/buy/${commodity.id}`);
-  };
 
   return (
     <MainLayout>
@@ -235,7 +228,7 @@ const MarketDetail = () => {
           <div className="space-y-4">
             <div className="aspect-square overflow-hidden rounded-lg border border-earth-light-brown/30 bg-white">
               <img
-                src={commodity.images[selectedImage]}
+                src={commodity.images[0]}
                 alt={commodity.name}
                 className="h-full w-full object-cover"
               />
@@ -338,8 +331,8 @@ const MarketDetail = () => {
                       {language === 'id' ? 'Sertifikasi' : 'Certifications'}
                     </p>
                     <div className="mt-1 flex flex-wrap gap-2">
-                      {commodity.certifications.map((cert, index) => (
-                        <Badge key={index} variant="outline" className="bg-[#F2FCE2]">
+                      {commodity.certifications.map((cert) => (
+                        <Badge key={cert} variant="outline" className="bg-[#F2FCE2]">
                           {cert}
                         </Badge>
                       ))}
@@ -385,13 +378,16 @@ const MarketDetail = () => {
                 </Tabs>
               </div>
 
-              <Button
-                className="w-full bg-earth-medium-green text-white hover:bg-earth-dark-green"
-                onClick={handleBuy}
-              >
-                <ShoppingCart className="mr-2 h-5 w-5" />
-                {language === 'id' ? 'Beli Sekarang' : 'Buy Now'}
-              </Button>
+              <BuyModalButton
+                commodity={{
+                  id: commodity.id,
+                  name: commodity.name,
+                  price: commodity.price,
+                  unit: commodity.unit,
+                  quantity: commodity.quantity,
+                }}
+                selectedQuantity={10} // This should be the quantity from your selected tab
+              />
 
               {/* <p className="mt-2 text-center text-xs text-muted-foreground">
                 {language === 'id'
@@ -486,8 +482,11 @@ const MarketDetail = () => {
           <CardContent className="p-6">
             {commodity.reviews.length > 0 ? (
               <div className="space-y-4">
-                {commodity.reviews.map((review, index) => (
-                  <div key={index} className="rounded-lg border border-earth-light-brown/30 p-4">
+                {commodity.reviews.map((review) => (
+                  <div
+                    key={review.date + review.user}
+                    className="rounded-lg border border-earth-light-brown/30 p-4"
+                  >
                     <div className="flex items-start justify-between">
                       <div>
                         <h4 className="font-medium">{review.user}</h4>

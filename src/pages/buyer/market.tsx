@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/language-context';
-import { Wheat, Info, ShoppingCart, Search, Filter, TrendingUp } from 'lucide-react';
+import { Wheat, Info, Search, Filter, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 
@@ -79,14 +79,9 @@ const categoryColors = [
 ];
 
 const Market = () => {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-
-  const handleBuy = (commodityId: string) => {
-    // Navigate to the buy transaction page
-    navigate(`/buy/${commodityId}`);
-  };
 
   const handleViewDetails = (commodityId: string) => {
     navigate(`/market/${commodityId}`);
@@ -209,14 +204,6 @@ const Market = () => {
                 >
                   <Info className="mr-1 h-4 w-4" />
                   {language === 'id' ? 'Detail' : 'Details'}
-                </Button>
-                <Button
-                  size="sm"
-                  className="bg-earth-medium-green hover:bg-earth-dark-green"
-                  onClick={() => handleBuy(commodity.id)}
-                >
-                  <ShoppingCart className="mr-1 h-4 w-4" />
-                  {language === 'id' ? 'Beli' : 'Buy'}
                 </Button>
               </CardFooter>
             </Card>
