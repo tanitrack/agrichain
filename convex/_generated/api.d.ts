@@ -21,6 +21,8 @@ import type * as harga_komoditas_queries from "../harga_komoditas_queries.js";
 import type * as http from "../http.js";
 import type * as komoditas_mutations from "../komoditas_mutations.js";
 import type * as komoditas_queries from "../komoditas_queries.js";
+import type * as orderbook_mutations from "../orderbook_mutations.js";
+import type * as orderbook_queries from "../orderbook_queries.js";
 import type * as transaction_mutations from "../transaction_mutations.js";
 import type * as transaction_queries from "../transaction_queries.js";
 import type * as users from "../users.js";
@@ -44,6 +46,8 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   komoditas_mutations: typeof komoditas_mutations;
   komoditas_queries: typeof komoditas_queries;
+  orderbook_mutations: typeof orderbook_mutations;
+  orderbook_queries: typeof orderbook_queries;
   transaction_mutations: typeof transaction_mutations;
   transaction_queries: typeof transaction_queries;
   users: typeof users;
