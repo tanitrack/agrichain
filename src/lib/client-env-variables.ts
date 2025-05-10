@@ -16,6 +16,8 @@ export const clientEnv = createEnv({
     VITE_CONVEX_URL: z.string().url(),
     VITE_CONVEX_SITE_URL: z.string().url(),
     VITE_DYNAMIC_ENVIRONMENT_ID: z.string(),
+    VITE_SOLANA_RPC_URL: z.string().url().optional(),
+    VITE_AGRICHAIN_PROGRAM_ID: z.string(),
   },
 
   /**
