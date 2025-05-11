@@ -1,101 +1,324 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// TODO: Disable any as the typesafety of Solana related codes are tricky
 import { useCreateVersionedTransaction } from '@/hooks/use-create-versioned-transaction';
-import { getEscrowAnchorProgram } from '@/lib/get-escrow-anchor-program';
-import { BN } from '@coral-xyz/anchor';
-import { Wallet } from '@coral-xyz/anchor/dist/cjs/provider';
+import { BN, Program } from '@coral-xyz/anchor';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
 import { isSolanaWallet } from '@dynamic-labs/solana';
 import { Connection, PublicKey, SystemProgram } from '@solana/web3.js';
+import { Wallet } from '@coral-xyz/anchor/dist/cjs/provider'; // For Anchor provider
+import { getEscrowAnchorProgram } from '@/lib/get-escrow-anchor-program';
+import { Escrow } from '@/lib/solana-lib/types/escrow';
+
+interface EscrowTransactionProps {
+  onSuccess?: (signature: string, pda?: string) => void;
+  onError?: (error: Error) => void;
+  onSubmitted?: (signature: string) => void;
+}
+
+interface InitializeEscrowProps extends EscrowTransactionProps {
+  sellerSolanaPublicKey: string;
+  orderDetails: string; // This will be orderBook._id
+  amountLamports: BN;
+  buyerSolanaPublicKey: string; // Payer
+}
+
+interface EscrowActionProps extends EscrowTransactionProps {
+  escrowPda: string; // The PDA of the escrow account
+  actorPublicKey: string; // The PublicKey of the user performing the action (buyer or seller)
+}
+
+interface FailOrderProps extends EscrowActionProps {
+  buyerAccountForRefund: string; // Buyer's public key to receive refund on fail
+}
 
 export const useEscrowTransaction = () => {
-  const { createAndSendTransaction } = useCreateVersionedTransaction();
+  const {
+    createAndSendTransaction,
+    isLoading,
+    error: CSTEError,
+    signature: CSTESignature,
+  } = useCreateVersionedTransaction();
   const { primaryWallet } = useDynamicContext();
 
-  const handleCreateEscrowTransaction = async (
-    sellerAddress: string,
-    orderDetails: string,
-    amount: number
-  ) => {
-    if (!primaryWallet) {
-      throw new Error('No primary wallet connected.');
+  const getProgram = async (): Promise<Program<Escrow>> => {
+    if (!primaryWallet || !isSolanaWallet(primaryWallet)) {
+      throw new Error('Solana wallet not connected or available.');
     }
 
-    // Not solana
-    if (!isSolanaWallet(primaryWallet)) {
-      throw new Error('Primary wallet is not a Solana wallet.');
-    }
-
-    const signerWallet = await primaryWallet.getSigner();
+    const signer = await primaryWallet.getSigner();
     const connection = await primaryWallet.getConnection();
-    if (!signerWallet) {
-      throw new Error('No signer wallet found.');
-    }
-    // Dynamic's primaryWallet can often be directly used as an Anchor Wallet
-    // as it should expose publicKey, signTransaction, and signAllTransactions.
     const anchorCompatibleWallet: Wallet = {
       publicKey: new PublicKey(primaryWallet.address),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      signTransaction: signerWallet.signTransaction as any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      signAllTransactions: signerWallet.signAllTransactions as any,
+      signTransaction: signer.signTransaction as any,
+      signAllTransactions: signer.signAllTransactions as any,
     };
-    const program = getEscrowAnchorProgram(
-      anchorCompatibleWallet,
-      connection as unknown as Connection
-    );
+    return getEscrowAnchorProgram(anchorCompatibleWallet, connection as unknown as Connection);
+  };
 
-    const buyerPublicKey = new PublicKey(signerWallet.publicKey);
-    const sellerPublicKey = new PublicKey(sellerAddress);
-    const amountInLamports = Number(amount) * 1000000000; // Convert SOL to lamports
-    // Derive the escrow account PDA
-    const [escrowAccountPDA] = PublicKey.findProgramAddressSync(
-      [
-        Buffer.from('escrow'),
-        buyerPublicKey.toBuffer(),
-        sellerPublicKey.toBuffer(),
-        Buffer.from(orderDetails),
-      ],
-      program.programId
-    );
-
-    console.log('Attempting to initialize escrow with PDA:', escrowAccountPDA.toString());
-    console.log('Buyer:', buyerPublicKey.toString());
-    console.log('Seller:', sellerPublicKey.toString());
-    console.log('Order Details:', orderDetails);
-    console.log('Amount (Lamports):', amountInLamports.toString());
-    console.log('Program ID:', program.programId.toString());
-
-    // Create the instruction using the Anchor program instance
-    const initializeInstruction = await program.methods
-      .initialize(orderDetails, new BN(amountInLamports))
-      .accounts({
-        escrowAccount: escrowAccountPDA, // THIS WAS MISSING/COMMENTED
-        buyer: buyerPublicKey,
-        seller: sellerPublicKey,
-        systemProgram: SystemProgram.programId, // THIS WAS MISSING
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any)
-      .instruction();
-
+  const initializeEscrow = async ({
+    sellerSolanaPublicKey,
+    orderDetails, // This is the orderBook._id string
+    amountLamports, // BN instance
+    buyerSolanaPublicKey, // Payer, string
+    onSuccess,
+    onError,
+    onSubmitted,
+  }: InitializeEscrowProps) => {
+    console.log('Initializing escrow with params:', {
+      sellerSolanaPublicKey,
+      orderDetails,
+      amountLamports: amountLamports.toString(),
+      buyerSolanaPublicKey,
+    });
     try {
-      const signature = await createAndSendTransaction({
-        instructions: [initializeInstruction],
-        payer: buyerPublicKey,
-        onSuccess: (signature) => {
-          console.log(`Transaction successful: https://solscan.io/tx/${signature}?cluster=devnet`);
+      if (
+        !primaryWallet ||
+        !isSolanaWallet(primaryWallet) ||
+        primaryWallet.address !== buyerSolanaPublicKey
+      ) {
+        throw new Error("Buyer's Solana wallet not connected or mismatch.");
+      }
+
+      const program = await getProgram();
+      const buyerPK = new PublicKey(buyerSolanaPublicKey);
+      const sellerPK = new PublicKey(sellerSolanaPublicKey);
+
+      // Derive the escrowAccountPDA using the same seeds as your Solana program
+      const [escrowAccountPDA /* bump */] = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from('escrow'), // Make sure this matches your program's seed constant
+          buyerPK.toBuffer(),
+          sellerPK.toBuffer(),
+          Buffer.from(orderDetails), // orderBook._id as string
+        ],
+        program.programId
+      );
+      console.log('Derived Escrow PDA for initialize:', escrowAccountPDA.toBase58());
+
+      const ix = await program.methods
+        .initialize(orderDetails, amountLamports) // orderDetails is string, amountLamports is BN
+        .accounts({
+          escrowAccount: escrowAccountPDA,
+          buyer: buyerPK,
+          seller: sellerPK,
+          systemProgram: SystemProgram.programId,
+        } as any)
+        .instruction();
+
+      const sig = await createAndSendTransaction({
+        instructions: [ix],
+        payer: buyerPK,
+        onSuccess: (txSig) => {
+          console.log(
+            'Escrow initialized on-chain. Tx Signature:',
+            txSig,
+            'PDA:',
+            escrowAccountPDA.toBase58()
+          );
+          onSuccess?.(txSig, escrowAccountPDA.toBase58());
         },
-        onError: (error) => {
-          console.error('Transaction failed:', error);
+        onError: (err) => {
+          console.error('Error in createAndSendTransaction for initializeEscrow:', err);
+          onError?.(err);
+        },
+        onSubmitted: (txSig) => {
+          console.log('InitializeEscrow tx submitted:', txSig);
+          onSubmitted?.(txSig);
         },
       });
 
-      return signature;
-    } catch (error) {
-      console.error('Error creating escrow transaction:', error);
-      throw error;
+      // createAndSendTransaction now handles calling onSuccess, so we just return its result
+      // if sig is not null, it implies onSubmitted and potentially onSuccess were called.
+      return sig ? { signature: sig, pda: escrowAccountPDA.toBase58() } : null;
+    } catch (e) {
+      console.error('Error in initializeEscrow function:', e);
+      onError?.(e as Error);
+      return null;
+    }
+  };
+
+  const confirmOrder = async ({
+    escrowPda,
+    actorPublicKey,
+    onSuccess,
+    onError,
+    onSubmitted,
+  }: EscrowActionProps) => {
+    try {
+      const program = await getProgram();
+      const escrowPK = new PublicKey(escrowPda);
+      const sellerPK = new PublicKey(actorPublicKey); // Seller confirms
+
+      const ix = await program.methods
+        .confirmOrder()
+        .accounts({
+          escrowAccount: escrowPK,
+          seller: sellerPK,
+        } as any)
+        .instruction();
+
+      const sig = await createAndSendTransaction({
+        instructions: [ix],
+        payer: sellerPK, // Seller pays for this tx
+        onSuccess,
+        onError,
+        onSubmitted,
+      });
+      return { signature: sig };
+    } catch (e) {
+      onError?.(e as Error);
+      return null;
+    }
+  };
+
+  const withdrawFunds = async ({
+    escrowPda,
+    actorPublicKey,
+    onSuccess,
+    onError,
+    onSubmitted,
+  }: EscrowActionProps) => {
+    try {
+      const program = await getProgram();
+      const escrowPK = new PublicKey(escrowPda);
+      const sellerPK = new PublicKey(actorPublicKey); // Seller withdraws
+
+      const ix = await program.methods
+        .withdrawFunds()
+        .accounts({
+          escrowAccount: escrowPK,
+          seller: sellerPK,
+        })
+        .instruction();
+
+      const sig = await createAndSendTransaction({
+        instructions: [ix],
+        payer: sellerPK, // Seller pays
+        onSuccess,
+        onError,
+        onSubmitted,
+      });
+      return { signature: sig };
+    } catch (e) {
+      onError?.(e as Error);
+      return null;
+    }
+  };
+
+  const refundOrder = async ({
+    escrowPda,
+    actorPublicKey,
+    onSuccess,
+    onError,
+    onSubmitted,
+  }: EscrowActionProps) => {
+    try {
+      const program = await getProgram();
+      const escrowPK = new PublicKey(escrowPda);
+      const buyerPK = new PublicKey(actorPublicKey); // Buyer initiates refund
+
+      const ix = await program.methods
+        .refundOrder()
+        .accounts({
+          escrowAccount: escrowPK,
+          buyer: buyerPK,
+        } as any)
+        .instruction();
+
+      const sig = await createAndSendTransaction({
+        instructions: [ix],
+        payer: buyerPK, // Buyer pays
+        onSuccess,
+        onError,
+        onSubmitted,
+      });
+      return { signature: sig };
+    } catch (e) {
+      onError?.(e as Error);
+      return null;
+    }
+  };
+
+  const failOrder = async ({
+    escrowPda,
+    actorPublicKey,
+    buyerAccountForRefund,
+    onSuccess,
+    onError,
+    onSubmitted,
+  }: FailOrderProps) => {
+    try {
+      const program = await getProgram();
+      const escrowPK = new PublicKey(escrowPda);
+      const authorityPK = new PublicKey(actorPublicKey); // Buyer or Seller can be authority
+      const buyerRefundPK = new PublicKey(buyerAccountForRefund);
+
+      const ix = await program.methods
+        .failOrder()
+        .accounts({
+          escrowAccount: escrowPK,
+          buyer: buyerRefundPK, // Account where funds are returned
+          authority: authorityPK,
+        } as any)
+        .instruction();
+
+      const sig = await createAndSendTransaction({
+        instructions: [ix],
+        payer: authorityPK, // Authority pays
+        onSuccess,
+        onError,
+        onSubmitted,
+      });
+      return { signature: sig };
+    } catch (e) {
+      onError?.(e as Error);
+      return null;
+    }
+  };
+
+  const closeEscrow = async ({
+    escrowPda,
+    actorPublicKey,
+    onSuccess,
+    onError,
+    onSubmitted,
+  }: EscrowActionProps) => {
+    try {
+      const program = await getProgram();
+      const escrowPK = new PublicKey(escrowPda);
+      const receiverPK = new PublicKey(actorPublicKey); // Receiver of rent (typically buyer)
+
+      const ix = await program.methods
+        .closeEscrow()
+        .accounts({
+          escrowAccount: escrowPK,
+          receiver: receiverPK,
+        } as any)
+        .instruction();
+
+      const sig = await createAndSendTransaction({
+        instructions: [ix],
+        payer: receiverPK, // Receiver pays
+        onSuccess,
+        onError,
+        onSubmitted,
+      });
+      return { signature: sig };
+    } catch (e) {
+      onError?.(e as Error);
+      return null;
     }
   };
 
   return {
-    handleCreateEscrowTransaction,
+    initializeEscrow,
+    confirmOrder,
+    withdrawFunds,
+    refundOrder,
+    failOrder,
+    closeEscrow,
+    isLoading, // from underlying useCreateVersionedTransaction
+    error: CSTEError, // from underlying
+    lastSignature: CSTESignature, // from underlying
   };
 };

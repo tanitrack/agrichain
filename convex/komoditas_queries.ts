@@ -1,3 +1,4 @@
+import { paginationOptsValidator } from 'convex/server';
 import { query } from './_generated/server';
 import { v } from 'convex/values';
 
@@ -29,19 +30,10 @@ export const get = query({
 // List all komoditas with optional pagination
 export const list = query({
   args: {
-    paginationOpts: v.optional(
-      v.object({
-        numItems: v.number(),
-        cursor: v.union(v.string(), v.null()),
-      })
-    ),
+    paginationOpts: paginationOptsValidator,
     category: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // check user
-    const auth = await ctx.auth.getUserIdentity();
-    console.log(auth);
-
     // Build the query step by step
     const baseQuery = ctx.db.query('komoditas');
 
