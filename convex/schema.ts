@@ -52,22 +52,19 @@ export default defineSchema({
     shippingAddress: v.optional(v.string()),
     shippingNotes: v.optional(v.string()),
     termsAndConditions: v.optional(v.string()), // Could be text or a link to a document
-    // Convex default fields _id, _creationTime will act as createdAt
     updatedAt: v.number(), // Manually manage for status updates
   })
     .index('by_buyerId_status', ['buyerId', 'status'])
     .index('by_sellerId_status', ['sellerId', 'status'])
     .index('by_komoditasId', ['komoditasId']),
   transaction: defineTable({
-    orderBookId: v.id('orderBook'),
+    orderBookId: v.id('orderBook'), // This is the orderDetails stored on-chain
     buyerSolanaPublicKey: v.string(),
     sellerSolanaPublicKey: v.string(),
-    orderDetails: v.string(), // Will store orderBook._id
     amountLamports: v.number(),
-    escrowPdaAddress: v.optional(v.string()),
-    onChainEscrowStatus: v.optional(v.string()), // "initialized", "confirmed", "completed", "refunded", "failed", "closed"
-
-    initializeTxHash: v.optional(v.string()),
+    escrowPdaAddress: v.string(),
+    onChainEscrowStatus: v.string(), // "initialized", "confirmed", "completed", "refunded", "failed", "closed"
+    initializeTxHash: v.string(),
     confirmOrderTxHash: v.optional(v.string()),
     withdrawFundsTxHash: v.optional(v.string()),
     refundOrderTxHash: v.optional(v.string()),

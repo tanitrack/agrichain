@@ -79,7 +79,7 @@ export const search = query({
     const baseQuery = ctx.db.query('komoditas');
 
     // Apply search with category filter if provided
-    const searchedQuery = baseQuery.withSearchIndex('search', (q) => {
+    const searchedQuery = baseQuery.withSearchIndex('search_komoditas', (q) => {
       let query = q.search('name', args.query);
       if (args.category !== undefined) {
         query = query.eq('category', args.category as string);
