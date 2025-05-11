@@ -36,7 +36,6 @@ const MarketDetail = () => {
 
   // Fetch the selected commodity by ID from Convex
   const commodity = useQuery(api.komoditas_queries.get, id ? { id: id } : 'skip');
-  console.log({ commodity });
 
   // State for processing and selected quantity
   const [isProcessing, setIsProcessing] = useState(false);
@@ -101,11 +100,17 @@ const MarketDetail = () => {
         title: 'Awaiting Payment...',
         description: 'Please confirm the transaction in your wallet.',
       });
+
+      // TODO: Change the amount to lamport by data
+      const amountLamports = new BN(0.001 * 1_000_000_000); // Example: 0.001 SOL to lamports, adjust as needed
+      // TODO: truncate order details for now find better way to hash later
+      const truncatedOrderDetails = orderPrepResult.orderBookId.slice(0, 20);
+
       const escrowResult = await initializeEscrow({
-        sellerSolanaPublicKey: orderPrepResult.sellerSolanaPublicKey,
-        orderDetails: orderPrepResult.orderBookId, // This IS the orderBook._id string
-        amountLamports: new BN(orderPrepResult.amountLamports),
         buyerSolanaPublicKey: orderPrepResult.buyerSolanaPublicKey,
+        sellerSolanaPublicKey: orderPrepResult.sellerSolanaPublicKey,
+        orderDetails: truncatedOrderDetails, // Use truncatedOrderDetails instead of slicing again
+        amountLamports,
         onSuccess: async (txSig, pdaAddress) => {
           console.log('Escrow initialized on-chain. Tx Signature:', txSig, 'PDA:', pdaAddress);
           toast({
