@@ -36,6 +36,7 @@ const MarketDetail = () => {
 
   // Fetch the selected commodity by ID from Convex
   const commodity = useQuery(api.komoditas_queries.get, id ? { id: id } : 'skip');
+  console.log({ commodity });
 
   // State for processing and selected quantity
   const [isProcessing, setIsProcessing] = useState(false);
@@ -49,6 +50,7 @@ const MarketDetail = () => {
   const recordEscrowInitializationAndLink = useMutation(
     api.transaction_mutations.recordEscrowInitializationAndLink
   ); // New mutation
+
   const {
     initializeEscrow,
     isLoading: isEscrowLoading,
@@ -83,6 +85,8 @@ const MarketDetail = () => {
       const orderPrepResult = await createOrderBookFromListing({
         komoditasId: commodity._id, // Use Convex _id
         quantity: selectedQuantity,
+        buyerUserId: userProfile._id, // Use Convex _id
+        buyerSolanaPublicKey: userProfile.solanaPublicKey, // Use Convex solanaPublicKey
       });
 
       if (!orderPrepResult || !orderPrepResult.orderBookId) {

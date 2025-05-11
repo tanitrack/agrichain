@@ -5,22 +5,7 @@ import { v } from 'convex/values';
 // Get a single komoditas by ID
 export const get = query({
   args: { id: v.id('komoditas') },
-  returns: v.union(
-    v.object({
-      _id: v.id('komoditas'),
-      _creationTime: v.number(),
-      name: v.string(),
-      description: v.optional(v.string()),
-      category: v.string(),
-      unit: v.string(),
-      pricePerUnit: v.number(),
-      stock: v.number(),
-      imageUrl: v.optional(v.string()),
-      createdBy: v.string(),
-      updatedAt: v.number(),
-    }),
-    v.null()
-  ),
+
   handler: async (ctx, args) => {
     const komoditas = await ctx.db.get(args.id);
     return komoditas;

@@ -57,7 +57,6 @@ const emptyInitialData = {};
 export function UserProfileForm({
   onSuccess,
   initialData = emptyInitialData,
-  userType = 'petani',
 }: UserProfileFormProps) {
   const [loading, setLoading] = useState(false);
   const { language } = useLanguage();
@@ -84,12 +83,6 @@ export function UserProfileForm({
   const handleSubmit = async (data: UserProfileFormValues) => {
     try {
       setLoading(true);
-
-      if (userType === 'petani') {
-        data.userType = 'farmer';
-      } else {
-        data.userType = 'consumer';
-      }
 
       // Extract Solana public key from Dynamic user context
       let userSolanaPublicKey: string | undefined = undefined;

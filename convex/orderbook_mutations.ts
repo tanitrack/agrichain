@@ -1,13 +1,12 @@
-// convex/orderbook_mutations.ts
 import { mutation } from './_generated/server';
 import { v } from 'convex/values';
-import { Id } from './_generated/dataModel';
 
 export const createFromListing = mutation({
   args: {
     komoditasId: v.id('komoditas'),
     quantity: v.number(),
-    // buyerUserId is implicitly from ctx.auth, no need to pass from client if using auth
+    buyerUserId: v.id('users'), // Optional: If you want to pass buyerUserId
+    buyerSolanaPublicKey: v.string(), // Optional: If you want to pass buyerSolanaPublicKey
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -15,14 +14,17 @@ export const createFromListing = mutation({
       // Check issuer for Convex standard auth
       throw new Error('Unauthorized: Buyer must be logged in.');
     }
-    const buyerConvexUserId = identity.subject as Id<'users'>; // Dynamic's userId mapping to Convex user _id
+
+    const { buyerUserId, buyerSolanaPublicKey } = args;
 
     // 1. Fetch Buyer's User Data (including Solana Public Key)
-    const buyerUser = await ctx.db.get(buyerConvexUserId);
-    if (!buyerUser || !buyerUser.solanaPublicKey) {
-      throw new Error("Buyer's Solana public key not found. Please complete your profile.");
+    const buyerUser = await ctx.db
+      .query('users')
+      .filter((q) => q.eq(q.field('_id'), buyerUserId))
+      .first();
+    if (!buyerUser) {
+      throw new Error('Buyer not found.');
     }
-    const buyerSolanaPublicKey = buyerUser.solanaPublicKey;
 
     // 2. Fetch Komoditas Data
     const komoditas = await ctx.db.get(args.komoditasId);
@@ -48,7 +50,7 @@ export const createFromListing = mutation({
     // 4. Create OrderBook Record
     // The financialTransactionId will be linked *after* the on-chain transaction is successful
     const orderBookId = await ctx.db.insert('orderBook', {
-      buyerId: buyerConvexUserId,
+      buyerId: buyerUserId,
       sellerId: sellerUserId,
       komoditasId: args.komoditasId,
       quantity: args.quantity,
