@@ -9,6 +9,7 @@ const users = defineTable({
   phone: v.string(),
   address: v.string(),
   nationalIdNumber: v.string(),
+  solanaPublicKey: v.optional(v.string()),
   createdAt: v.number(),
   updatedAt: v.number(),
   userType: v.union(v.literal('farmer'), v.literal('consumer')),
@@ -16,6 +17,7 @@ const users = defineTable({
   .index('by_email', ['email'])
   .index('by_name', ['name'])
   .index('by_user_id', ['userId'])
-  .index('by_tani_id', ['taniId']);
+  .index('by_tani_id', ['taniId'])
+  .index('by_solana_publicKey', ['solanaPublicKey']);
 
 export default users;

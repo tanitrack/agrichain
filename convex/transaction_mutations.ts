@@ -1,90 +1,70 @@
- 
+// convex/transaction_mutations.ts
 import { mutation } from './_generated/server';
 import { v } from 'convex/values';
 
-export const create = mutation({
+export const recordEscrowInitializationAndLink = mutation({
   args: {
-    trxId: v.string(),
-    customerName: v.string(),
-    commodityName: v.string(),
-    unit: v.string(), 
-    totalUnit: v.number(),
-    status: v.string(), 
-    type: v.string(),
-    unitPrice: v.number(),
-    price: v.number(),
-    name: v.string(),
-    description: v.optional(v.string()),
+    orderBookId: v.id('orderBook'),
+    initializeTxHash: v.string(),
+    escrowPdaAddress: v.string(),
+    onChainStatus: v.string(),
+    buyerSolanaPublicKey: v.string(),
+    sellerSolanaPublicKey: v.string(),
+    amountLamports: v.number(),
   },
-  returns: v.id('transaction'),
-  handler: async (ctx, args) => {
-
-    const transactionId = await ctx.db.insert('transaction', {
-      ...args,
-      createdBy: 'anonymous',
-      updatedAt: Date.now(),
-    });
-
-    return transactionId;
-  },
-});
-
-export const update = mutation({
-  args: {
-    id: v.id('transaction'),
-    name: v.optional(v.string()),
-    description: v.optional(v.string()),
-    category: v.optional(v.string()),
-    unit: v.optional(v.string()),
-    pricePerUnit: v.optional(v.number()),
-    stock: v.optional(v.number()),
-    imageUrl: v.optional(v.string()),
-  },
-  returns: v.id('transaction'),
-  handler: async (ctx, args) => {
-    const { id, ...updates } = args;
-
- 
-    const existing = await ctx.db.get(id);
-    if (!existing) {
-      throw new Error('transaction not found');
-    }
-
-    
-    const validUpdates = Object.fromEntries(
-      Object.entries(updates).filter(([_, v]) => v !== undefined)
-    );
-
-    await ctx.db.patch(id, {
-      ...validUpdates,
-      updatedAt: Date.now(),
-    });
-
-    return id;
-  },
-});
-
-export const remove = mutation({
-  args: {
-    id: v.id('transaction'),
-  },
-  returns: v.boolean(),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      throw new Error('Unauthorized');
+      throw new Error('Unauthorized: User must be logged in.');
     }
 
-    const existing = await ctx.db.get(args.id);
-    if (!existing) {
-      return false;
+    // 1. Fetch and validate the OrderBook
+    const orderBook = await ctx.db.get(args.orderBookId);
+    if (!orderBook) {
+      throw new Error('OrderBook not found.');
     }
 
-    if (existing.createdBy !== identity.subject) {
-      throw new Error('Unauthorized: You can only delete your own komoditas');
+    // Optional: Check if the caller is the buyer for this orderBook
+    // This check might be too strict if a system process calls this,
+    // but good if only the buyer's frontend action triggers it.
+    // if (orderBook.buyerId !== identity.subject) { // Assuming identity.subject is Convex user _id
+    //     throw new Error("Unauthorized: Only the buyer can record escrow initialization for their order.");
+    // }
+
+    // Ensure the order book is in the expected state and not already linked
+    if (orderBook.status !== 'awaiting_escrow_payment' || orderBook.financialTransactionId) {
+      throw new Error('Invalid order state for recording escrow initialization.');
     }
 
-    await ctx.db.delete(args.id);
-    return true;
+    // 2. Create the Transaction record
+    const now = Date.now();
+    const newTransactionId = await ctx.db.insert('transaction', {
+      orderBookId: args.orderBookId,
+      buyerSolanaPublicKey: args.buyerSolanaPublicKey,
+      sellerSolanaPublicKey: args.sellerSolanaPublicKey,
+      amountLamports: args.amountLamports,
+      escrowPdaAddress: args.escrowPdaAddress,
+      onChainEscrowStatus: args.onChainStatus, // "initialized"
+      initializeTxHash: args.initializeTxHash,
+      updatedAt: now,
+    });
+
+    // 3. Update the OrderBook record to link the transaction and update status
+    await ctx.db.patch(args.orderBookId, {
+      financialTransactionId: newTransactionId,
+      status: 'escrow_funded', // Or "awaiting_seller_confirmation"
+      updatedAt: now,
+    });
+
+    // 4. (Optional) Notify the seller
+    // Example: await ctx.scheduler.runAfter(0, internal.notifications.createSellerNotification, {
+    //   orderBookId: args.orderBookId,
+    //   message: `Order ${args.orderBookId} has been funded and awaits your confirmation.`,
+    //   sellerId: orderBook.sellerId
+    // });
+
+    return { success: true, transactionId: newTransactionId.toString() };
   },
 });
+
+// Potentially add other transaction mutations here later

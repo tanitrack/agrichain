@@ -11,92 +11,58 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/language-context';
-import { Wheat, Info, ShoppingCart, Search, Filter, TrendingUp } from 'lucide-react';
+import { Wheat, Info, Search, Filter, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 
-// Mock data for commodity marketplace
-const mockCommodities = [
-  {
-    id: '1',
-    name: 'Beras Organik Premium',
-    variety: 'IR 64',
-    farmer: 'Pak Joko',
-    location: 'Subang, Jawa Barat',
-    quantity: 500,
-    unit: 'kg',
-    price: 12000,
-    imageUrl: '/placeholder.svg',
-    description: 'Beras organik premium hasil panen terbaru, bebas pestisida.',
-  },
-  {
-    id: '2',
-    name: 'Beras Merah',
-    variety: 'Red Rice',
-    farmer: 'Bu Siti',
-    location: 'Cianjur, Jawa Barat',
-    quantity: 200,
-    unit: 'kg',
-    price: 15000,
-    imageUrl: '/placeholder.svg',
-    description: 'Beras merah organik kaya nutrisi dan serat.',
-  },
-  {
-    id: '3',
-    name: 'Beras Hitam',
-    variety: 'Black Rice',
-    farmer: 'Pak Budi',
-    location: 'Klaten, Jawa Tengah',
-    quantity: 100,
-    unit: 'kg',
-    price: 18000,
-    imageUrl: '/placeholder.svg',
-    description: 'Beras hitam dengan kandungan antioksidan tinggi.',
-  },
-  {
-    id: '4',
-    name: 'Beras Ketan',
-    variety: 'White Glutinous',
-    farmer: 'Bu Maya',
-    location: 'Tasikmalaya, Jawa Barat',
-    quantity: 150,
-    unit: 'kg',
-    price: 14000,
-    imageUrl: '/placeholder.svg',
-    description: 'Beras ketan putih berkualitas untuk olahan kue tradisional.',
-  },
-];
-
-// Color classes for category badges
-const categoryColors = [
-  'bg-[#F2FCE2] text-earth-dark-green border-earth-medium-green/50',
-  'bg-[#FEF7CD] text-earth-brown border-earth-clay/50',
-  'bg-[#FEC6A1] text-earth-brown border-earth-clay/50',
-  'bg-[#E5DEFF] text-indigo-800 border-indigo-300',
-  'bg-[#FFDEE2] text-rose-700 border-rose-300',
-  'bg-[#FDE1D3] text-amber-800 border-amber-300',
-  'bg-[#D3E4FD] text-sky-800 border-sky-300',
-];
+// Import Convex hooks and API
+import { usePaginatedQuery } from 'convex/react'; // Use usePaginatedQuery
+import { api } from '@/lib/convex'; // Assuming api is exported from here
 
 const Market = () => {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
-  const handleBuy = (commodityId: string) => {
-    // Navigate to the buy transaction page
-    navigate(`/buy/${commodityId}`);
-  };
+  // Fetch commodities from Convex using the paginated list query
+  const {
+    results: commodities,
+    status,
+    loadMore,
+  } = usePaginatedQuery(
+    api.komoditas_queries.list, // Query name
+    {}, // Arguments (none needed for this basic list)
+    { initialNumItems: 10 } // Options: initial number of items per page
+  );
 
   const handleViewDetails = (commodityId: string) => {
     navigate(`/market/${commodityId}`);
   };
 
-  const getRandomColorClass = (id: string) => {
-    // Use the ID as a seed to get a consistent color for each commodity
-    const index = parseInt(id, 10) % categoryColors.length;
-    return categoryColors[index];
-  };
+  // Handle loading state
+  if (status === 'LoadingFirstPage') {
+    return (
+      <MainLayout>
+        <div className="flex h-[60vh] flex-col items-center justify-center">
+          <p>{language === 'id' ? 'Memuat komoditas...' : 'Loading commodities...'}</p>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  // Handle no data state
+  if (!commodities || commodities.length === 0) {
+    return (
+      <MainLayout>
+        <div className="flex h-[60vh] flex-col items-center justify-center">
+          <h2 className="mb-4 text-xl font-semibold">
+            {language === 'id' ? 'Tidak ada komoditas ditemukan' : 'No commodities found'}
+          </h2>
+          {/* Optionally add a button to add komoditas if user is a farmer */}
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -145,21 +111,30 @@ const Market = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {mockCommodities.map((commodity) => (
+          {/* Use data from Convex query */}
+          {commodities.map((commodity) => (
             <Card
-              key={commodity.id}
+              key={commodity._id.toString()} // Use Convex _id for key
               className="group overflow-hidden border border-earth-light-brown/30 transition-shadow hover:shadow-md"
             >
               <div className="relative h-40 overflow-hidden bg-gray-100">
-                <img
-                  src={commodity.imageUrl}
-                  alt={commodity.name}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
+                {/* Use imageUrl from Convex, handle optional */}
+                {commodity.imageUrl ? (
+                  <img
+                    src={commodity.imageUrl}
+                    alt={commodity.name}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-gray-200 text-muted-foreground">
+                    No Image
+                  </div>
+                )}
                 <Badge
-                  className={`absolute right-3 top-3 ${getRandomColorClass(commodity.id)} border`}
+                  className={`absolute right-3 top-3  border`} // Use Convex _id for color
                 >
-                  Rp {commodity.price.toLocaleString()} / {commodity.unit}
+                  Rp {commodity.pricePerUnit.toLocaleString()} / {commodity.unit}{' '}
+                  {/* Use pricePerUnit */}
                 </Badge>
               </div>
               <CardHeader className="bg-gradient-to-r from-earth-pale-green to-white pb-2">
@@ -170,58 +145,64 @@ const Market = () => {
                     </CardTitle>
                     <CardDescription className="flex items-center gap-1 text-earth-medium-green">
                       <Wheat className="h-3.5 w-3.5" />
-                      <span>{commodity.variety}</span>
+                      <span>{commodity.category}</span> {/* Use category instead of variety */}
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="p-4">
                 <div className="space-y-2">
+                  {/* Farmer and Location are not directly available */}
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">
                       {language === 'id' ? 'Petani:' : 'Farmer:'}
                     </span>
-                    <span className="font-medium">{commodity.farmer}</span>
+                    {/* Placeholder or fetch user data */}
+                    <span className="font-medium">N/A</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">
                       {language === 'id' ? 'Lokasi:' : 'Location:'}
                     </span>
-                    <span>{commodity.location}</span>
+                    {/* Placeholder or fetch user data */}
+                    <span>N/A</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">
                       {language === 'id' ? 'Stok:' : 'Stock:'}
                     </span>
                     <span>
-                      {commodity.quantity} {commodity.unit}
+                      {commodity.stock} {commodity.unit} {/* Use stock */}
                     </span>
                   </div>
-                  <p className="mt-2 line-clamp-2 text-sm">{commodity.description}</p>
+                  {/* Use description from Convex, handle optional */}
+                  {commodity.description && (
+                    <p className="mt-2 line-clamp-2 text-sm">{commodity.description}</p>
+                  )}
                 </div>
               </CardContent>
               <CardFooter className="flex justify-between gap-2 border-t border-earth-light-brown/20 bg-white">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleViewDetails(commodity.id)}
+                  onClick={() => handleViewDetails(commodity._id.toString())} // Use Convex _id for navigation
                   className="border-earth-medium-green/50 text-earth-dark-green hover:bg-earth-pale-green"
                 >
                   <Info className="mr-1 h-4 w-4" />
                   {language === 'id' ? 'Detail' : 'Details'}
                 </Button>
-                <Button
-                  size="sm"
-                  className="bg-earth-medium-green hover:bg-earth-dark-green"
-                  onClick={() => handleBuy(commodity.id)}
-                >
-                  <ShoppingCart className="mr-1 h-4 w-4" />
-                  {language === 'id' ? 'Beli' : 'Buy'}
-                </Button>
               </CardFooter>
             </Card>
           ))}
         </div>
+        {/* Optional: Load More Button */}
+        {status === 'CanLoadMore' && (
+          <div className="flex justify-center">
+            <Button onClick={() => loadMore(10)} disabled={status !== 'CanLoadMore'}>
+              {language === 'id' ? 'Muat Lebih Banyak' : 'Load More'}
+            </Button>
+          </div>
+        )}
       </div>
     </MainLayout>
   );

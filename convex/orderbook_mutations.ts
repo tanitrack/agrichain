@@ -1,86 +1,80 @@
-
 import { mutation } from './_generated/server';
 import { v } from 'convex/values';
 
-export const create = mutation({
+export const createFromListing = mutation({
   args: {
-    id: v.string(),
-    commodityName: v.string(),
-    unit: v.string(),
-    totalUnit: v.number(),
-    status: v.string(),
-    sendDate: v.number(),
-    expiredDate: v.number(),
-    createdBy: v.string(),
+    komoditasId: v.id('komoditas'),
+    quantity: v.number(),
+    buyerUserId: v.id('users'), // Optional: If you want to pass buyerUserId
+    buyerSolanaPublicKey: v.string(), // Optional: If you want to pass buyerSolanaPublicKey
   },
-  returns: v.id('orderBook'),
-  handler: async (ctx, args) => {
-
-    const orderBookId = await ctx.db.insert('orderBook', {
-      ...args,
-      createdBy: 'anonymous',
-      updatedAt: Date.now(),
-    });
-
-    return orderBookId;
-  },
-});
-
-export const update = mutation({
-  args: {
-    id: v.id('orderBook'),
-    commodityName: v.optional(v.string()),
-    unit: v.optional(v.string()),
-    totalUnit: v.optional(v.number()),
-    status: v.optional(v.string()),
-    sendDate: v.optional(v.number()),
-    updatedAt: v.optional(v.number()),
-  },
-  returns: v.id('orderBook'),
-  handler: async (ctx, args) => {
-    const { id, ...updates } = args;
-
-
-    const existing = await ctx.db.get(id);
-    if (!existing) {
-      throw new Error('orderBook not found');
-    }
-
-
-    const validUpdates = Object.fromEntries(
-      Object.entries(updates).filter(([_, v]) => v !== undefined)
-    );
-
-    await ctx.db.patch(id, {
-      ...validUpdates,
-      updatedAt: Date.now(),
-    });
-
-    return id;
-  },
-});
-
-export const remove = mutation({
-  args: {
-    id: v.id('orderBook'),
-  },
-  returns: v.boolean(),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) {
-      throw new Error('Unauthorized');
+    if (!identity || !identity.subject || !identity.issuer) {
+      // Check issuer for Convex standard auth
+      throw new Error('Unauthorized: Buyer must be logged in.');
     }
 
-    const existing = await ctx.db.get(args.id);
-    if (!existing) {
-      return false;
+    const { buyerUserId, buyerSolanaPublicKey } = args;
+
+    // 1. Fetch Buyer's User Data (including Solana Public Key)
+    const buyerUser = await ctx.db
+      .query('users')
+      .filter((q) => q.eq(q.field('_id'), buyerUserId))
+      .first();
+    if (!buyerUser) {
+      throw new Error('Buyer not found.');
     }
 
-    if (existing.createdBy !== identity.subject) {
-      throw new Error('Unauthorized: You can only delete your own orderBook');
+    // 2. Fetch Komoditas Data
+    const komoditas = await ctx.db.get(args.komoditasId);
+    if (!komoditas) {
+      throw new Error('Commodity not found.');
     }
+    if (args.quantity > komoditas.stock) {
+      throw new Error('Insufficient stock for the requested quantity.');
+    }
+    const sellerSolanaPublicKey = komoditas.sellerSolanaPublicKey; // Already stored in Phase 1
+    const sellerUserId = komoditas.createdBy; // This is the Convex _id of the farmer user
 
-    await ctx.db.delete(args.id);
-    return true;
+    // 3. Calculate Total Amount (ensure pricePerUnit is a number)
+    const agreedPricePerUnit = Number(komoditas.pricePerUnit);
+    if (isNaN(agreedPricePerUnit)) {
+      throw new Error('Invalid price per unit for the commodity.');
+    }
+    const totalAmount = agreedPricePerUnit * args.quantity;
+    const amountLamports = totalAmount * 1_000_000_000; // Example: Assuming price is in SOL, convert to lamports. Adjust if price is in IDR then converted to SOL.
+
+    const now = Date.now();
+
+    // 4. Create OrderBook Record
+    // The financialTransactionId will be linked *after* the on-chain transaction is successful
+    const orderBookId = await ctx.db.insert('orderBook', {
+      buyerId: buyerUserId,
+      sellerId: sellerUserId,
+      komoditasId: args.komoditasId,
+      quantity: args.quantity,
+      agreedPricePerUnit: agreedPricePerUnit,
+      totalAmount: totalAmount, // Store in native currency (e.g. IDR or SOL representation before lamports)
+      status: 'awaiting_escrow_payment', // Initial status for TaniTrack workflow
+      buyerSolanaPublicKey: buyerSolanaPublicKey,
+      sellerSolanaPublicKey: sellerSolanaPublicKey,
+      // financialTransactionId will be set after transaction record is created in recordEscrowInit
+      updatedAt: now,
+      // _creationTime is automatic
+    });
+
+    // 5. Return necessary data to frontend for Solana transaction
+    // The frontend will use orderBookId as the orderDetails for the on-chain tx
+    return {
+      orderBookId: orderBookId, // Used as `orderDetails` on-chain
+      sellerSolanaPublicKey: sellerSolanaPublicKey,
+      buyerSolanaPublicKey: buyerSolanaPublicKey, // Payer of initialize tx
+      amountLamports: amountLamports,
+    };
   },
 });
+
+// Potentially add other orderBook mutations like `createRequest` (buyer posts a general need)
+// and `farmerAcceptsOrderRequest` (farmer accepts a buyer's general request) later.
+// For now, `createFromListing` is the primary path.

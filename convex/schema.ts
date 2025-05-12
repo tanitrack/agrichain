@@ -9,17 +9,19 @@ export default defineSchema({
     description: v.optional(v.string()),
     category: v.string(),
     unit: v.string(), // e.g., "kg", "ton", "piece"
-    pricePerUnit: v.number(),
+    pricePerUnit: v.number(), // Base price
     stock: v.number(),
     imageUrl: v.optional(v.string()),
-    createdBy: v.string(), // User ID who created this
-    updatedAt: v.number(), // Timestamp
+    createdBy: v.id('users'), // Link to the farmer's user record in Convex
+    sellerSolanaPublicKey: v.string(), // Farmer's Solana public key
+    updatedAt: v.number(),
   })
     .index('by_category', ['category'])
     .index('by_name', ['name'])
-    .searchIndex('search', {
+    .index('by_createdBy', ['createdBy']) // Good for fetching all commodities by a farmer
+    .searchIndex('search_komoditas', {
       searchField: 'name',
-      filterFields: ['category'],
+      filterFields: ['category', 'createdBy'],
     }),
   harga_komoditas: defineTable({
     name: v.string(),
@@ -36,41 +38,42 @@ export default defineSchema({
       searchField: 'name',
       filterFields: ['region'],
     }),
-  transaction: defineTable({
-    trxId: v.string(),
-    customerName: v.string(),
-    commodityName: v.string(),
-    unit: v.string(), // e.g., "kg", "ton", "piece"
-    totalUnit: v.number(),
-    status: v.string(),
-    type: v.string(),
-    unitPrice: v.number(),
-    price: v.number(),
-    description: v.optional(v.string()),
-    createdBy: v.string(),
-    updatedAt: v.number(),
-  })
-    .index('by_status', ['status'])
-    .index('by_trxId', ['trxId'])
-    .searchIndex('search', {
-      searchField: 'trxId',
-      filterFields: ['status'],
-    }),
   orderBook: defineTable({
-    id: v.string(),
-    commodityName: v.string(),
-    totalUnit: v.number(),
-    unit: v.string(),
-    sendDate: v.number(),
-    expiredDate: v.number(),
-    status: v.string(),
-    createdBy: v.string(),
-    updatedAt: v.number(),
+    buyerId: v.id('users'),
+    sellerId: v.optional(v.id('users')), // Optional if buyer creates a general request first
+    komoditasId: v.id('komoditas'),
+    quantity: v.number(),
+    agreedPricePerUnit: v.number(),
+    totalAmount: v.number(), // quantity * agreedPricePerUnit
+    status: v.string(), // e.g., "awaiting_payment_for_escrow", "escrow_funded", "seller_confirmed", "shipped", "goods_received", "completed", "cancelled"
+    buyerSolanaPublicKey: v.string(),
+    sellerSolanaPublicKey: v.string(), // Denormalized from komoditas.sellerSolanaPublicKey or users table
+    financialTransactionId: v.optional(v.id('transaction')), // Link to the on-chain transaction log
+    shippingAddress: v.optional(v.string()),
+    shippingNotes: v.optional(v.string()),
+    termsAndConditions: v.optional(v.string()), // Could be text or a link to a document
+    updatedAt: v.number(), // Manually manage for status updates
   })
-    .index('by_commodityName', ['commodityName'])
-    .index('by_id', ['id'])
-    .searchIndex('search', {
-      searchField: 'id',
-      filterFields: ['commodityName'],
-    }),
+    .index('by_buyerId_status', ['buyerId', 'status'])
+    .index('by_sellerId_status', ['sellerId', 'status'])
+    .index('by_komoditasId', ['komoditasId']),
+  transaction: defineTable({
+    orderBookId: v.id('orderBook'), // This is the orderDetails stored on-chain
+    buyerSolanaPublicKey: v.string(),
+    sellerSolanaPublicKey: v.string(),
+    amountLamports: v.number(),
+    escrowPdaAddress: v.string(),
+    onChainEscrowStatus: v.string(), // "initialized", "confirmed", "completed", "refunded", "failed", "closed"
+    initializeTxHash: v.string(),
+    confirmOrderTxHash: v.optional(v.string()),
+    withdrawFundsTxHash: v.optional(v.string()),
+    refundOrderTxHash: v.optional(v.string()),
+    failOrderTxHash: v.optional(v.string()),
+    closeEscrowTxHash: v.optional(v.string()),
+
+    // Convex default fields _id, _creationTime
+    updatedAt: v.number(), // Manually manage for status updates
+  })
+    .index('by_orderBookId', ['orderBookId'])
+    .index('by_escrowPdaAddress', ['escrowPdaAddress']), // Might be useful
 });

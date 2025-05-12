@@ -12,6 +12,8 @@ import { UserProfileForm } from '@/components/auth/user-profile-form';
 const Profile = () => {
   const { userProfile, wallet } = useAuthCheck();
 
+  console.log({ userProfile });
+
   return (
     <MainLayout>
       <div className="mb-8">

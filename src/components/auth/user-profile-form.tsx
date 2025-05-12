@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/language-context';
 import { UserCircle2, User, Phone, MapPin, ArrowRightIcon } from 'lucide-react';
 import { CardContent, CardFooter } from '@/components/ui/card';
 import { useState } from 'react';
-import { useUserUpdateRequest } from '@dynamic-labs/sdk-react-core';
+import { useUserUpdateRequest, useDynamicContext } from '@dynamic-labs/sdk-react-core'; // Make sure this is imported
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -57,7 +57,6 @@ const emptyInitialData = {};
 export function UserProfileForm({
   onSuccess,
   initialData = emptyInitialData,
-  userType = 'petani',
 }: UserProfileFormProps) {
   const [loading, setLoading] = useState(false);
   const { language } = useLanguage();
@@ -68,6 +67,7 @@ export function UserProfileForm({
     api.users_queries.getUserByUserId,
     initialData.userId ? { userId: initialData.userId } : 'skip'
   );
+  const { user: dynamicUser } = useDynamicContext(); // Get the full dynamic user object
 
   const form = useForm<UserProfileFormValues>({
     resolver: zodResolver(userProfileSchema),
@@ -84,38 +84,46 @@ export function UserProfileForm({
     try {
       setLoading(true);
 
-      if (userType === 'petani') {
-        data.userType = 'farmer';
-      } else {
-        data.userType = 'consumer';
+      // Extract Solana public key from Dynamic user context
+      let userSolanaPublicKey: string | undefined = undefined;
+      if (dynamicUser?.verifiedCredentials) {
+        const solanaCredential = dynamicUser.verifiedCredentials.find(
+          (cred) => cred.format === 'blockchain' && cred.chain === 'solana'
+        );
+        if (solanaCredential) {
+          userSolanaPublicKey = solanaCredential.address;
+        }
       }
 
+      // Update metadata for Dynamic
       const result = await updateUser({
-        metadata: data,
+        // This is Dynamic's updateUser
+        metadata: { ...data },
       });
+      const updatedDynamicUser = result.updateUserProfileResponse.user;
+      const metadataFromDynamic = updatedDynamicUser.metadata as UserProfileFormValues; // Cast assuming structure matches
 
-      const user = result.updateUserProfileResponse.user;
-
-      const metadata = user.metadata as UserProfileFormValues;
-
-      if (!initialData.taniId) {
+      if (!initialData.taniId && userConvex?._id === undefined) {
+        // Check if it's a new Convex user profile
         await createConvexUser({
-          userId: user.id,
-          email: user.email,
-          name: metadata.fullName,
-          phone: metadata.phoneNumber,
-          address: metadata.address,
-          nationalIdNumber: metadata.nationalIdNumber,
-          userType: metadata.userType,
+          userId: updatedDynamicUser.id, // Dynamic's user ID
+          email: updatedDynamicUser.email,
+          name: metadataFromDynamic.fullName,
+          phone: metadataFromDynamic.phoneNumber,
+          address: metadataFromDynamic.address,
+          nationalIdNumber: metadataFromDynamic.nationalIdNumber,
+          userType: metadataFromDynamic.userType,
+          solanaPublicKey: userSolanaPublicKey, // Pass it here
         });
-      } else {
+      } else if (userConvex?._id) {
         await updateConvexUser({
           convexId: userConvex._id,
-          name: metadata.fullName,
-          phone: metadata.phoneNumber,
-          address: metadata.address,
-          nationalIdNumber: metadata.nationalIdNumber,
-          userType: metadata.userType,
+          name: metadataFromDynamic.fullName,
+          phone: metadataFromDynamic.phoneNumber,
+          address: metadataFromDynamic.address,
+          nationalIdNumber: metadataFromDynamic.nationalIdNumber,
+          userType: metadataFromDynamic.userType,
+          solanaPublicKey: userSolanaPublicKey, // Pass it here for updates
         });
       }
 

@@ -1,25 +1,11 @@
+import { paginationOptsValidator } from 'convex/server';
 import { query } from './_generated/server';
 import { v } from 'convex/values';
 
 // Get a single komoditas by ID
 export const get = query({
   args: { id: v.id('komoditas') },
-  returns: v.union(
-    v.object({
-      _id: v.id('komoditas'),
-      _creationTime: v.number(),
-      name: v.string(),
-      description: v.optional(v.string()),
-      category: v.string(),
-      unit: v.string(),
-      pricePerUnit: v.number(),
-      stock: v.number(),
-      imageUrl: v.optional(v.string()),
-      createdBy: v.string(),
-      updatedAt: v.number(),
-    }),
-    v.null()
-  ),
+
   handler: async (ctx, args) => {
     const komoditas = await ctx.db.get(args.id);
     return komoditas;
@@ -29,19 +15,10 @@ export const get = query({
 // List all komoditas with optional pagination
 export const list = query({
   args: {
-    paginationOpts: v.optional(
-      v.object({
-        numItems: v.number(),
-        cursor: v.union(v.string(), v.null()),
-      })
-    ),
+    paginationOpts: paginationOptsValidator,
     category: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // check user
-    const auth = await ctx.auth.getUserIdentity();
-    console.log(auth);
-
     // Build the query step by step
     const baseQuery = ctx.db.query('komoditas');
 
@@ -79,7 +56,7 @@ export const search = query({
     const baseQuery = ctx.db.query('komoditas');
 
     // Apply search with category filter if provided
-    const searchedQuery = baseQuery.withSearchIndex('search', (q) => {
+    const searchedQuery = baseQuery.withSearchIndex('search_komoditas', (q) => {
       let query = q.search('name', args.query);
       if (args.category !== undefined) {
         query = query.eq('category', args.category as string);

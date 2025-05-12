@@ -35,6 +35,9 @@ import {
   SheetTitle,
   SheetClose,
 } from '@/components/ui/sheet';
+// Import useDynamicContext
+// Import isSolanaWallet
+
 // Mock data for units and categories
 const units = ['kg', 'ton', 'gram', 'liter'];
 const categories = ['Padi', 'Jagung', 'Kedelai', 'Gula', 'Kopi', 'Cabai', 'Bawang'];
@@ -48,7 +51,7 @@ interface AddKomoditasDialogProps {
 export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomoditasDialogProps) => {
   const { toast } = useToast();
   const { t } = useLanguage();
-  const create = useMutation(api.komoditas_mutations.create);
+  const createKomoditasMutation = useMutation(api.komoditas_mutations.create);
 
   // Bulk pricing state
   const [bulkPrices, setBulkPrices] = useState<BulkPrice[]>([]);
@@ -100,6 +103,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
           description: 'Name is required',
           variant: 'destructive',
         });
+        setIsSubmitting(false); // Ensure loading is set to false on error
         return;
       }
 
@@ -110,13 +114,13 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
         ...(formData.category && { category: formData.category }),
         ...(formData.unit && { unit: formData.unit }),
         // ...(formData.pricePerUnit && { pricePerUnit: parseFloat(formData.pricePerUnit) }),
-        ...(formData.basePrice && { basePrice: parseFloat(formData.basePrice) }),
+        ...(formData.basePrice && { pricePerUnit: parseFloat(formData.basePrice) }), // Use basePrice for pricePerUnit
         ...(formData.stock && { stock: parseFloat(formData.stock) }),
         ...(formData.imageUrl && { imageUrl: formData.imageUrl }),
       };
 
       // ACTIVATE THIS AFTER 🔥🔥🔥🔥
-      // await create(komoditasData);
+      await createKomoditasMutation(komoditasData); // Use the mutation
 
       toast({
         title: 'Komoditas berhasil ditambahkan',
@@ -137,9 +141,11 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
         bulkPrices: [],
         basePrice: '',
       });
+      setDisplayPrice(''); // Reset display price
 
       onOpenChange(false);
     } catch (error) {
+      console.error('Failed to add komoditas:', error); // Log the error for debugging
       toast({
         title: 'Error',
         description: error instanceof Error ? error.message : 'Failed to add komoditas',
@@ -369,7 +375,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                   </Button>
                 </div>
                 <div className="space-y-1">
-                  {bulkPrices.slice(0, 3).map((price, index) => (
+                  {bulkPrices.slice(0, 3).map((price) => (
                     <div
                       key={price.id}
                       className="flex justify-between text-xs text-earth-dark-green"

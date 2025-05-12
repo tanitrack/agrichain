@@ -1,7 +1,5 @@
- 
 import { query } from './_generated/server';
 import { v } from 'convex/values';
-
 
 export const get = query({
   args: { id: v.id('transaction') },
@@ -9,17 +7,18 @@ export const get = query({
     v.object({
       _id: v.id('transaction'),
       _creationTime: v.number(),
-      trxId: v.string(),
-      customerName: v.string(),
-      commodityName: v.optional(v.string()),
-      status: v.string(),
-      unit: v.string(),
-      unitPrice: v.number(),
-      totalUnit: v.number(),
-      type: v.optional(v.string()),
-      price: v.number(),
-      description: v.optional(v.string()),
-      createdBy: v.string(),
+      orderBookId: v.id('orderBook'),
+      buyerSolanaPublicKey: v.string(),
+      sellerSolanaPublicKey: v.string(),
+      amountLamports: v.number(),
+      escrowPdaAddress: v.optional(v.string()),
+      onChainEscrowStatus: v.optional(v.string()),
+      initializeTxHash: v.optional(v.string()),
+      confirmOrderTxHash: v.optional(v.string()),
+      withdrawFundsTxHash: v.optional(v.string()),
+      refundOrderTxHash: v.optional(v.string()),
+      failOrderTxHash: v.optional(v.string()),
+      closeEscrowTxHash: v.optional(v.string()),
       updatedAt: v.number(),
     }),
     v.null()
@@ -30,68 +29,44 @@ export const get = query({
   },
 });
 
-export const list = query({
-  args: {
-    paginationOpts: v.optional(
-      v.object({
-        numItems: v.number(),
-        cursor: v.union(v.string(), v.null()),
-      })
-    ),
-    status: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    
-    const baseQuery = ctx.db.query('transaction');
+// export const list = query({
+//   args: {
+//     paginationOpts: v.optional(
+//       v.object({
+//         numItems: v.number(),
+//         cursor: v.union(v.string(), v.null()),
+//       })
+//     ),
+//     orderBookId: v.optional(v.id('orderBook')), // Filter by orderBookId
+//     escrowPdaAddress: v.optional(v.string()), // Filter by escrowPdaAddress
+//   },
+//   handler: async (ctx, args) => {
+//     let baseQuery = ctx.db.query('transaction');
 
-    
-    const filteredQuery =
-      args.status !== undefined
-        ? baseQuery.withIndex('by_status', (q) => q.eq('status', args.status as string))
-        : baseQuery;
+//     // Apply filtering based on provided arguments
+//     if (args.orderBookId !== undefined) {
+//       baseQuery = baseQuery.withIndex('by_orderBookId', (q) =>
+//         q.eq('orderBookId', args.orderBookId)
+//       );
+//     } else if (args.escrowPdaAddress !== undefined) {
+//       baseQuery = baseQuery.withIndex('by_escrowPdaAddress', (q) =>
+//         q.eq('escrowPdaAddress', args.escrowPdaAddress)
+//       );
+//     }
+//     // Note: If both are provided, orderBookId filter will take precedence due to the if/else if structure.
+//     // Adjust logic if you need to support filtering by both simultaneously or with different precedence.
 
-    const orderedQuery = filteredQuery.order('desc');
+//     const orderedQuery = baseQuery.order('desc'); // Keep ordering by creation time (default) descending
 
-    if (args.paginationOpts) {
-      return await orderedQuery.paginate(args.paginationOpts);
-    }
+//     if (args.paginationOpts) {
+//       return await orderedQuery.paginate(args.paginationOpts);
+//     }
 
-    const results = await orderedQuery.collect();
-    return {
-      page: results,
-      isDone: true,
-      continueCursor: null,
-    };
-  },
-});
-
-export const search = query({
-  args: {
-    query: v.string(),
-    status: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    
-    const baseQuery = ctx.db.query('transaction');
-
-    const searchedQuery = baseQuery.withSearchIndex('search', (q) => {
-      let query = q.search('trxId', args.query);
-      if (args.status !== undefined) {
-        query = query.eq('status', args.status as string);
-      }
-      return query;
-    });
-
-    // Take only 10 results
-    return await searchedQuery.take(10);
-  },
-});
-
-export const listStatus = query({
-  args: {},
-  handler: async (ctx) => {
-    const transaction = await ctx.db.query('transaction').collect();
-    const status = new Set(transaction.map((k) => k.status));
-    return Array.from(status).sort();
-  },
-});
+//     const results = await orderedQuery.collect();
+//     return {
+//       page: results,
+//       isDone: true,
+//       continueCursor: null,
+//     };
+//   },
+// });

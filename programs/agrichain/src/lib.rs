@@ -3,7 +3,8 @@
 
 use anchor_lang::prelude::*;
 use anchor_lang::system_program;
-declare_id!("coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF");
+// declare_id!("coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF"); // localnet
+declare_id!("49BKpDeZKKAGt6cRn5fGb3DizL64XSyHpbta3xdbSEKq"); // devnet
 
 #[program]
 pub mod escrow {
