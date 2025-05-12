@@ -49,7 +49,6 @@ type UserProfileFormValues = z.infer<typeof userProfileSchema>;
 interface UserProfileFormProps {
   onSuccess?: () => void;
   initialData?: Partial<UserProfileFormValues>;
-  userType?: string;
 }
 
 const emptyInitialData = {};

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -7,18 +6,20 @@ import { UserProfileForm } from '@/components/auth/user-profile-form';
 import { EmailRegistrationForm } from '@/components/auth/email-registration-form';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Leaf, ShoppingBasket } from 'lucide-react';
+import { parseAsStringLiteral, useQueryState } from 'nuqs';
 
 interface AuthRightSectionProps {
-  userType?: string;
-  setUserType?: (value: string) => void;
+  userType?: 'farmer' | 'consumer';
+  setUserType?: (value: 'farmer' | 'consumer') => void;
 }
 
 // Define registration steps
-type RegistrationStep = 'email' | 'userType' | 'profile' | 'complete';
+const step = ['email', 'userType', 'profile', 'complete'] as const;
 
 export function AuthRightSection({ userType, setUserType }: AuthRightSectionProps) {
-  const [registrationStep, setRegistrationStep] = useState<RegistrationStep>(
-    userType ? 'userType' : 'email'
+  const [registrationStep, setRegistrationStep] = useQueryState(
+    'registrationStep',
+    parseAsStringLiteral(step).withDefault('email')
   );
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -27,11 +28,11 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
   // Handle email registration completion
   const handleEmailRegistrationComplete = () => {
     console.log('handleEmailRegistrationComplete');
-    navigate('/register-profile', { replace: true });
+    navigate('/register-profile?registrationStep=userType', { replace: true });
   };
 
   // Handle user type selection
-  const handleUserTypeSelection = (type: string) => {
+  const handleUserTypeSelection = (type: 'farmer' | 'consumer') => {
     setUserType(type);
     setRegistrationStep('profile');
   };
@@ -74,7 +75,7 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
             <div className="grid grid-cols-2 gap-4">
               <button
                 type="button"
-                onClick={() => handleUserTypeSelection('petani')}
+                onClick={() => handleUserTypeSelection('farmer')}
                 className="relative rounded-lg border border-earth-light-brown bg-gradient-to-br from-[#224c2a] via-[#356d3a] to-[#193c1e] p-4  transition duration-300 hover:-translate-y-4 hover:bg-earth-pale-green"
               >
                 <div className="absolute left-2 top-2 mr-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
@@ -93,7 +94,7 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
               </button>
               <button
                 type="button"
-                onClick={() => handleUserTypeSelection('konsumen')}
+                onClick={() => handleUserTypeSelection('consumer')}
                 className="relative rounded-lg border border-earth-light-brown bg-gradient-to-br from-[#d79c08] via-[#e1c169] to-[#d79d08] p-4 transition duration-300 hover:-translate-y-4 hover:bg-earth-pale-green"
               >
                 <div className="absolute left-2 top-2 mr-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
@@ -128,18 +129,18 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
                 <div className="inline-flex items-center rounded-full bg-earth-pale-green px-4 py-2 text-earth-dark-green">
                   <span className="mr-2 text-lg">👤</span>
                   <span className="font-medium">
-                    {userType === 'petani'
+                    {userType === 'farmer'
                       ? language === 'id'
                         ? 'Petani'
                         : 'Farmer'
                       : language === 'id'
-                        ? 'Konsumen'
+                        ? 'Pembeli'
                         : 'Buyer'}
                   </span>
                 </div>
               </div>
             </div>
-            <UserProfileForm onSuccess={handleProfileComplete} userType={userType} />
+            <UserProfileForm onSuccess={handleProfileComplete} initialData={{ userType }} />
           </div>
         );
       case 'complete':
