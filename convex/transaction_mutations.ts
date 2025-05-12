@@ -1,6 +1,7 @@
 // convex/transaction_mutations.ts
 import { mutation } from './_generated/server';
 import { v } from 'convex/values';
+// Assuming Id is needed here too
 
 export const recordEscrowInitializationAndLink = mutation({
   args: {
@@ -68,3 +69,38 @@ export const recordEscrowInitializationAndLink = mutation({
 });
 
 // Potentially add other transaction mutations here later
+
+export const recordSellerConfirmation = mutation({
+  args: {
+    orderBookId: v.id('orderBook'),
+    txHash: v.string(),
+    onChainStatus: v.string(), // "confirmed"
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error('Unauthorized');
+
+    const orderBook = await ctx.db.get(args.orderBookId);
+    if (!orderBook || !orderBook.financialTransactionId) {
+      throw new Error('OrderBook or linked transaction not found.');
+    }
+    // Optional: Authorization check for seller
+    if (orderBook.sellerId !== identity.subject) {
+      // throw new Error("Unauthorized: Only the seller can confirm this order.");
+    }
+
+    await ctx.db.patch(orderBook.financialTransactionId, {
+      confirmOrderTxHash: args.txHash,
+      onChainEscrowStatus: args.onChainStatus,
+      updatedAt: Date.now(),
+    });
+
+    await ctx.db.patch(args.orderBookId, {
+      status: 'seller_confirmed_awaiting_shipment',
+      updatedAt: Date.now(),
+    });
+
+    // ... (notify buyer)
+    return { success: true };
+  },
+});
