@@ -1,5 +1,6 @@
 import { query } from './_generated/server';
 import { v } from 'convex/values';
+// Assuming Id is needed here too
 
 // Get a single orderBook by ID
 export const get = query({
@@ -35,5 +36,22 @@ export const get = query({
 
     const orderBook = await ctx.db.get(args.id);
     return orderBook;
+  },
+});
+
+export const listBySellerAndStatus = query({
+  args: { sellerId: v.id('users'), status: v.string() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error('Unauthorized: User must be logged in to view their order books.');
+    }
+
+    return await ctx.db
+      .query('orderBook')
+      .withIndex('by_sellerId_status', (q) =>
+        q.eq('sellerId', args.sellerId).eq('status', args.status)
+      )
+      .collect();
   },
 });
