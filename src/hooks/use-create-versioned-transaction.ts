@@ -8,7 +8,6 @@ import {
   TransactionMessage,
 } from '@solana/web3.js';
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core';
-import { clientEnv } from '@/lib/client-env-variables'; // Your environment variables
 import { isSolanaWallet } from '@dynamic-labs/solana';
 
 interface CreateVersionedTransactionProps {
@@ -25,7 +24,6 @@ interface UseCreateVersionedTransactionReturn {
   isLoading: boolean;
   error: Error | null;
   signature: string | null;
-  programId: string;
 }
 
 export function useCreateVersionedTransaction(): UseCreateVersionedTransactionReturn {
@@ -142,6 +140,5 @@ export function useCreateVersionedTransaction(): UseCreateVersionedTransactionRe
     isLoading,
     error,
     signature,
-    programId: clientEnv.VITE_AGRICHAIN_PROGRAM_ID ?? '',
   };
 }
