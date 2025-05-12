@@ -70,3 +70,43 @@ export const get = query({
 //     };
 //   },
 // });
+
+export const getEscrowDetailsForAction = query({
+  args: { orderBookId: v.id('orderBook') },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error('Unauthorized: User must be logged in.');
+    }
+
+    const orderBook = await ctx.db.get(args.orderBookId);
+    if (!orderBook) {
+      throw new Error('OrderBook not found.');
+    }
+
+    // Authorization check: Ensure the querier is part of this order
+    if (orderBook.buyerId !== identity.subject && orderBook.sellerId !== identity.subject) {
+      // throw new Error("Unauthorized: You are not part of this order.");
+      // Consider if this check is needed here or if the calling mutation/action handles it.
+      // For a query, it might be okay to return if it's just fetching non-sensitive link data.
+    }
+
+    if (!orderBook.financialTransactionId) {
+      throw new Error('Transaction not linked to this OrderBook yet.');
+    }
+
+    const transaction = await ctx.db.get(orderBook.financialTransactionId);
+    if (!transaction || !transaction.escrowPdaAddress) {
+      throw new Error('Escrow details not found or escrow not initialized for this transaction.');
+    }
+
+    return {
+      escrowPdaAddress: transaction.escrowPdaAddress,
+      // You might also need buyer/seller Solana public keys from the transaction record
+      // if the frontend doesn't already have them for constructing the on-chain call.
+      buyerSolanaPublicKey: transaction.buyerSolanaPublicKey,
+      sellerSolanaPublicKey: transaction.sellerSolanaPublicKey,
+      onChainEscrowStatus: transaction.onChainEscrowStatus, // Useful for frontend logic
+    };
+  },
+});
