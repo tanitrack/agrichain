@@ -329,28 +329,46 @@ export const useEscrowTransaction = () => {
     onError,
     onSubmitted,
   }: EscrowActionProps) => {
+    console.log('Closing escrow account:', escrowPda, 'Receiver:', actorPublicKey);
     try {
+      if (
+        !primaryWallet ||
+        !isSolanaWallet(primaryWallet) ||
+        primaryWallet.address !== actorPublicKey
+      ) {
+        throw new Error("Rent payer's Solana wallet not connected or mismatch.");
+      }
       const program = await getProgram();
       const escrowPK = new PublicKey(escrowPda);
-      const receiverPK = new PublicKey(actorPublicKey); // Receiver of rent (typically buyer)
+      const receiverPK = new PublicKey(actorPublicKey); // This is the actor who is closing and receiving rent
 
       const ix = await program.methods
         .closeEscrow()
         .accounts({
           escrowAccount: escrowPK,
-          receiver: receiverPK,
+          receiver: receiverPK, // The signer and recipient of the rent
         } as any)
         .instruction();
 
       const sig = await createAndSendTransaction({
         instructions: [ix],
-        payer: receiverPK, // Receiver pays
-        onSuccess,
-        onError,
-        onSubmitted,
+        payer: receiverPK, // The one closing the account pays the tx fee
+        onSuccess: (txSig) => {
+          console.log('Escrow account closed on-chain. Tx Signature:', txSig);
+          onSuccess?.(txSig);
+        },
+        onError: (err) => {
+          console.error('Error in createAndSendTransaction for closeEscrow:', err);
+          onError?.(err);
+        },
+        onSubmitted: (txSig) => {
+          console.log('closeEscrow tx submitted:', txSig);
+          onSubmitted?.(txSig);
+        },
       });
-      return { signature: sig };
+      return sig ? { signature: sig } : null;
     } catch (e) {
+      console.error('Error in closeEscrow function:', e);
       onError?.(e as Error);
       return null;
     }
@@ -362,7 +380,7 @@ export const useEscrowTransaction = () => {
     withdrawFunds, // <-- ADDED
     refundOrder,
     failOrder,
-    closeEscrow,
+    closeEscrow, // <-- ADDED
     isLoading, // from underlying useCreateVersionedTransaction
     error: CSTEError, // from underlying
     lastSignature: CSTESignature, // from underlying
