@@ -19,6 +19,8 @@ import type * as corsHeaders from "../corsHeaders.js";
 import type * as harga_komoditas_mutations from "../harga_komoditas_mutations.js";
 import type * as harga_komoditas_queries from "../harga_komoditas_queries.js";
 import type * as http from "../http.js";
+import type * as komoditas_bulk_mutations from "../komoditas_bulk_mutations.js";
+import type * as komoditas_bulk_queries from "../komoditas_bulk_queries.js";
 import type * as komoditas_mutations from "../komoditas_mutations.js";
 import type * as komoditas_queries from "../komoditas_queries.js";
 import type * as orderbook_mutations from "../orderbook_mutations.js";
@@ -44,6 +46,8 @@ declare const fullApi: ApiFromModules<{
   harga_komoditas_mutations: typeof harga_komoditas_mutations;
   harga_komoditas_queries: typeof harga_komoditas_queries;
   http: typeof http;
+  komoditas_bulk_mutations: typeof komoditas_bulk_mutations;
+  komoditas_bulk_queries: typeof komoditas_bulk_queries;
   komoditas_mutations: typeof komoditas_mutations;
   komoditas_queries: typeof komoditas_queries;
   orderbook_mutations: typeof orderbook_mutations;

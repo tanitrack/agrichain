@@ -34,6 +34,10 @@ export const KomoditasTable = ({
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
+  console.log('====================================');
+  console.log('DATA ---> ', data);
+  console.log('====================================');
+
   return (
     <Card className="">
       <CardHeader className="earth-header-forest pb-3">

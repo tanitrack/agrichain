@@ -5,7 +5,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, QrCode, Edit, Trash2, Scale, Calendar, PackageOpen } from 'lucide-react';
+import {
+  ArrowLeft,
+  QrCode,
+  Edit,
+  Trash2,
+  Scale,
+  Calendar,
+  PackageOpen,
+  MapPin,
+} from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import { formatDate } from '@/lib/utils';
 import { useQuery } from 'convex/react';
@@ -120,11 +129,15 @@ const KomoditasDetail = () => {
     id: id as Id<'komoditas'>,
   });
 
+  const komoditas_bulks = useQuery(api.komoditas_bulk_queries.get, {
+    commodityId: id,
+  });
+
   useEffect(() => {
-    if (komoditas) {
+    if (komoditas && komoditas_bulks) {
       setLoading(false);
     }
-  }, [komoditas]);
+  }, [komoditas, komoditas_bulks]);
 
   if (loading) {
     return (
@@ -240,10 +253,10 @@ const KomoditasDetail = () => {
                       <p className="text-sm text-earth-medium-green">{t('commodities.type')}</p>
                       <p className="font-medium text-earth-dark-green">{komoditas.category}</p>
                     </div>
-                    {/* <div>
+                    <div>
                       <p className="text-sm text-earth-medium-green">{t('commodities.grade')}</p>
                       <div>{renderGradeBadge(komoditas.grade)}</div>
-                    </div> */}
+                    </div>
                     <div>
                       <p className="text-sm text-earth-medium-green">{t('commodities.quantity')}</p>
                       <p className="font-medium text-earth-dark-green">
@@ -251,65 +264,49 @@ const KomoditasDetail = () => {
                       </p>
                     </div>
                     <div>
-                      <p className="text-sm text-earth-medium-green">{t('commodities.created')}</p>
+                      <p className="text-sm text-earth-medium-green">
+                        {t('commodities.harvestDate')}
+                      </p>
                       <p className="font-medium text-earth-dark-green">
-                        {formatDate(new Date(komoditas._creationTime))}
+                        {formatDate(new Date(komoditas.harvestDate))}
                       </p>
                     </div>
-                    {/* <div className="md:col-span-2">
+                    <div className="md:col-span-2">
                       <p className="text-sm text-earth-medium-green">{t('commodities.location')}</p>
                       <p className="flex items-center font-medium text-earth-dark-green">
                         <MapPin className="mr-1 h-4 w-4 text-earth-medium-green" />
-                        {komoditas.location}
+                        {'Indonesia'}
                       </p>
-                    </div> */}
+                    </div>
                   </div>
 
                   <div className="mt-4">
                     <p className="mb-2 text-sm text-earth-medium-green">{'Harga Grosir'}</p>
                     <div className=" overflow-hidden rounded-lg border border-earth-light-brown/30 bg-white">
-                      <Tabs defaultValue="description" className="w-full">
+                      <Tabs defaultValue={komoditas_bulks[0].minQuantity} className="w-full">
                         <TabsList className="w-full bg-earth-pale-green">
-                          <TabsTrigger value="description" className="flex-1">
-                            {`10 ${komoditas.unit}`}
-                          </TabsTrigger>
-                          <TabsTrigger value="nutrition" className="flex-1">
-                            {`100 ${komoditas.unit}`}
-                          </TabsTrigger>
-                          <TabsTrigger value="storage" className="flex-1">
-                            {`1000 ${komoditas.unit}`}
-                          </TabsTrigger>
+                          {komoditas_bulks.map((bulk) => (
+                            <TabsTrigger key={bulk._id} value={bulk.minQuantity} className="flex-1">
+                              {`${bulk.minQuantity} ${komoditas.unit}`}
+                            </TabsTrigger>
+                          ))}
                         </TabsList>
-                        <TabsContent value="description" className="space-y-4 p-4">
-                          <p>
-                            Harga: Rp {komoditas.pricePerUnit.toLocaleString()} / {komoditas.unit}
-                          </p>
-                          <p>Harga Total: Rp {(komoditas.pricePerUnit * 10).toLocaleString()}</p>
-                          {/* <p>{komoditas.description}</p> */}
-                        </TabsContent>
-                        <TabsContent value="nutrition" className="space-y-4 p-4">
-                          <p>
-                            Harga: Rp {(komoditas.pricePerUnit - 2000).toLocaleString()} /{' '}
-                            {komoditas.unit}
-                          </p>
-                          <p>
-                            Harga Total: Rp{' '}
-                            {((komoditas.pricePerUnit - 2000) * 100).toLocaleString()}
-                          </p>
-                          {/* <p>{komoditas.nutritionalInfo}</p> */}
-                        </TabsContent>
-
-                        <TabsContent value="storage" className="space-y-4 p-4">
-                          <p>
-                            Harga: Rp {(komoditas.pricePerUnit - 4000).toLocaleString()} /{' '}
-                            {komoditas.unit}
-                          </p>
-                          <p>
-                            Harga Total: Rp{' '}
-                            {((komoditas.pricePerUnit - 4000) * 100).toLocaleString()}
-                          </p>
-                          {/* <p>{komoditas.storageInfo}</p> */}
-                        </TabsContent>
+                        {komoditas_bulks.map((bulk) => (
+                          <TabsContent
+                            key={bulk._id}
+                            value={bulk.minQuantity}
+                            className="space-y-4 p-4"
+                          >
+                            <p>
+                              Harga: Rp {bulk.price.toLocaleString()} / {komoditas.unit}
+                            </p>
+                            <p>
+                              Harga Total: Rp{' '}
+                              {(bulk.price * parseInt(bulk.minQuantity)).toLocaleString()}
+                            </p>
+                            {/* <p>{komoditas.description}</p> */}
+                          </TabsContent>
+                        ))}
                       </Tabs>
                     </div>
                   </div>
@@ -423,9 +420,11 @@ const KomoditasDetail = () => {
                     <Calendar className="h-5 w-5 text-amber-600" />
                   </div>
                   <div>
-                    <p className="text-sm text-earth-medium-green">{t('commodities.created')}</p>
+                    <p className="text-sm text-earth-medium-green">
+                      {t('commodities.harvestDate')}
+                    </p>
                     <p className="font-medium text-earth-dark-green">
-                      {formatDate(new Date(komoditas._creationTime))}
+                      {formatDate(new Date(komoditas.harvestDate))}
                     </p>
                   </div>
                 </div>

@@ -35,6 +35,7 @@ import {
   SheetTitle,
   SheetClose,
 } from '@/components/ui/sheet';
+import { DatePicker } from '../ui/datepicker';
 // Import useDynamicContext
 // Import isSolanaWallet
 
@@ -50,12 +51,14 @@ interface AddKomoditasDialogProps {
 
 export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomoditasDialogProps) => {
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const createKomoditasMutation = useMutation(api.komoditas_mutations.create);
+  const createKomoditasBulkMutation = useMutation(api.komoditas_bulk_mutations.create);
 
   // Bulk pricing state
   const [bulkPrices, setBulkPrices] = useState<BulkPrice[]>([]);
   const [newBulkPrice, setNewBulkPrice] = useState({
+    commodityId: '',
     minQuantity: '',
     price: '',
   });
@@ -65,11 +68,13 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
     description: '',
     category: '',
     unit: '',
+    grade: '',
     // pricePerUnit: '',
     stock: '',
     imageUrl: '',
-    bulkPrices: bulkPrices,
+
     basePrice: '',
+    harvestDate: undefined as Date | undefined,
   });
 
   // Format display for price inputs
@@ -79,7 +84,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: any) => {
     if (field === 'basePrice') {
       // Format the input as currency
       const formattedValue = formatPriceInput(value);
@@ -117,12 +122,25 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
         ...(formData.basePrice && { pricePerUnit: parseFloat(formData.basePrice) }), // Use basePrice for pricePerUnit
         ...(formData.stock && { stock: parseFloat(formData.stock) }),
         ...(formData.imageUrl && { imageUrl: formData.imageUrl }),
+        ...(formData.harvestDate && { harvestDate: formData.harvestDate.toDateString() }),
+        ...(formData.grade && { grade: formData.grade }),
       };
 
       // ACTIVATE THIS AFTER 🔥🔥🔥🔥
-      await createKomoditasMutation(komoditasData); // Use the mutation
+      await createKomoditasMutation(komoditasData).then((createdKomoditasId) => {
+        // ADD BULK
+        bulkPrices.forEach(async (value) => {
+          const komoditasBulkData = {
+            commodityId: createdKomoditasId,
+            ...(value.minQuantity && { minQuantity: value.minQuantity.toString() }),
+            ...(value.price && { price: value.price }), // Use basePrice for pricePerUnit
+          };
 
-      toast({
+          await createKomoditasBulkMutation(komoditasBulkData);
+        });
+      }); // Use the mutation
+
+      await toast({
         title: 'Komoditas berhasil ditambahkan',
         description: `${formData.name} telah ditambahkan ke daftar komoditas Anda`,
       });
@@ -136,10 +154,11 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
         category: '',
         unit: '',
         // pricePerUnit: '',
+        grade: '',
         stock: '',
         imageUrl: '',
-        bulkPrices: [],
         basePrice: '',
+        harvestDate: undefined,
       });
       setDisplayPrice(''); // Reset display price
 
@@ -188,6 +207,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
       setNewBulkPrice({
         minQuantity: '',
         price: '',
+        commodityId: '',
       });
       setDisplayBulkPrice('');
     }
@@ -294,6 +314,28 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                   className="border-earth-medium-green focus:border-earth-dark-green"
                 />
               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="grade" className="text-earth-dark-green">
+                  {'Grade'}
+                </Label>
+                <Input
+                  id="imageUrl"
+                  placeholder="Level Grade cth: A, B, C"
+                  value={formData.grade}
+                  onChange={(e) => handleInputChange('grade', e.target.value)}
+                  className="border-earth-medium-green focus:border-earth-dark-green"
+                />
+              </div>
+              <DatePicker
+                label={language === 'id' ? 'Tanggal Panen' : 'Harvest Date'}
+                date={formData.harvestDate}
+                onDateChange={(date) => handleInputChange('harvestDate', date)}
+                placeholder={language === 'id' ? 'Pilih tanggal' : 'Pick a date'}
+                locale={language}
+              />
             </div>
 
             <div className="space-y-2">

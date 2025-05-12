@@ -11,6 +11,10 @@ export default defineSchema({
     unit: v.string(), // e.g., "kg", "ton", "piece"
     pricePerUnit: v.number(), // Base price
     stock: v.number(),
+    grade: v.optional(v.string()),
+    harvestDate: v.optional(v.string()),
+    farmersName: v.optional(v.string()),
+    address: v.optional(v.string()),
     imageUrl: v.optional(v.string()),
     createdBy: v.id('users'), // Link to the farmer's user record in Convex
     sellerSolanaPublicKey: v.string(), // Farmer's Solana public key
@@ -23,6 +27,15 @@ export default defineSchema({
       searchField: 'name',
       filterFields: ['category', 'createdBy'],
     }),
+  komoditas_bulk: defineTable({
+    commodityId: v.string(),
+    minQuantity: v.string(),
+    price: v.number(), // Base price
+    createdBy: v.id('users'), // Link to the farmer's user record in Convex
+    sellerSolanaPublicKey: v.string(), // Farmer's Solana public key
+    updatedAt: v.number(),
+  }).index('by_commodity_id', ['commodityId']),
+
   harga_komoditas: defineTable({
     name: v.string(),
     price: v.string(),
