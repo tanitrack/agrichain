@@ -29,6 +29,8 @@ export function useAuthFromDynamic() {
       .then((r) => r.json())
       .catch((e) => {
         console.error(e);
+        console.log('Error fetching access token, logout to reset');
+        handleLogOut();
       });
 
     const { valid } = await fetch(
@@ -44,6 +46,8 @@ export function useAuthFromDynamic() {
       .then((r) => r.json())
       .catch((e) => {
         console.error(e);
+        console.log('Error fetching access token, logout to reset');
+        handleLogOut();
       });
 
     if (token && valid) {
@@ -51,7 +55,7 @@ export function useAuthFromDynamic() {
     }
 
     return null;
-  }, [isLoggedIn, dynamicJwtToken, user]);
+  }, [isLoggedIn, dynamicJwtToken, user, handleLogOut]);
 
   return useMemo(
     () => ({

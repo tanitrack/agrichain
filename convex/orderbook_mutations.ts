@@ -78,3 +78,83 @@ export const createFromListing = mutation({
 // Potentially add other orderBook mutations like `createRequest` (buyer posts a general need)
 // and `farmerAcceptsOrderRequest` (farmer accepts a buyer's general request) later.
 // For now, `createFromListing` is the primary path.
+
+export const markAsShipped = mutation({
+  args: {
+    orderBookId: v.id('orderBook'),
+    shippingDetails: v.optional(
+      v.object({
+        courier: v.optional(v.string()),
+        trackingNumber: v.optional(v.string()),
+        estimatedDeliveryDate: v.optional(v.string()), // Or v.number() for timestamp
+        notes: v.optional(v.string()),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    const orderBook = await ctx.db.get(args.orderBookId);
+
+    if (!identity || !orderBook) {
+      throw new Error('Unauthorized or OrderBook not found.');
+    }
+    if (orderBook.status !== 'seller_confirmed_awaiting_shipment' /* or similar */) {
+      throw new Error('Order cannot be marked as shipped in its current state.');
+    }
+
+    const updates: Partial<typeof orderBook> = {
+      status: 'shipped',
+      updatedAt: Date.now(),
+    };
+    if (args.shippingDetails) {
+      // Assuming schema has these fields: shippingCourier, shippingTrackingNumber, shippingEstimatedDelivery, shippingNotes
+      if (args.shippingDetails.courier) updates.shippingCourier = args.shippingDetails.courier;
+      if (args.shippingDetails.trackingNumber)
+        updates.shippingTrackingNumber = args.shippingDetails.trackingNumber;
+      if (args.shippingDetails.estimatedDeliveryDate)
+        updates.shippingEstimatedDelivery = args.shippingDetails.estimatedDeliveryDate;
+      if (args.shippingDetails.notes) updates.shippingNotes = args.shippingDetails.notes;
+    }
+
+    await ctx.db.patch(args.orderBookId, updates);
+
+    // TODO: Notify buyer
+    // console.log(`Order ${args.orderBookId} marked as shipped. Buyer ID: ${orderBook.buyerId}`);
+
+    return { success: true };
+  },
+});
+
+export const buyerConfirmsGoodsReceipt = mutation({
+  args: { orderBookId: v.id('orderBook') },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    const orderBook = await ctx.db.get(args.orderBookId);
+
+    console.log({
+      identity,
+      orderBook,
+      orderBookId: args.orderBookId,
+    });
+
+    if (!identity || !orderBook) {
+      throw new Error('Unauthorized or OrderBook not found.');
+    }
+    // Ensure order is in a state where it can be confirmed as received
+    if (
+      orderBook.status !== 'shipped' /* and potentially other statuses like 'delivery_attempted' */
+    ) {
+      throw new Error('Order cannot be confirmed as received in its current state.');
+    }
+
+    await ctx.db.patch(args.orderBookId, {
+      status: 'goods_received', // This status signals the seller can now withdraw
+      updatedAt: Date.now(),
+    });
+
+    // TODO: Notify seller they can withdraw funds
+    // console.log(`Buyer confirmed receipt for Order ${args.orderBookId}. Seller ID: ${orderBook.sellerId}`);
+
+    return { success: true };
+  },
+});

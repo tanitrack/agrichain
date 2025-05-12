@@ -64,12 +64,15 @@ export default defineSchema({
     financialTransactionId: v.optional(v.id('transaction')), // Link to the on-chain transaction log
     shippingAddress: v.optional(v.string()),
     shippingNotes: v.optional(v.string()),
+    shippingCourier: v.optional(v.string()), // Added for Phase 4
+    shippingTrackingNumber: v.optional(v.string()), // Added for Phase 4
+    shippingEstimatedDelivery: v.optional(v.string()), // Added for Phase 4 (using string as per mutation example)
     termsAndConditions: v.optional(v.string()), // Could be text or a link to a document
     updatedAt: v.number(), // Manually manage for status updates
   })
-    .index('by_buyerId_status', ['buyerId', 'status'])
-    .index('by_sellerId_status', ['sellerId', 'status'])
-    .index('by_komoditasId', ['komoditasId']),
+    .index('by_komoditasId', ['komoditasId'])
+    .index('by_sellerId', ['sellerId']) // Added index for sellerId
+    .index('by_buyerId', ['buyerId']), // Added index for buyerId
   transaction: defineTable({
     orderBookId: v.id('orderBook'), // This is the orderDetails stored on-chain
     buyerSolanaPublicKey: v.string(),

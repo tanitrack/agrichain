@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/main-layout';
-import { Eye, Check, X, Package } from 'lucide-react';
+import { Eye, Check, Package, CheckCircle } from 'lucide-react'; // Added CheckCircle
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,78 +14,15 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-import { formatDate } from '@/lib/utils';
 import { useLanguage } from '@/contexts/language-context';
 import { useToast } from '@/hooks/use-toast';
 
-// Sample order book data
-const orderBooks = [
-  {
-    id: 'OB-2023-001',
-    buyerName: 'PT Agrimax',
-    commodityType: 'Padi',
-    quantity: 1000,
-    unit: 'kg',
-    requestedGrade: 'A',
-    requestedDeliveryDate: new Date('2023-12-15'),
-    offerExpiryDate: new Date('2023-11-30'),
-    status: 'open',
-    termsConditions: 'Kualitas premium, kadar air maksimal 14%',
-    createdAt: new Date('2023-11-05'),
-  },
-  {
-    id: 'OB-2023-002',
-    buyerName: 'Restoran Padang Jaya',
-    commodityType: 'Kedelai',
-    quantity: 500,
-    unit: 'kg',
-    requestedGrade: 'Premium',
-    requestedDeliveryDate: new Date('2023-12-10'),
-    offerExpiryDate: new Date('2023-11-25'),
-    status: 'accepted',
-    termsConditions: 'Ukuran biji seragam, bebas kotoran',
-    createdAt: new Date('2023-11-08'),
-  },
-  {
-    id: 'OB-2023-003',
-    buyerName: 'Pabrik Tepung Makmur',
-    commodityType: 'Jagung',
-    quantity: 2000,
-    unit: 'kg',
-    requestedGrade: 'B',
-    requestedDeliveryDate: new Date('2023-12-20'),
-    offerExpiryDate: new Date('2023-12-05'),
-    status: 'open',
-    termsConditions: 'Jagung kering, tidak berjamur',
-    createdAt: new Date('2023-11-10'),
-  },
-  {
-    id: 'OB-2023-004',
-    buyerName: 'Kafe Denpasar',
-    commodityType: 'Kopi',
-    quantity: 200,
-    unit: 'kg',
-    requestedGrade: 'Premium',
-    requestedDeliveryDate: new Date('2023-12-05'),
-    offerExpiryDate: new Date('2023-11-20'),
-    status: 'completed',
-    termsConditions: 'Biji kopi arabika, roasting medium',
-    createdAt: new Date('2023-11-01'),
-  },
-  {
-    id: 'OB-2023-005',
-    buyerName: 'Pabrik Gula Jawa',
-    commodityType: 'Gula',
-    quantity: 1500,
-    unit: 'kg',
-    requestedGrade: 'A',
-    requestedDeliveryDate: new Date('2023-12-25'),
-    offerExpiryDate: new Date('2023-12-10'),
-    status: 'expired',
-    termsConditions: 'Gula kristal putih, kemasan 50kg',
-    createdAt: new Date('2023-10-25'),
-  },
-];
+// Import Convex hooks and API
+import { useQuery, useMutation, useConvex } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+import { useEscrowTransaction } from '@/hooks/use-escrow-transaction';
+import { useAuthCheck } from '@/hooks/use-auth-check';
+import { Id } from '../../convex/_generated/dataModel';
 
 const OrderBook = () => {
   const navigate = useNavigate();
@@ -94,33 +31,74 @@ const OrderBook = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [activeTab, setActiveTab] = useState('all');
+  const [isProcessingOrder, setIsProcessingOrder] = useState(false); // State for seller confirmation loading
+  const [isMarkingAsShipped, setIsMarkingAsShipped] = useState(false); // State for marking as shipped loading
+  const [isConfirmingReceipt, setIsConfirmingReceipt] = useState(false); // State for buyer confirmation loading
 
-  // Filter order books based on search query and status
-  const filteredOrderBooks = orderBooks.filter((orderBook) => {
+  // Get logged-in user and wallet info
+  const { userProfile, wallet: dynamicWalletInfo } = useAuthCheck();
+  const userId = userProfile?._id; // Assuming userProfile contains the Convex user ID
+
+  // Fetch orders where the logged-in user is the seller
+  const sellerOrders = useQuery(
+    api.orderbook_queries.listBySeller,
+    userId ? { sellerId: userId } : 'skip' // Fetch if userId exists
+  );
+
+  // Fetch orders where the logged-in user is the buyer
+  const buyerOrders = useQuery(
+    api.orderbook_queries.listByBuyer,
+    userId ? { buyerId: userId } : 'skip' // Fetch if userId exists
+  );
+
+  // Combine the results (handle potential undefined/null from skip)
+  const allOrders = [...(sellerOrders || []), ...(buyerOrders || [])];
+
+  // Filter order books based on search query and status (now applied to fetched data)
+  const filteredOrdersToDisplay = allOrders.filter((orderBook) => {
     const matchesSearch =
-      orderBook.commodityType.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      orderBook.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      orderBook.buyerName.toLowerCase().includes(searchQuery.toLowerCase());
+      searchQuery === '' ||
+      orderBook.komoditasId.toLowerCase().includes(searchQuery.toLowerCase()) || // Assuming komoditasId is searchable or fetch commodity name
+      orderBook._id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      // Need to fetch buyer/seller name based on buyerId/sellerId if not included in orderBook
+      // orderBook.buyerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      // orderBook.sellerName.toLowerCase().includes(searchQuery.toLowerCase());
+      false; // Placeholder until buyer/seller name is available
 
     const matchesStatus = statusFilter === 'all' || orderBook.status === statusFilter;
 
+    // Adjust tab filtering to match fetched statuses
     const matchesTab =
       activeTab === 'all' ||
-      (activeTab === 'open' && orderBook.status === 'open') ||
-      (activeTab === 'accepted' && orderBook.status === 'accepted') ||
-      (activeTab === 'completed' && orderBook.status === 'completed') ||
-      (activeTab === 'expired' &&
-        (orderBook.status === 'expired' || orderBook.status === 'cancelled'));
+      (activeTab === 'awaiting_confirmation' &&
+        (orderBook.status === 'escrow_funded' ||
+          orderBook.status === 'awaiting_seller_confirmation')) ||
+      (activeTab === 'shipped' && orderBook.status === 'shipped') || // Filter for shipped status
+      (activeTab === 'completed' && orderBook.status === 'goods_received'); // Filter for goods_received status
 
     return matchesSearch && matchesStatus && matchesTab;
   });
 
+  // Mutation for recording seller confirmation
+  const recordSellerConfirmationMutation = useMutation(
+    api.transaction_mutations.recordSellerConfirmation
+  );
+  // Mutation for marking order as shipped
+  const markAsShippedMutation = useMutation(api.orderbook_mutations.markAsShipped);
+
+  // Mutation for buyer confirming goods receipt
+  const buyerConfirmsGoodsReceiptMutation = useMutation(
+    api.orderbook_mutations.buyerConfirmsGoodsReceipt
+  );
+
+  const convex = useConvex(); // Get Convex client for direct query call
+
   // Function to handle viewing details
-  const handleViewDetails = (id: string) => {
-    navigate(`/order-book/${id}`);
+  const handleViewDetails = (id: Id<'orderBook'>) => {
+    navigate(`/order-book/${id}`); // Assuming route uses Convex Id
   };
 
-  // Function to handle accepting an order
+  // Function to handle accepting an order (This might be for the old flow, keep for now or remove if not needed)
   const handleAccept = (id: string) => {
     toast({
       title: 'Order Accepted',
@@ -128,13 +106,122 @@ const OrderBook = () => {
     });
   };
 
-  // Function to handle rejecting an order
+  // Function to handle rejecting an order (This might be for the old flow, keep for now or remove if not needed)
   const handleReject = (id: string) => {
     toast({
       title: 'Order Rejected',
       description: `You have rejected the order ${id}`,
       variant: 'destructive',
     });
+  };
+
+  // Use the escrow transaction hook
+  const { confirmOrder, isLoading: isEscrowActionLoading } = useEscrowTransaction();
+
+  // Function to handle confirming an order (New function for Phase 3)
+  const handleConfirmOrderClick = async (orderBookId: Id<'orderBook'>) => {
+    if (!dynamicWalletInfo?.address) {
+      toast({
+        title: 'Error',
+        description: 'Seller Solana wallet not available.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setIsProcessingOrder(true); // Local state for this specific order action
+    toast({ title: 'Processing Confirmation...', description: 'Please wait.' });
+
+    try {
+      const escrowDetails = await convex.query(api.transaction_queries.getEscrowDetailsForAction, {
+        orderBookId,
+      });
+      if (!escrowDetails?.escrowPdaAddress) {
+        throw new Error('Could not fetch escrow details for confirmation.');
+      }
+
+      toast({
+        title: 'Awaiting Wallet Confirmation...',
+        description: 'Please confirm the transaction in your wallet.',
+      });
+      await confirmOrder({
+        escrowPda: escrowDetails.escrowPdaAddress,
+        actorPublicKey: dynamicWalletInfo.address, // Seller's public key
+        onSuccess: async (txSig) => {
+          toast({
+            title: 'Order Confirmed On-Chain!',
+            description: `Tx: ${txSig.substring(0, 10)}...`,
+          });
+          await recordSellerConfirmationMutation({
+            orderBookId: orderBookId,
+            txHash: txSig,
+            onChainStatus: 'confirmed',
+          });
+          // Optionally refetch orders or navigate
+        },
+        onError: (err) => {
+          toast({
+            title: 'Confirmation Failed',
+            description: err.message || 'Could not confirm order on-chain.',
+            variant: 'destructive',
+          });
+        },
+        onSubmitted: (txSig) => {
+          toast({
+            title: 'Transaction Submitted',
+            description: `Tx: ${txSig.substring(0, 10)}... Awaiting confirmation.`,
+          });
+        },
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: (error as Error).message || 'Failed to process order confirmation.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsProcessingOrder(false);
+    }
+  };
+
+  // Function to handle marking an order as shipped (New function for Phase 4)
+  const handleMarkAsShippedClick = async (orderBookId: Id<'orderBook'>) => {
+    setIsMarkingAsShipped(true); // Local state for this specific order action
+    toast({ title: 'Processing Shipment...', description: 'Please wait.' });
+
+    try {
+      // Call the Convex mutation to mark as shipped
+      await markAsShippedMutation({ orderBookId }); // Add shippingDetails here if collecting them
+
+      toast({ title: 'Order Marked as Shipped!', description: 'Status updated in TaniTrack.' });
+      // Optionally refetch orders or rely on Convex real-time updates
+    } catch (error) {
+      toast({
+        title: 'Failed to Mark as Shipped',
+        description: (error as Error).message || 'Could not update order status.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsMarkingAsShipped(false);
+    }
+  };
+
+  // Function to handle confirming goods receipt (New function for Buyer)
+  const handleConfirmReceiptClick = async (orderBookId: Id<'orderBook'>) => {
+    setIsConfirmingReceipt(true);
+    toast({ title: 'Processing Confirmation...', description: 'Please wait.' });
+
+    try {
+      await buyerConfirmsGoodsReceiptMutation({ orderBookId });
+      toast({ title: 'Goods Receipt Confirmed!', description: 'Status updated.' });
+    } catch (error) {
+      toast({
+        title: 'Confirmation Failed',
+        description: (error as Error).message || 'Could not confirm goods receipt.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsConfirmingReceipt(false);
+    }
   };
 
   // Function to render status badge with appropriate color
@@ -160,6 +247,31 @@ const OrderBook = () => {
         label: t('status.canceled'),
         className: 'bg-red-100 text-red-800',
       },
+      escrow_funded: {
+        // Add new status
+        label: 'Escrow Funded', // Or use translation key
+        className: 'bg-yellow-100 text-yellow-800',
+      },
+      awaiting_seller_confirmation: {
+        // Add new status
+        label: 'Awaiting Confirmation', // Or use translation key
+        className: 'bg-orange-100 text-orange-800',
+      },
+      seller_confirmed_awaiting_shipment: {
+        // Add new status
+        label: 'Confirmed, Awaiting Shipment', // Or use translation key
+        className: 'bg-purple-100 text-purple-800',
+      },
+      shipped: {
+        // Add new status for Phase 4
+        label: 'Shipped', // Or use translation key
+        className: 'bg-blue-500 text-white', // Example color
+      },
+      goods_received: {
+        // Added new status for Buyer
+        label: 'Goods Received', // Or use translation key
+        className: 'bg-green-500 text-white', // Example color
+      },
     };
 
     const statusInfo = statusMap[status] || {
@@ -169,6 +281,30 @@ const OrderBook = () => {
 
     return <Badge className={`${statusInfo.className}`}>{statusInfo.label}</Badge>;
   };
+
+  // Show loading state while fetching orders
+  if (allOrders === undefined) {
+    // Check loading for both queries
+    return (
+      <MainLayout>
+        <div className="mb-8">
+          <h1 className="mb-2 text-2xl font-bold">{t('orderbook.title')}</h1>
+          <p className="text-gray-600">{t('orderbook.subtitle')}</p>
+        </div>
+        <Card className="">
+          <CardHeader className="earth-header-forest pb-3">
+            <CardTitle className="flex items-center text-lg text-white">
+              <Package className="mr-2 h-5 w-5" />
+              {t('commodities.list')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="py-8 text-center">Loading orders...</div> {/* Loading indicator */}
+          </CardContent>
+        </Card>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -180,7 +316,7 @@ const OrderBook = () => {
         <CardHeader className="earth-header-forest pb-3">
           <CardTitle className="flex items-center text-lg text-white">
             <Package className="mr-2 h-5 w-5" />
-            {t('commodities.list')}
+            {t('commodities.list')} {/* This might need to be "Orders" */}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -188,62 +324,86 @@ const OrderBook = () => {
             <Table>
               <TableHeader className="bg-earth-light-green/30">
                 <TableRow>
-                  <TableHead className="text-earth-dark-green">{t('commodities.name')}</TableHead>
-                  <TableHead className="text-earth-dark-green">{t('commodities.type')}</TableHead>
-                  <TableHead className="hidden text-earth-dark-green md:table-cell">
-                    {t('commodities.quantity')}
-                  </TableHead>
-                  <TableHead className="hidden text-earth-dark-green lg:table-cell">
-                    {t('commodities.location')}
-                  </TableHead>
-                  <TableHead className="text-earth-dark-green">{t('commodities.grade')}</TableHead>
+                  <TableHead className="text-earth-dark-green">Order ID</TableHead>{' '}
+                  {/* Update header */}
+                  <TableHead className="text-earth-dark-green">Counterparty</TableHead>{' '}
+                  {/* Changed from Buyer to Counterparty */}
+                  <TableHead className="text-earth-dark-green">Commodity</TableHead>{' '}
+                  {/* Update header */}
+                  <TableHead className="text-earth-dark-green">Quantity</TableHead>{' '}
+                  {/* Update header */}
+                  <TableHead className="text-earth-dark-green">Total Amount</TableHead>{' '}
+                  {/* Add Total Amount */}
+                  <TableHead className="text-earth-dark-green">Status</TableHead>{' '}
+                  {/* Update header */}
                   <TableHead className="text-right text-earth-dark-green">
-                    {t('commodities.action')}
+                    {t('commodities.action')} {/* Update header */}
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredOrderBooks.length > 0 ? (
-                  filteredOrderBooks.map((orderBook) => (
-                    <TableRow key={orderBook.id}>
-                      <TableCell className="font-medium">{orderBook.id}</TableCell>
-                      <TableCell>{orderBook.buyerName}</TableCell>
-                      <TableCell>{orderBook.commodityType}</TableCell>
+                {filteredOrdersToDisplay.length > 0 ? (
+                  filteredOrdersToDisplay.map((orderBook) => (
+                    <TableRow key={orderBook._id}>
+                      {' '}
+                      {/* Use _id for key */}
+                      <TableCell className="font-medium">{orderBook._id}</TableCell>
+                      {/* Need to fetch buyer/seller name based on orderBook.buyerId/sellerId */}
+                      <TableCell>Counterparty Name Placeholder</TableCell> {/* Placeholder */}
+                      <TableCell>Commodity Name Placeholder</TableCell> {/* Placeholder */}
                       <TableCell>
-                        {orderBook.quantity} {orderBook.unit}
+                        {orderBook.quantity} {/* Unit might be in commodity details */}
                       </TableCell>
-                      <TableCell>{orderBook.requestedGrade}</TableCell>
-                      <TableCell>{formatDate(orderBook.requestedDeliveryDate)}</TableCell>
-                      <TableCell>{formatDate(orderBook.offerExpiryDate)}</TableCell>
-                      <TableCell>{getStatusBadge(orderBook.status)}</TableCell>
+                      <TableCell>{orderBook.totalAmount}</TableCell> {/* Display total amount */}
+                      <TableCell>{getStatusBadge(orderBook.status)}</TableCell>{' '}
+                      {/* Use fetched status */}
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleViewDetails(orderBook.id)}
+                            onClick={() => handleViewDetails(orderBook._id)}
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          {orderBook.status === 'open' && (
-                            <>
+                          {/* Show Confirm button for seller for relevant statuses */}
+                          {orderBook.sellerId === userId &&
+                            (orderBook.status === 'escrow_funded' ||
+                              orderBook.status === 'awaiting_seller_confirmation') && (
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 className="text-green-600"
-                                onClick={() => handleAccept(orderBook.id)}
+                                onClick={() => handleConfirmOrderClick(orderBook._id)} // Use _id
+                                disabled={isProcessingOrder || isEscrowActionLoading} // Disable while processing
                               >
                                 <Check className="h-4 w-4" />
                               </Button>
+                            )}
+                          {/* Show Mark as Shipped button for seller for relevant statuses */}
+                          {orderBook.sellerId === userId &&
+                            orderBook.status === 'seller_confirmed_awaiting_shipment' && (
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="text-red-600"
-                                onClick={() => handleReject(orderBook.id)}
+                                className="text-blue-600" // Use a different color, e.g., blue
+                                onClick={() => handleMarkAsShippedClick(orderBook._id)} // Call new handler
+                                disabled={isMarkingAsShipped} // Disable while processing
                               >
-                                <X className="h-4 w-4" />
+                                <Package className="h-4 w-4" /> {/* Use Package icon */}
                               </Button>
-                            </>
+                            )}
+                          {/* Show Confirm Goods Received button for buyer for 'shipped' status */}
+                          {orderBook.buyerId === userId && orderBook.status === 'shipped' && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-green-600"
+                              onClick={() => handleConfirmReceiptClick(orderBook._id)} // Call new handler
+                              disabled={isConfirmingReceipt} // Disable while processing
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                            </Button>
                           )}
                         </div>
                       </TableCell>
@@ -251,10 +411,14 @@ const OrderBook = () => {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="py-8 text-center text-earth-medium-green">
+                    <TableCell colSpan={7} className="py-8 text-center text-earth-medium-green">
+                      {' '}
+                      {/* Adjust colspan */}
+                      {/* Update empty state message */}
                       {searchQuery
-                        ? `${t('commodities.notfound')} "${searchQuery}"`
-                        : `${t('commodities.notfound')}. ${t('commodities.add')} to get started.`}
+                        ? `No orders found matching "${searchQuery}"`
+                        : `No orders found.`}{' '}
+                      {/* Updated empty state message */}
                     </TableCell>
                   </TableRow>
                 )}
@@ -263,369 +427,6 @@ const OrderBook = () => {
           </div>
         </CardContent>
       </Card>
-
-      {/* <Card className="mb-6">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center text-lg">
-            <ClipboardList className="text-tani-green-dark mr-2 h-5 w-5" />
-            {t('orderbook.list')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col justify-between gap-4 sm:flex-row">
-              <div className="relative flex-1">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                <Input
-                  type="search"
-                  placeholder={t('orderbook.search')}
-                  className="pl-8"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              <div className="flex flex-col gap-4 sm:flex-row">
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="Filter Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t('orderbook.all')}</SelectItem>
-                    <SelectItem value="open">{t('status.open')}</SelectItem>
-                    <SelectItem value="accepted">{t('status.accepted')}</SelectItem>
-                    <SelectItem value="completed">{t('status.completed')}</SelectItem>
-                    <SelectItem value="expired">{t('status.expired')}</SelectItem>
-                    <SelectItem value="cancelled">{t('status.canceled')}</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button variant="outline" className="flex gap-2">
-                  <Filter className="h-4 w-4" />
-                  {t('action.filter')}
-                </Button>
-              </div>
-            </div>
-
-            <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
-              <TabsList className="mb-4">
-                <TabsTrigger value="all">{t('orderbook.all')}</TabsTrigger>
-                <TabsTrigger value="open">{t('status.open')}</TabsTrigger>
-                <TabsTrigger value="accepted">{t('status.accepted')}</TabsTrigger>
-                <TabsTrigger value="completed">{t('status.completed')}</TabsTrigger>
-                <TabsTrigger value="expired">{t('status.expired')}</TabsTrigger>
-              </TabsList>
-              <TabsContent value="all" className="mt-0">
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t('orderbook.id')}</TableHead>
-                        <TableHead>{t('orderbook.buyer')}</TableHead>
-                        <TableHead>{t('orderbook.commodity')}</TableHead>
-                        <TableHead>{t('orderbook.quantity')}</TableHead>
-                        <TableHead>{t('orderbook.grade')}</TableHead>
-                        <TableHead>{t('orderbook.delivery')}</TableHead>
-                        <TableHead>{t('orderbook.expiry')}</TableHead>
-                        <TableHead>{t('orderbook.status')}</TableHead>
-                        <TableHead className="text-right">{t('orderbook.action')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredOrderBooks.length > 0 ? (
-                        filteredOrderBooks.map((orderBook) => (
-                          <TableRow key={orderBook.id}>
-                            <TableCell className="font-medium">{orderBook.id}</TableCell>
-                            <TableCell>{orderBook.buyerName}</TableCell>
-                            <TableCell>{orderBook.commodityType}</TableCell>
-                            <TableCell>
-                              {orderBook.quantity} {orderBook.unit}
-                            </TableCell>
-                            <TableCell>{orderBook.requestedGrade}</TableCell>
-                            <TableCell>{formatDate(orderBook.requestedDeliveryDate)}</TableCell>
-                            <TableCell>{formatDate(orderBook.offerExpiryDate)}</TableCell>
-                            <TableCell>{getStatusBadge(orderBook.status)}</TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex justify-end gap-2">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleViewDetails(orderBook.id)}
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                                {orderBook.status === 'open' && (
-                                  <>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="text-green-600"
-                                      onClick={() => handleAccept(orderBook.id)}
-                                    >
-                                      <Check className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      className="text-red-600"
-                                      onClick={() => handleReject(orderBook.id)}
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  </>
-                                )}
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={9} className="py-8 text-center text-gray-500">
-                            {t('orderbook.notfound')}
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </TabsContent>
-
-             
-              <TabsContent value="open" className="mt-0">
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t('orderbook.id')}</TableHead>
-                        <TableHead>{t('orderbook.buyer')}</TableHead>
-                        <TableHead>{t('orderbook.commodity')}</TableHead>
-                        <TableHead>{t('orderbook.quantity')}</TableHead>
-                        <TableHead>{t('orderbook.grade')}</TableHead>
-                        <TableHead>{t('orderbook.delivery')}</TableHead>
-                        <TableHead>{t('orderbook.expiry')}</TableHead>
-                        <TableHead>{t('orderbook.status')}</TableHead>
-                        <TableHead className="text-right">{t('orderbook.action')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredOrderBooks.length > 0 ? (
-                        filteredOrderBooks.map((orderBook) => (
-                          <TableRow key={orderBook.id}>
-                            <TableCell className="font-medium">{orderBook.id}</TableCell>
-                            <TableCell>{orderBook.buyerName}</TableCell>
-                            <TableCell>{orderBook.commodityType}</TableCell>
-                            <TableCell>
-                              {orderBook.quantity} {orderBook.unit}
-                            </TableCell>
-                            <TableCell>{orderBook.requestedGrade}</TableCell>
-                            <TableCell>{formatDate(orderBook.requestedDeliveryDate)}</TableCell>
-                            <TableCell>{formatDate(orderBook.offerExpiryDate)}</TableCell>
-                            <TableCell>{getStatusBadge(orderBook.status)}</TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex justify-end gap-2">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleViewDetails(orderBook.id)}
-                                >
-                                  <Eye className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="text-green-600"
-                                  onClick={() => handleAccept(orderBook.id)}
-                                >
-                                  <Check className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="text-red-600"
-                                  onClick={() => handleReject(orderBook.id)}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={9} className="py-8 text-center text-gray-500">
-                            {t('orderbook.notfound')}
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </TabsContent>
-
-            
-              <TabsContent value="accepted" className="mt-0">
-                <div className="rounded-md border">
-                  <Table>
-                 
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t('orderbook.id')}</TableHead>
-                        <TableHead>{t('orderbook.buyer')}</TableHead>
-                        <TableHead>{t('orderbook.commodity')}</TableHead>
-                        <TableHead>{t('orderbook.quantity')}</TableHead>
-                        <TableHead>{t('orderbook.grade')}</TableHead>
-                        <TableHead>{t('orderbook.delivery')}</TableHead>
-                        <TableHead>{t('orderbook.expiry')}</TableHead>
-                        <TableHead>{t('orderbook.status')}</TableHead>
-                        <TableHead className="text-right">{t('orderbook.action')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredOrderBooks.length > 0 ? (
-                        filteredOrderBooks.map((orderBook) => (
-                          <TableRow key={orderBook.id}>
-                            <TableCell className="font-medium">{orderBook.id}</TableCell>
-                            <TableCell>{orderBook.buyerName}</TableCell>
-                            <TableCell>{orderBook.commodityType}</TableCell>
-                            <TableCell>
-                              {orderBook.quantity} {orderBook.unit}
-                            </TableCell>
-                            <TableCell>{orderBook.requestedGrade}</TableCell>
-                            <TableCell>{formatDate(orderBook.requestedDeliveryDate)}</TableCell>
-                            <TableCell>{formatDate(orderBook.offerExpiryDate)}</TableCell>
-                            <TableCell>{getStatusBadge(orderBook.status)}</TableCell>
-                            <TableCell className="text-right">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleViewDetails(orderBook.id)}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={9} className="py-8 text-center text-gray-500">
-                            {t('orderbook.notfound')}
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="completed" className="mt-0">
-              
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t('orderbook.id')}</TableHead>
-                        <TableHead>{t('orderbook.buyer')}</TableHead>
-                        <TableHead>{t('orderbook.commodity')}</TableHead>
-                        <TableHead>{t('orderbook.quantity')}</TableHead>
-                        <TableHead>{t('orderbook.grade')}</TableHead>
-                        <TableHead>{t('orderbook.delivery')}</TableHead>
-                        <TableHead>{t('orderbook.expiry')}</TableHead>
-                        <TableHead>{t('orderbook.status')}</TableHead>
-                        <TableHead className="text-right">{t('orderbook.action')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredOrderBooks.length > 0 ? (
-                        filteredOrderBooks.map((orderBook) => (
-                          <TableRow key={orderBook.id}>
-                            <TableCell className="font-medium">{orderBook.id}</TableCell>
-                            <TableCell>{orderBook.buyerName}</TableCell>
-                            <TableCell>{orderBook.commodityType}</TableCell>
-                            <TableCell>
-                              {orderBook.quantity} {orderBook.unit}
-                            </TableCell>
-                            <TableCell>{orderBook.requestedGrade}</TableCell>
-                            <TableCell>{formatDate(orderBook.requestedDeliveryDate)}</TableCell>
-                            <TableCell>{formatDate(orderBook.offerExpiryDate)}</TableCell>
-                            <TableCell>{getStatusBadge(orderBook.status)}</TableCell>
-                            <TableCell className="text-right">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleViewDetails(orderBook.id)}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={9} className="py-8 text-center text-gray-500">
-                            {t('orderbook.notfound')}
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="expired" className="mt-0">
-             
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t('orderbook.id')}</TableHead>
-                        <TableHead>{t('orderbook.buyer')}</TableHead>
-                        <TableHead>{t('orderbook.commodity')}</TableHead>
-                        <TableHead>{t('orderbook.quantity')}</TableHead>
-                        <TableHead>{t('orderbook.grade')}</TableHead>
-                        <TableHead>{t('orderbook.delivery')}</TableHead>
-                        <TableHead>{t('orderbook.expiry')}</TableHead>
-                        <TableHead>{t('orderbook.status')}</TableHead>
-                        <TableHead className="text-right">{t('orderbook.action')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredOrderBooks.length > 0 ? (
-                        filteredOrderBooks.map((orderBook) => (
-                          <TableRow key={orderBook.id}>
-                            <TableCell className="font-medium">{orderBook.id}</TableCell>
-                            <TableCell>{orderBook.buyerName}</TableCell>
-                            <TableCell>{orderBook.commodityType}</TableCell>
-                            <TableCell>
-                              {orderBook.quantity} {orderBook.unit}
-                            </TableCell>
-                            <TableCell>{orderBook.requestedGrade}</TableCell>
-                            <TableCell>{formatDate(orderBook.requestedDeliveryDate)}</TableCell>
-                            <TableCell>{formatDate(orderBook.offerExpiryDate)}</TableCell>
-                            <TableCell>{getStatusBadge(orderBook.status)}</TableCell>
-                            <TableCell className="text-right">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleViewDetails(orderBook.id)}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={9} className="py-8 text-center text-gray-500">
-                            {t('orderbook.notfound')}
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </CardContent>
-      </Card> */}
     </MainLayout>
   );
 };

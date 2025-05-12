@@ -144,10 +144,18 @@ export const useEscrowTransaction = () => {
     onError,
     onSubmitted,
   }: EscrowActionProps) => {
+    console.log('Confirming order for escrow:', escrowPda, 'by actor:', actorPublicKey);
     try {
+      if (
+        !primaryWallet ||
+        !isSolanaWallet(primaryWallet) ||
+        primaryWallet.address !== actorPublicKey
+      ) {
+        throw new Error("Seller's Solana wallet not connected or mismatch.");
+      }
       const program = await getProgram();
       const escrowPK = new PublicKey(escrowPda);
-      const sellerPK = new PublicKey(actorPublicKey); // Seller confirms
+      const sellerPK = new PublicKey(actorPublicKey);
 
       const ix = await program.methods
         .confirmOrder()
@@ -159,13 +167,23 @@ export const useEscrowTransaction = () => {
 
       const sig = await createAndSendTransaction({
         instructions: [ix],
-        payer: sellerPK, // Seller pays for this tx
-        onSuccess,
-        onError,
-        onSubmitted,
+        payer: sellerPK, // Seller pays for this action
+        onSuccess: (txSig) => {
+          console.log('Order confirmed on-chain. Tx Signature:', txSig);
+          onSuccess?.(txSig);
+        },
+        onError: (err) => {
+          console.error('Error in createAndSendTransaction for confirmOrder:', err);
+          onError?.(err);
+        },
+        onSubmitted: (txSig) => {
+          console.log('confirmOrder tx submitted:', txSig);
+          onSubmitted?.(txSig);
+        },
       });
-      return { signature: sig };
+      return sig ? { signature: sig } : null;
     } catch (e) {
+      console.error('Error in confirmOrder function:', e);
       onError?.(e as Error);
       return null;
     }
@@ -312,7 +330,7 @@ export const useEscrowTransaction = () => {
 
   return {
     initializeEscrow,
-    confirmOrder,
+    confirmOrder, // <-- ADDED
     withdrawFunds,
     refundOrder,
     failOrder,
