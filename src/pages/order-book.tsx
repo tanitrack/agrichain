@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/main-layout';
-import { Eye, Check, Package } from 'lucide-react';
+import { Eye, Check, Package, CheckCircle } from 'lucide-react'; // Added CheckCircle
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,39 +31,39 @@ const OrderBook = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [activeTab, setActiveTab] = useState('all');
-  const [isProcessingOrder, setIsProcessingOrder] = useState(false); // State for confirmation loading
+  const [isProcessingOrder, setIsProcessingOrder] = useState(false); // State for seller confirmation loading
+  const [isMarkingAsShipped, setIsMarkingAsShipped] = useState(false); // State for marking as shipped loading
+  const [isConfirmingReceipt, setIsConfirmingReceipt] = useState(false); // State for buyer confirmation loading
 
   // Get logged-in user and wallet info
   const { userProfile, wallet: dynamicWalletInfo } = useAuthCheck();
-  const sellerId = userProfile?._id; // Assuming userProfile contains the Convex user ID
+  const userId = userProfile?._id; // Assuming userProfile contains the Convex user ID
 
-  // Fetch orders awaiting seller confirmation
-  // We only fetch if sellerId is available
-  const ordersAwaitingConfirmation = useQuery(
-    api.orderbook_queries.listBySellerAndStatus,
-    sellerId ? { sellerId, status: 'escrow_funded' } : 'skip' // Fetch if sellerId exists
+  // Fetch orders where the logged-in user is the seller
+  const sellerOrders = useQuery(
+    api.orderbook_queries.listBySeller,
+    userId ? { sellerId: userId } : 'skip' // Fetch if userId exists
   );
 
-  // Fetch orders awaiting seller confirmation with a different status if needed
-  const ordersAwaitingSellerConfirmationStatus = useQuery(
-    api.orderbook_queries.listBySellerAndStatus,
-    sellerId ? { sellerId, status: 'awaiting_seller_confirmation' } : 'skip' // Fetch if sellerId exists
+  // Fetch orders where the logged-in user is the buyer
+  const buyerOrders = useQuery(
+    api.orderbook_queries.listByBuyer,
+    userId ? { buyerId: userId } : 'skip' // Fetch if userId exists
   );
 
   // Combine the results (handle potential undefined/null from skip)
-  const ordersToDisplay = [
-    ...(ordersAwaitingConfirmation || []),
-    ...(ordersAwaitingSellerConfirmationStatus || []),
-  ];
+  const allOrders = [...(sellerOrders || []), ...(buyerOrders || [])];
 
   // Filter order books based on search query and status (now applied to fetched data)
-  const filteredOrdersToDisplay = ordersToDisplay.filter((orderBook) => {
+  const filteredOrdersToDisplay = allOrders.filter((orderBook) => {
     const matchesSearch =
+      searchQuery === '' ||
       orderBook.komoditasId.toLowerCase().includes(searchQuery.toLowerCase()) || // Assuming komoditasId is searchable or fetch commodity name
       orderBook._id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      // Need to fetch buyer name based on buyerId if not included in orderBook
-      // orderBook.buyerName.toLowerCase().includes(searchQuery.toLowerCase());
-      false; // Placeholder until buyer name is available
+      // Need to fetch buyer/seller name based on buyerId/sellerId if not included in orderBook
+      // orderBook.buyerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      // orderBook.sellerName.toLowerCase().includes(searchQuery.toLowerCase());
+      false; // Placeholder until buyer/seller name is available
 
     const matchesStatus = statusFilter === 'all' || orderBook.status === statusFilter;
 
@@ -72,8 +72,9 @@ const OrderBook = () => {
       activeTab === 'all' ||
       (activeTab === 'awaiting_confirmation' &&
         (orderBook.status === 'escrow_funded' ||
-          orderBook.status === 'awaiting_seller_confirmation'));
-    // Add other relevant statuses as needed for other tabs
+          orderBook.status === 'awaiting_seller_confirmation')) ||
+      (activeTab === 'shipped' && orderBook.status === 'shipped') || // Filter for shipped status
+      (activeTab === 'completed' && orderBook.status === 'goods_received'); // Filter for goods_received status
 
     return matchesSearch && matchesStatus && matchesTab;
   });
@@ -82,6 +83,14 @@ const OrderBook = () => {
   const recordSellerConfirmationMutation = useMutation(
     api.transaction_mutations.recordSellerConfirmation
   );
+  // Mutation for marking order as shipped
+  const markAsShippedMutation = useMutation(api.orderbook_mutations.markAsShipped);
+
+  // Mutation for buyer confirming goods receipt
+  const buyerConfirmsGoodsReceiptMutation = useMutation(
+    api.orderbook_mutations.buyerConfirmsGoodsReceipt
+  );
+
   const convex = useConvex(); // Get Convex client for direct query call
 
   // Function to handle viewing details
@@ -174,6 +183,47 @@ const OrderBook = () => {
     }
   };
 
+  // Function to handle marking an order as shipped (New function for Phase 4)
+  const handleMarkAsShippedClick = async (orderBookId: Id<'orderBook'>) => {
+    setIsMarkingAsShipped(true); // Local state for this specific order action
+    toast({ title: 'Processing Shipment...', description: 'Please wait.' });
+
+    try {
+      // Call the Convex mutation to mark as shipped
+      await markAsShippedMutation({ orderBookId }); // Add shippingDetails here if collecting them
+
+      toast({ title: 'Order Marked as Shipped!', description: 'Status updated in TaniTrack.' });
+      // Optionally refetch orders or rely on Convex real-time updates
+    } catch (error) {
+      toast({
+        title: 'Failed to Mark as Shipped',
+        description: (error as Error).message || 'Could not update order status.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsMarkingAsShipped(false);
+    }
+  };
+
+  // Function to handle confirming goods receipt (New function for Buyer)
+  const handleConfirmReceiptClick = async (orderBookId: Id<'orderBook'>) => {
+    setIsConfirmingReceipt(true);
+    toast({ title: 'Processing Confirmation...', description: 'Please wait.' });
+
+    try {
+      await buyerConfirmsGoodsReceiptMutation({ orderBookId });
+      toast({ title: 'Goods Receipt Confirmed!', description: 'Status updated.' });
+    } catch (error) {
+      toast({
+        title: 'Confirmation Failed',
+        description: (error as Error).message || 'Could not confirm goods receipt.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsConfirmingReceipt(false);
+    }
+  };
+
   // Function to render status badge with appropriate color
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; className: string }> = {
@@ -212,6 +262,16 @@ const OrderBook = () => {
         label: 'Confirmed, Awaiting Shipment', // Or use translation key
         className: 'bg-purple-100 text-purple-800',
       },
+      shipped: {
+        // Add new status for Phase 4
+        label: 'Shipped', // Or use translation key
+        className: 'bg-blue-500 text-white', // Example color
+      },
+      goods_received: {
+        // Added new status for Buyer
+        label: 'Goods Received', // Or use translation key
+        className: 'bg-green-500 text-white', // Example color
+      },
     };
 
     const statusInfo = statusMap[status] || {
@@ -223,7 +283,8 @@ const OrderBook = () => {
   };
 
   // Show loading state while fetching orders
-  if (ordersToDisplay === undefined) {
+  if (allOrders === undefined) {
+    // Check loading for both queries
     return (
       <MainLayout>
         <div className="mb-8">
@@ -265,8 +326,8 @@ const OrderBook = () => {
                 <TableRow>
                   <TableHead className="text-earth-dark-green">Order ID</TableHead>{' '}
                   {/* Update header */}
-                  <TableHead className="text-earth-dark-green">Buyer</TableHead>{' '}
-                  {/* Update header */}
+                  <TableHead className="text-earth-dark-green">Counterparty</TableHead>{' '}
+                  {/* Changed from Buyer to Counterparty */}
                   <TableHead className="text-earth-dark-green">Commodity</TableHead>{' '}
                   {/* Update header */}
                   <TableHead className="text-earth-dark-green">Quantity</TableHead>{' '}
@@ -287,9 +348,8 @@ const OrderBook = () => {
                       {' '}
                       {/* Use _id for key */}
                       <TableCell className="font-medium">{orderBook._id}</TableCell>
-                      {/* Need to fetch buyer name based on orderBook.buyerId */}
-                      <TableCell>Buyer Name Placeholder</TableCell> {/* Placeholder */}
-                      {/* Need to fetch commodity name based on orderBook.komoditasId */}
+                      {/* Need to fetch buyer/seller name based on orderBook.buyerId/sellerId */}
+                      <TableCell>Counterparty Name Placeholder</TableCell> {/* Placeholder */}
                       <TableCell>Commodity Name Placeholder</TableCell> {/* Placeholder */}
                       <TableCell>
                         {orderBook.quantity} {/* Unit might be in commodity details */}
@@ -306,17 +366,43 @@ const OrderBook = () => {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          {/* Show Confirm button for relevant statuses */}
-                          {(orderBook.status === 'escrow_funded' ||
-                            orderBook.status === 'awaiting_seller_confirmation') && (
+                          {/* Show Confirm button for seller for relevant statuses */}
+                          {orderBook.sellerId === userId &&
+                            (orderBook.status === 'escrow_funded' ||
+                              orderBook.status === 'awaiting_seller_confirmation') && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-green-600"
+                                onClick={() => handleConfirmOrderClick(orderBook._id)} // Use _id
+                                disabled={isProcessingOrder || isEscrowActionLoading} // Disable while processing
+                              >
+                                <Check className="h-4 w-4" />
+                              </Button>
+                            )}
+                          {/* Show Mark as Shipped button for seller for relevant statuses */}
+                          {orderBook.sellerId === userId &&
+                            orderBook.status === 'seller_confirmed_awaiting_shipment' && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-blue-600" // Use a different color, e.g., blue
+                                onClick={() => handleMarkAsShippedClick(orderBook._id)} // Call new handler
+                                disabled={isMarkingAsShipped} // Disable while processing
+                              >
+                                <Package className="h-4 w-4" /> {/* Use Package icon */}
+                              </Button>
+                            )}
+                          {/* Show Confirm Goods Received button for buyer for 'shipped' status */}
+                          {orderBook.buyerId === userId && orderBook.status === 'shipped' && (
                             <Button
                               variant="ghost"
                               size="icon"
                               className="text-green-600"
-                              onClick={() => handleConfirmOrderClick(orderBook._id)} // Use _id
-                              disabled={isProcessingOrder || isEscrowActionLoading} // Disable while processing
+                              onClick={() => handleConfirmReceiptClick(orderBook._id)} // Call new handler
+                              disabled={isConfirmingReceipt} // Disable while processing
                             >
-                              <Check className="h-4 w-4" />
+                              <CheckCircle className="h-4 w-4" />
                             </Button>
                           )}
                         </div>
@@ -331,7 +417,8 @@ const OrderBook = () => {
                       {/* Update empty state message */}
                       {searchQuery
                         ? `No orders found matching "${searchQuery}"`
-                        : `No orders awaiting confirmation.`}
+                        : `No orders found.`}{' '}
+                      {/* Updated empty state message */}
                     </TableCell>
                   </TableRow>
                 )}
