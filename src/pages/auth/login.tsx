@@ -98,7 +98,7 @@ export default function Login() {
               ? 'Silakan lengkapi profil Anda terlebih dahulu'
               : 'Please complete your profile first',
         });
-        navigate('/register-profile', { replace: true });
+        navigate('/register-profile?registrationStep=userType', { replace: true });
         return;
       }
       toast({
