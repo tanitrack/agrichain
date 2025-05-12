@@ -26,7 +26,7 @@ import Market from './pages/buyer/market';
 import MarketDetail from './pages/buyer/market-detail';
 import BuyTransaction from './pages/buyer/buy-transaction';
 import TransactionNegotiation from './pages/buyer/transaction-negotiation';
-import OrderBookList from './pages/buyer/order-book-list'; // Buyer order book list
+// import OrderBookList from './pages/buyer/order-book-list'; // Buyer order book list
 
 // New farmer-specific pages
 import TransactionManagement from './pages/farmer/transaction-management';
@@ -35,6 +35,7 @@ import TransactionPriceSubmitted from './pages/farmer/transaction-price-submitte
 
 import { ConvexDynamicProvider } from '@/contexts/convex-auth-context';
 import RegisterProfile from '@/pages/auth/register-profile';
+import OrderBook from '@/pages/order-book';
 
 const App = () => (
   <NuqsAdapter>
@@ -171,7 +172,7 @@ const App = () => (
                 path="/order-book/"
                 element={
                   <ProtectedRoute>
-                    <OrderBookList />
+                    <OrderBook />
                   </ProtectedRoute>
                 }
               />
@@ -217,14 +218,7 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/buyer/order-book"
-                element={
-                  <ProtectedRoute>
-                    <OrderBookList />
-                  </ProtectedRoute>
-                }
-              />
+
               <Route
                 path="/buyer/order-book/:id"
                 element={

@@ -286,7 +286,7 @@ const OrderBook = () => {
                     <TableRow key={orderBook._id}>
                       {' '}
                       {/* Use _id for key */}
-                      <TableCell className="font-medium">{orderBook._id}</TableCell> {/* Use _id */}
+                      <TableCell className="font-medium">{orderBook._id}</TableCell>
                       {/* Need to fetch buyer name based on orderBook.buyerId */}
                       <TableCell>Buyer Name Placeholder</TableCell> {/* Placeholder */}
                       {/* Need to fetch commodity name based on orderBook.komoditasId */}
