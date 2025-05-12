@@ -14,6 +14,7 @@ import {
   Share2,
   Heart,
   CircleDollarSign,
+  Calendar,
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -26,6 +27,7 @@ import { BN } from '@coral-xyz/anchor';
 import { useToast } from '@/components/ui/use-toast'; // Assuming useToast is exported from here
 import { useState } from 'react'; // Import useState
 import { Id } from 'convex/_generated/dataModel';
+import { formatDate } from '@/lib/utils';
 
 // Removed Mock data for commodity details
 
@@ -36,6 +38,10 @@ const MarketDetail = () => {
 
   // Fetch the selected commodity by ID from Convex
   const commodity = useQuery(api.komoditas_queries.get, id ? { id: id } : 'skip');
+
+  const commodity_bulks = useQuery(api.komoditas_bulk_queries.get, {
+    commodityId: id,
+  });
 
   // State for processing and selected quantity
   const [isProcessing, setIsProcessing] = useState(false);
@@ -295,7 +301,7 @@ const MarketDetail = () => {
                       {language === 'id' ? 'Petani' : 'Farmer'}
                     </p>
                     {/* Farmer name is not directly available, use placeholder or fetch user data */}
-                    <p className="font-medium">N/A</p>
+                    <p className="font-medium">{commodity.farmersName ?? 'N/A'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
@@ -305,7 +311,7 @@ const MarketDetail = () => {
                       {language === 'id' ? 'Lokasi' : 'Location'}
                     </p>
                     {/* Location is not directly available, use placeholder or fetch user data */}
-                    <p className="font-medium">N/A</p>
+                    <p className="font-medium">{commodity.address ?? 'N/A'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
@@ -321,16 +327,16 @@ const MarketDetail = () => {
                   </div>
                 </div>
                 {/* Harvest Date, Grade, Certifications are not in Convex schema */}
-                {/* <div className="flex items-start gap-2">
+                <div className="flex items-start gap-2">
                   <Calendar className="mt-0.5 h-5 w-5 text-earth-medium-green" />
                   <div>
                     <p className="text-sm text-muted-foreground">
                       {language === 'id' ? 'Tanggal Panen' : 'Harvest Date'}
                     </p>
-                    <p className="font-medium">{commodity.harvestDate}</p>
+                    <p className="font-medium">{formatDate(new Date(commodity.harvestDate))}</p>
                   </div>
                 </div>
-                <div className="col-span-2 flex items-start gap-2">
+                {/* <div className="col-span-2 flex items-start gap-2">
                   <BadgeCheck className="mt-0.5 h-5 w-5 text-earth-medium-green" />
                   <div>
                     <p className="text-sm text-muted-foreground">
@@ -347,38 +353,39 @@ const MarketDetail = () => {
                 </div> */}
               </div>
               {/* Tabs for quantity/price variations - need to implement logic based on pricePerUnit and potentially minOrder */}
-              <div className="overflow-hidden rounded-lg border border-earth-light-brown/30 bg-white">
-                <Tabs defaultValue="description" className="w-full">
-                  <TabsList className="w-full bg-earth-pale-green">
-                    {/* These tabs should dynamically show price based on selected quantity */}
-                    <TabsTrigger value="description" className="flex-1">
-                      {/* Example: {`10 ${commodity.unit}`} */}
-                      Quantity Option 1
-                    </TabsTrigger>
-                    <TabsTrigger value="nutrition" className="flex-1">
-                      Quantity Option 2
-                    </TabsTrigger>
-                    <TabsTrigger value="storage" className="flex-1">
-                      Quantity Option 3
-                    </TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="description" className="space-y-4 p-4">
-                    {/* Display price for Quantity Option 1 */}
-                    <p>Price: Calculate based on selected quantity</p>
-                    <p>Total Price: Calculate based on selected quantity</p>
-                  </TabsContent>
-                  <TabsContent value="nutrition" className="space-y-4 p-4">
-                    {/* Display price for Quantity Option 2 */}
-                    <p>Price: Calculate based on selected quantity</p>
-                    <p>Total Price: Calculate based on selected quantity</p>
-                  </TabsContent>
-                  <TabsContent value="storage" className="space-y-4 p-4">
-                    {/* Display price for Quantity Option 3 */}
-                    <p>Price: Calculate based on selected quantity</p>
-                    <p>Total Price: Calculate based on selected quantity</p>
-                  </TabsContent>
-                </Tabs>
-              </div>
+              {commodity_bulks === undefined && (
+                <div className="overflow-hidden rounded-lg border border-earth-light-brown/30 bg-white">
+                  Memuat harga...
+                </div>
+              )}
+              {commodity_bulks && (
+                <div className="overflow-hidden rounded-lg border border-earth-light-brown/30 bg-white">
+                  <Tabs defaultValue={commodity_bulks[0].minQuantity} className="w-full">
+                    <TabsList className="w-full bg-earth-pale-green">
+                      {commodity_bulks?.map((bulk) => (
+                        <TabsTrigger key={bulk._id} value={bulk.minQuantity} className="flex-1">
+                          {`${bulk.minQuantity} ${commodity.unit}`}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+                    {commodity_bulks?.map((bulk) => (
+                      <TabsContent
+                        key={bulk._id}
+                        value={bulk.minQuantity}
+                        className="space-y-4 p-4"
+                      >
+                        <p>
+                          Harga: Rp {bulk.price.toLocaleString()} / {commodity.unit}
+                        </p>
+                        <p>
+                          Harga Total: Rp{' '}
+                          {(bulk.price * parseInt(bulk.minQuantity)).toLocaleString()}
+                        </p>
+                      </TabsContent>
+                    ))}
+                  </Tabs>
+                </div>
+              )}
 
               {/* Button to trigger the purchase flow */}
               <Button
@@ -447,10 +454,10 @@ const MarketDetail = () => {
                 </div>
                 <div>
                   {/* Farmer name is not directly available, use placeholder or fetch user data */}
-                  <h3 className="font-semibold">N/A</h3>
+                  <h3 className="font-semibold">{commodity.farmersName ?? 'N/A'}</h3>
                   {/* Member since, rating, transactions are not directly available */}
                   <p className="text-sm text-muted-foreground">
-                    {language === 'id' ? 'Bergabung sejak' : 'Member since'} N/A
+                    {language === 'id' ? 'Bergabung sejak' : 'Member since'}
                   </p>
                   <div className="mt-1 flex items-center gap-1">
                     <span className="font-medium text-amber-600">★ N/A</span>
