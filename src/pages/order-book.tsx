@@ -423,6 +423,16 @@ const OrderBook = () => {
 
   // Function to handle requesting a refund (New function for Phase 7 A.2)
   const handleRequestRefundClick = async (orderBookId: Id<'orderBook'>) => {
+    // a. Confirm action with the user.
+    const confirmed = window.confirm('Are you sure you want to request a refund for this order?');
+    if (!confirmed) {
+      toast({
+        title: 'Refund Request Cancelled',
+        description: 'You cancelled the refund request.',
+      });
+      return;
+    }
+
     if (!dynamicWalletInfo?.address) {
       toast({
         title: 'Error',
@@ -435,19 +445,20 @@ const OrderBook = () => {
     toast({ title: 'Processing Refund Request...', description: 'Please wait.' });
 
     try {
+      // b. Fetch escrow details: Call convex.query(api.transaction_queries.getEscrowDetailsForAction, { orderBookId }). Get escrowPdaAddress and buyerSolanaPublicKey.
       const escrowDetails = await convex.query(api.transaction_queries.getEscrowDetailsForAction, {
         orderBookId,
       });
 
-      // Client-side checks:
+      // c. Client-side check: Ensure onChainEscrowStatus from query is "initialized" (or equivalent, meaning seller hasn't confirmed yet). If seller has confirmed, this path is invalid.
       if (
         !escrowDetails?.escrowPdaAddress ||
         !escrowDetails?.buyerSolanaPublicKey ||
-        escrowDetails.onChainEscrowStatus !== 'initialized' // Refund only possible if not confirmed/completed/failed
+        escrowDetails.onChainEscrowStatus !== 'initialized' // Refund only possible if initialized
       ) {
         toast({
           title: 'Refund Not Possible',
-          description: 'Escrow details missing or status is not initialized.',
+          description: 'Refund is only possible when the escrow status is initialized.',
           variant: 'destructive',
         });
         return; // Stop if details are missing or status is wrong
@@ -468,15 +479,18 @@ const OrderBook = () => {
         description: 'Please confirm the transaction in your wallet.',
       });
 
+      // d. Call useEscrowTransaction.refundOrder({ escrowPda, actorPublicKey: buyerSolanaPublicKey, ...callbacks }).
       await refundOrder({
         escrowPda: escrowDetails.escrowPdaAddress,
         actorPublicKey: dynamicWalletInfo.address, // Buyer's public key (signer and receiver)
         onSuccess: async (txSig) => {
+          // e. onSuccess for refundOrder:
+          // * Update UI, show success toast.
           toast({
             title: 'Order Refunded On-Chain!',
             description: `Tx: ${txSig.substring(0, 10)}... Funds returned to your wallet.`,
           });
-          // Call the Convex mutation to record the refund (Step 26 A.3)
+          // * Call Convex mutation transaction_mutations.recordOrderRefunded (see below).
           await recordOrderRefundedMutation({
             orderBookId: orderBookId,
             txHash: txSig,
@@ -486,6 +500,7 @@ const OrderBook = () => {
           // Optionally refetch orders or navigate
         },
         onError: (err) => {
+          // f. Handle errors.
           toast({
             title: 'Refund Failed',
             description: err.message || 'Could not refund order on-chain.',
@@ -500,6 +515,7 @@ const OrderBook = () => {
         },
       });
     } catch (error) {
+      // f. Handle errors.
       toast({
         title: 'Error',
         description: (error as Error).message || 'Failed to process refund request.',
@@ -802,6 +818,22 @@ const OrderBook = () => {
                               >
                                 {/* Use an appropriate icon, e.g., DollarSign or Wallet */}
                                 💰 {/* Using a money bag emoji for now */}
+                              </Button>
+                            )}
+
+                          {/* Show Request Refund button for buyer for relevant statuses */}
+                          {orderBook.buyerId === userId &&
+                            (orderBook.status === 'escrow_funded' ||
+                              orderBook.status === 'awaiting_seller_confirmation') && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-red-600" // Use a color indicating refund/cancellation
+                                onClick={() => handleRequestRefundClick(orderBook._id)} // Call the new handler
+                                disabled={isRequestingRefund || isEscrowActionLoading} // Disable while processing
+                              >
+                                {/* Use an appropriate icon, e.g., Wallet or Undo */}
+                                <Wallet className="h-4 w-4" /> {/* Using Wallet icon */}
                               </Button>
                             )}
 
