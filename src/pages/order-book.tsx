@@ -34,6 +34,7 @@ const OrderBook = () => {
   const [isProcessingOrder, setIsProcessingOrder] = useState(false); // State for seller confirmation loading
   const [isMarkingAsShipped, setIsMarkingAsShipped] = useState(false); // State for marking as shipped loading
   const [isConfirmingReceipt, setIsConfirmingReceipt] = useState(false); // State for buyer confirmation loading
+  const [isWithdrawingFunds, setIsWithdrawingFunds] = useState(false); // State for seller withdrawal loading
 
   // Get logged-in user and wallet info
   const { userProfile, wallet: dynamicWalletInfo } = useAuthCheck();
@@ -116,7 +117,7 @@ const OrderBook = () => {
   };
 
   // Use the escrow transaction hook
-  const { confirmOrder, isLoading: isEscrowActionLoading } = useEscrowTransaction();
+  const { confirmOrder, withdrawFunds, isLoading: isEscrowActionLoading } = useEscrowTransaction(); // Added withdrawFunds
 
   // Function to handle confirming an order (New function for Phase 3)
   const handleConfirmOrderClick = async (orderBookId: Id<'orderBook'>) => {
@@ -221,6 +222,94 @@ const OrderBook = () => {
       });
     } finally {
       setIsConfirmingReceipt(false);
+    }
+  };
+
+  // Function to handle seller withdrawing funds (New function for Phase 5)
+  const handleWithdrawFundsClick = async (orderBookId: Id<'orderBook'>) => {
+    if (!dynamicWalletInfo?.address) {
+      toast({
+        title: 'Error',
+        description: 'Seller Solana wallet not available.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setIsWithdrawingFunds(true); // Local state for this specific order action
+    toast({ title: 'Processing Withdrawal...', description: 'Please wait.' });
+
+    try {
+      const escrowDetails = await convex.query(api.transaction_queries.getEscrowDetailsForAction, {
+        orderBookId,
+      });
+
+      if (
+        !escrowDetails?.escrowPdaAddress ||
+        !escrowDetails?.sellerSolanaPublicKey ||
+        escrowDetails.onChainEscrowStatus !== 'confirmed'
+      ) {
+        toast({
+          title: 'Withdrawal Not Possible',
+          description: 'Escrow details missing, status not confirmed, or you are not the seller.',
+          variant: 'destructive',
+        });
+        return; // Stop if details are missing or status is wrong
+      }
+
+      // Client-side check: Ensure the seller's wallet matches the one in the transaction record
+      if (dynamicWalletInfo.address !== escrowDetails.sellerSolanaPublicKey) {
+        toast({
+          title: 'Unauthorized',
+          description: 'Your connected wallet does not match the seller wallet for this order.',
+          variant: 'destructive',
+        });
+        return; // Stop if wallet mismatch
+      }
+
+      toast({
+        title: 'Awaiting Wallet Confirmation...',
+        description: 'Please confirm the transaction in your wallet.',
+      });
+
+      await withdrawFunds({
+        escrowPda: escrowDetails.escrowPdaAddress,
+        actorPublicKey: dynamicWalletInfo.address, // Seller's public key
+        onSuccess: async (txSig) => {
+          toast({
+            title: 'Funds Withdrawn Successfully!',
+            description: `Tx: ${txSig.substring(0, 10)}...`,
+          });
+          // Call the Convex mutation to record the withdrawal (Step 19)
+          await convex.mutation(api.transaction_mutations.recordFundsWithdrawn, {
+            orderBookId: orderBookId,
+            txHash: txSig,
+            onChainStatus: 'completed', // As per Step 19 instructions
+          });
+
+          // Optionally refetch orders or navigate
+        },
+        onError: (err) => {
+          toast({
+            title: 'Withdrawal Failed',
+            description: err.message || 'Could not withdraw funds on-chain.',
+            variant: 'destructive',
+          });
+        },
+        onSubmitted: (txSig) => {
+          toast({
+            title: 'Transaction Submitted',
+            description: `Tx: ${txSig.substring(0, 10)}... Awaiting confirmation.`,
+          });
+        },
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: (error as Error).message || 'Failed to process fund withdrawal.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsWithdrawingFunds(false);
     }
   };
 
@@ -405,6 +494,20 @@ const OrderBook = () => {
                               <CheckCircle className="h-4 w-4" />
                             </Button>
                           )}
+                          {/* Show Withdraw Funds button for seller for 'goods_received' status */}
+                          {orderBook.sellerId === userId &&
+                            orderBook.status === 'goods_received' && (
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-purple-600" // Use a different color, e.g., purple
+                                onClick={() => handleWithdrawFundsClick(orderBook._id)} // Call new handler
+                                disabled={isWithdrawingFunds} // Disable while processing
+                              >
+                                {/* Use an appropriate icon, e.g., DollarSign or Wallet */}
+                                💰 {/* Using a money bag emoji for now */}
+                              </Button>
+                            )}
                         </div>
                       </TableCell>
                     </TableRow>

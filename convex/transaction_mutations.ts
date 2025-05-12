@@ -25,13 +25,6 @@ export const recordEscrowInitializationAndLink = mutation({
       throw new Error('OrderBook not found.');
     }
 
-    // Optional: Check if the caller is the buyer for this orderBook
-    // This check might be too strict if a system process calls this,
-    // but good if only the buyer's frontend action triggers it.
-    // if (orderBook.buyerId !== identity.subject) { // Assuming identity.subject is Convex user _id
-    //     throw new Error("Unauthorized: Only the buyer can record escrow initialization for their order.");
-    // }
-
     // Ensure the order book is in the expected state and not already linked
     if (orderBook.status !== 'awaiting_escrow_payment' || orderBook.financialTransactionId) {
       throw new Error('Invalid order state for recording escrow initialization.');
@@ -84,10 +77,6 @@ export const recordSellerConfirmation = mutation({
     if (!orderBook || !orderBook.financialTransactionId) {
       throw new Error('OrderBook or linked transaction not found.');
     }
-    // Optional: Authorization check for seller
-    if (orderBook.sellerId !== identity.subject) {
-      // throw new Error("Unauthorized: Only the seller can confirm this order.");
-    }
 
     await ctx.db.patch(orderBook.financialTransactionId, {
       confirmOrderTxHash: args.txHash,
@@ -101,6 +90,43 @@ export const recordSellerConfirmation = mutation({
     });
 
     // ... (notify buyer)
+    return { success: true };
+  },
+});
+
+export const recordFundsWithdrawn = mutation({
+  args: {
+    orderBookId: v.id('orderBook'),
+    txHash: v.string(),
+    onChainStatus: v.string(), // "completed"
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    const orderBook = await ctx.db.get(args.orderBookId);
+
+    if (!identity || !orderBook || !orderBook.financialTransactionId) {
+      throw new Error('Unauthorized or OrderBook/Transaction not found.');
+    }
+
+    // Optional: Check if orderBook status is "goods_received"
+    if (orderBook.status !== 'goods_received') {
+      // throw new Error("Cannot withdraw funds until buyer confirms receipt.");
+    }
+
+    await ctx.db.patch(orderBook.financialTransactionId, {
+      withdrawFundsTxHash: args.txHash,
+      onChainEscrowStatus: args.onChainStatus,
+      amountLamports: 0, // Escrow account should be empty of principal now
+      updatedAt: Date.now(),
+    });
+
+    await ctx.db.patch(args.orderBookId, {
+      status: 'completed',
+      updatedAt: Date.now(),
+    });
+
+    // TODO: Notify buyer transaction is complete.
+
     return { success: true };
   },
 });

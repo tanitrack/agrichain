@@ -196,10 +196,28 @@ export const useEscrowTransaction = () => {
     onError,
     onSubmitted,
   }: EscrowActionProps) => {
+    console.log('Withdrawing funds from escrow:', escrowPda, 'by actor:', actorPublicKey);
     try {
+      if (
+        !primaryWallet ||
+        !isSolanaWallet(primaryWallet) ||
+        primaryWallet.address !== actorPublicKey
+      ) {
+        throw new Error("Seller's Solana wallet not connected or mismatch.");
+      }
       const program = await getProgram();
       const escrowPK = new PublicKey(escrowPda);
-      const sellerPK = new PublicKey(actorPublicKey); // Seller withdraws
+      const sellerPK = new PublicKey(actorPublicKey);
+
+      // Ensure the on-chain escrow account's seller matches the actorPublicKey
+      // This is a good client-side check before sending, though the program enforces it.
+      // const escrowAccountState = await program.account.escrowAccount.fetch(escrowPK);
+      // if (escrowAccountState.seller.toBase58() !== sellerPK.toBase58()) {
+      //     throw new Error("Mismatch: Actor is not the designated seller for this escrow.");
+      // }
+      // if (escrowAccountState.status.toString() !== "Confirmed" /* Or however your enum translates */) {
+      //     throw new Error("Escrow not in 'Confirmed' state for withdrawal.");
+      // }
 
       const ix = await program.methods
         .withdrawFunds()
@@ -211,13 +229,23 @@ export const useEscrowTransaction = () => {
 
       const sig = await createAndSendTransaction({
         instructions: [ix],
-        payer: sellerPK, // Seller pays
-        onSuccess,
-        onError,
-        onSubmitted,
+        payer: sellerPK,
+        onSuccess: (txSig) => {
+          console.log('Funds withdrawn on-chain. Tx Signature:', txSig);
+          onSuccess?.(txSig);
+        },
+        onError: (err) => {
+          console.error('Error in createAndSendTransaction for withdrawFunds:', err);
+          onError?.(err);
+        },
+        onSubmitted: (txSig) => {
+          console.log('withdrawFunds tx submitted:', txSig);
+          onSubmitted?.(txSig);
+        },
       });
-      return { signature: sig };
+      return sig ? { signature: sig } : null;
     } catch (e) {
+      console.error('Error in withdrawFunds function:', e);
       onError?.(e as Error);
       return null;
     }
@@ -331,7 +359,7 @@ export const useEscrowTransaction = () => {
   return {
     initializeEscrow,
     confirmOrder, // <-- ADDED
-    withdrawFunds,
+    withdrawFunds, // <-- ADDED
     refundOrder,
     failOrder,
     closeEscrow,

@@ -84,13 +84,6 @@ export const getEscrowDetailsForAction = query({
       throw new Error('OrderBook not found.');
     }
 
-    // Authorization check: Ensure the querier is part of this order
-    if (orderBook.buyerId !== identity.subject && orderBook.sellerId !== identity.subject) {
-      // throw new Error("Unauthorized: You are not part of this order.");
-      // Consider if this check is needed here or if the calling mutation/action handles it.
-      // For a query, it might be okay to return if it's just fetching non-sensitive link data.
-    }
-
     if (!orderBook.financialTransactionId) {
       throw new Error('Transaction not linked to this OrderBook yet.');
     }

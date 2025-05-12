@@ -10,7 +10,7 @@ export const createFromListing = mutation({
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity || !identity.subject || !identity.issuer) {
+    if (!identity) {
       // Check issuer for Convex standard auth
       throw new Error('Unauthorized: Buyer must be logged in.');
     }
