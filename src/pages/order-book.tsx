@@ -111,23 +111,6 @@ const OrderBook = () => {
     navigate(`/order-book/${id}`); // Assuming route uses Convex Id
   };
 
-  // Function to handle accepting an order (This might be for the old flow, keep for now or remove if not needed)
-  const handleAccept = (id: string) => {
-    toast({
-      title: 'Order Accepted',
-      description: `You have accepted the order ${id}`,
-    });
-  };
-
-  // Function to handle rejecting an order (This might be for the old flow, keep for now or remove if not needed)
-  const handleReject = (id: string) => {
-    toast({
-      title: 'Order Rejected',
-      description: `You have rejected the order ${id}`,
-      variant: 'destructive',
-    });
-  };
-
   // Use the escrow transaction hook
   const {
     confirmOrder,
