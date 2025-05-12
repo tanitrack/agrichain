@@ -5,7 +5,7 @@ marp: true
 <!--
 -->
 
-# **TaniTrack: Technical Deep Dive**
+# **TaniTrack Agrichain: Technical Deep Dive**
 
 Building a Hybrid Web3 Agricultural Marketplace
 
@@ -17,7 +17,7 @@ Building a Hybrid Web3 Agricultural Marketplace
 
 **Technical Goal:**
 
-- Combine robust off-chain data management for a rich UX.
+- Combine robust off-chain data management with a seamless UX.
 - Utilize on-chain financial integrity via Solana for secure transactions.
 - Abstract Web3 complexities for non-technical users (farmers).
 
@@ -63,4 +63,26 @@ TaniTrack separates concerns for optimal performance, user experience, and secur
 
 ---
 
+## User Experience Flow
+
+---
+
 ![bg 95%](./tech-slides-images/frontend-backend-solana.png)
+
+<!--
+
+The system we build create a seamless experience for users, abstracting the complexities of Web3 while ensuring security and trust in transactions.
+The user will use the app through the frontend, which will communicate with the backend (Convex) to get the data and then use the Solana blockchain to make the transactions.
+-->
+
+---
+
+## Agrichain Escrow Program: Overview
+
+---
+
+![bg 95%](./tech-slides-images/escrow-states.png)
+
+<!--
+
+The Solana Escrow Program is a smart contract that facilitates the secure exchange of assets between a buyer and a seller. It ensures that the buyer's funds are held in escrow until the seller fulfills their part of the agreement. -->
