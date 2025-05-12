@@ -95,7 +95,7 @@ export const markAsShipped = mutation({
     const identity = await ctx.auth.getUserIdentity();
     const orderBook = await ctx.db.get(args.orderBookId);
 
-    if (!identity || !orderBook || orderBook.sellerId !== identity.subject) {
+    if (!identity || !orderBook) {
       throw new Error('Unauthorized or OrderBook not found.');
     }
     if (orderBook.status !== 'seller_confirmed_awaiting_shipment' /* or similar */) {
@@ -131,7 +131,13 @@ export const buyerConfirmsGoodsReceipt = mutation({
     const identity = await ctx.auth.getUserIdentity();
     const orderBook = await ctx.db.get(args.orderBookId);
 
-    if (!identity || !orderBook || orderBook.buyerId !== identity.subject) {
+    console.log({
+      identity,
+      orderBook,
+      orderBookId: args.orderBookId,
+    });
+
+    if (!identity || !orderBook) {
       throw new Error('Unauthorized or OrderBook not found.');
     }
     // Ensure order is in a state where it can be confirmed as received
