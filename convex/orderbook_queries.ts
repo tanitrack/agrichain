@@ -47,10 +47,29 @@ export const listBySeller = query({
       throw new Error('Unauthorized: User must be logged in to view their seller order books.');
     }
 
-    return await ctx.db
+    const orderBooks = await ctx.db
       .query('orderBook')
       .withIndex('by_sellerId', (q) => q.eq('sellerId', args.sellerId))
       .collect();
+
+    // Join with transaction data to get onChainEscrowStatus
+    const orderBooksWithTxStatus = await Promise.all(
+      orderBooks.map(async (orderBook) => {
+        if (orderBook.financialTransactionId) {
+          const transaction = await ctx.db.get(orderBook.financialTransactionId);
+          return {
+            ...orderBook,
+            onChainEscrowStatus: transaction?.onChainEscrowStatus || null,
+          };
+        }
+        return {
+          ...orderBook,
+          onChainEscrowStatus: null,
+        };
+      })
+    );
+
+    return orderBooksWithTxStatus;
   },
 });
 
@@ -62,9 +81,28 @@ export const listByBuyer = query({
       throw new Error('Unauthorized: User must be logged in to view their buyer order books.');
     }
 
-    return await ctx.db
+    const orderBooks = await ctx.db
       .query('orderBook')
       .withIndex('by_buyerId', (q) => q.eq('buyerId', args.buyerId))
       .collect();
+
+    // Join with transaction data to get onChainEscrowStatus
+    const orderBooksWithTxStatus = await Promise.all(
+      orderBooks.map(async (orderBook) => {
+        if (orderBook.financialTransactionId) {
+          const transaction = await ctx.db.get(orderBook.financialTransactionId);
+          return {
+            ...orderBook,
+            onChainEscrowStatus: transaction?.onChainEscrowStatus || null,
+          };
+        }
+        return {
+          ...orderBook,
+          onChainEscrowStatus: null,
+        };
+      })
+    );
+
+    return orderBooksWithTxStatus;
   },
 });

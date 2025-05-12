@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/main-layout';
-import { Eye, Check, Package, CheckCircle } from 'lucide-react'; // Added CheckCircle
+import { Eye, Check, Package, CheckCircle, Wallet } from 'lucide-react'; // Added CheckCircle, Wallet
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +35,9 @@ const OrderBook = () => {
   const [isMarkingAsShipped, setIsMarkingAsShipped] = useState(false); // State for marking as shipped loading
   const [isConfirmingReceipt, setIsConfirmingReceipt] = useState(false); // State for buyer confirmation loading
   const [isWithdrawingFunds, setIsWithdrawingFunds] = useState(false); // State for seller withdrawal loading
+  const [isClosingEscrow, setIsClosingEscrow] = useState(false); // State for closing escrow loading
+  const [isRequestingRefund, setIsRequestingRefund] = useState(false); // State for buyer refund loading
+  const [isFailingOrder, setIsFailingOrder] = useState(false); // State for failing order loading
 
   // Get logged-in user and wallet info
   const { userProfile, wallet: dynamicWalletInfo } = useAuthCheck();
@@ -92,6 +95,15 @@ const OrderBook = () => {
     api.orderbook_mutations.buyerConfirmsGoodsReceipt
   );
 
+  // Mutation for recording escrow closed (Step 24)
+  const recordEscrowClosedMutation = useMutation(api.transaction_mutations.recordEscrowClosed);
+
+  // Mutation for recording order refunded (Step 26 A.3)
+  const recordOrderRefundedMutation = useMutation(api.transaction_mutations.recordOrderRefunded);
+
+  // Mutation for recording order failed (Step 26 B.3)
+  const recordOrderFailedMutation = useMutation(api.transaction_mutations.recordOrderFailed);
+
   const convex = useConvex(); // Get Convex client for direct query call
 
   // Function to handle viewing details
@@ -117,7 +129,14 @@ const OrderBook = () => {
   };
 
   // Use the escrow transaction hook
-  const { confirmOrder, withdrawFunds, isLoading: isEscrowActionLoading } = useEscrowTransaction(); // Added withdrawFunds
+  const {
+    confirmOrder,
+    withdrawFunds,
+    closeEscrow,
+    refundOrder, // Added refundOrder
+    failOrder, // Added failOrder
+    isLoading: isEscrowActionLoading,
+  } = useEscrowTransaction(); // Added withdrawFunds, closeEscrow, refundOrder, failOrder
 
   // Function to handle confirming an order (New function for Phase 3)
   const handleConfirmOrderClick = async (orderBookId: Id<'orderBook'>) => {
@@ -313,6 +332,278 @@ const OrderBook = () => {
     }
   };
 
+  // Function to handle closing the escrow account (New function for Phase 6)
+  const handleCloseEscrowClick = async (orderBookId: Id<'orderBook'>) => {
+    if (!dynamicWalletInfo?.address) {
+      toast({
+        title: 'Error',
+        description: 'Buyer Solana wallet not available.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setIsClosingEscrow(true); // Local state for this specific order action
+    toast({ title: 'Processing Escrow Closure...', description: 'Please wait.' });
+
+    try {
+      const escrowDetails = await convex.query(api.transaction_queries.getEscrowDetailsForAction, {
+        orderBookId,
+      });
+
+      // Client-side checks:
+      if (
+        !escrowDetails?.escrowPdaAddress ||
+        !escrowDetails?.buyerSolanaPublicKey ||
+        !['completed', 'refunded', 'failed'].includes(escrowDetails.onChainEscrowStatus!) // Check for final on-chain states
+      ) {
+        toast({
+          title: 'Escrow Closure Not Possible',
+          description: 'Escrow details missing or status is not final.',
+          variant: 'destructive',
+        });
+        return; // Stop if details are missing or status is wrong
+      }
+
+      // Client-side check: Ensure the buyer's wallet matches the one in the transaction record
+      if (dynamicWalletInfo.address !== escrowDetails.buyerSolanaPublicKey) {
+        toast({
+          title: 'Unauthorized',
+          description: 'Your connected wallet does not match the buyer wallet for this order.',
+          variant: 'destructive',
+        });
+        return; // Stop if wallet mismatch
+      }
+
+      toast({
+        title: 'Awaiting Wallet Confirmation...',
+        description: 'Please confirm the transaction in your wallet.',
+      });
+
+      await closeEscrow({
+        escrowPda: escrowDetails.escrowPdaAddress,
+        actorPublicKey: dynamicWalletInfo.address, // Buyer's public key (receiver of rent)
+        onSuccess: async (txSig) => {
+          toast({
+            title: 'Escrow Rent Reclaimed!',
+            description: `Tx: ${txSig.substring(0, 10)}...`,
+          });
+          // Call the Convex mutation to record the closure (Step 24)
+          await recordEscrowClosedMutation({
+            orderBookId: orderBookId,
+            txHash: txSig,
+            onChainStatus: 'closed', // As per Step 24 instructions
+          });
+
+          // Optionally refetch orders or navigate
+        },
+        onError: (err) => {
+          toast({
+            title: 'Escrow Closure Failed',
+            description: err.message || 'Could not close escrow account on-chain.',
+            variant: 'destructive',
+          });
+        },
+        onSubmitted: (txSig) => {
+          toast({
+            title: 'Transaction Submitted',
+            description: `Tx: ${txSig.substring(0, 10)}... Awaiting confirmation.`,
+          });
+        },
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: (error as Error).message || 'Failed to process escrow closure.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsClosingEscrow(false);
+    }
+  };
+
+  // Function to handle requesting a refund (New function for Phase 7 A.2)
+  const handleRequestRefundClick = async (orderBookId: Id<'orderBook'>) => {
+    if (!dynamicWalletInfo?.address) {
+      toast({
+        title: 'Error',
+        description: 'Buyer Solana wallet not available.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setIsRequestingRefund(true); // Local state for this specific order action
+    toast({ title: 'Processing Refund Request...', description: 'Please wait.' });
+
+    try {
+      const escrowDetails = await convex.query(api.transaction_queries.getEscrowDetailsForAction, {
+        orderBookId,
+      });
+
+      // Client-side checks:
+      if (
+        !escrowDetails?.escrowPdaAddress ||
+        !escrowDetails?.buyerSolanaPublicKey ||
+        escrowDetails.onChainEscrowStatus !== 'initialized' // Refund only possible if not confirmed/completed/failed
+      ) {
+        toast({
+          title: 'Refund Not Possible',
+          description: 'Escrow details missing or status is not initialized.',
+          variant: 'destructive',
+        });
+        return; // Stop if details are missing or status is wrong
+      }
+
+      // Client-side check: Ensure the buyer's wallet matches the one in the transaction record
+      if (dynamicWalletInfo.address !== escrowDetails.buyerSolanaPublicKey) {
+        toast({
+          title: 'Unauthorized',
+          description: 'Your connected wallet does not match the buyer wallet for this order.',
+          variant: 'destructive',
+        });
+        return; // Stop if wallet mismatch
+      }
+
+      toast({
+        title: 'Awaiting Wallet Confirmation...',
+        description: 'Please confirm the transaction in your wallet.',
+      });
+
+      await refundOrder({
+        escrowPda: escrowDetails.escrowPdaAddress,
+        actorPublicKey: dynamicWalletInfo.address, // Buyer's public key (signer and receiver)
+        onSuccess: async (txSig) => {
+          toast({
+            title: 'Order Refunded On-Chain!',
+            description: `Tx: ${txSig.substring(0, 10)}... Funds returned to your wallet.`,
+          });
+          // Call the Convex mutation to record the refund (Step 26 A.3)
+          await recordOrderRefundedMutation({
+            orderBookId: orderBookId,
+            txHash: txSig,
+            onChainStatus: 'refunded', // As per Step 26 A.3 instructions
+          });
+
+          // Optionally refetch orders or navigate
+        },
+        onError: (err) => {
+          toast({
+            title: 'Refund Failed',
+            description: err.message || 'Could not refund order on-chain.',
+            variant: 'destructive',
+          });
+        },
+        onSubmitted: (txSig) => {
+          toast({
+            title: 'Transaction Submitted',
+            description: `Tx: ${txSig.substring(0, 10)}... Awaiting confirmation.`,
+          });
+        },
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: (error as Error).message || 'Failed to process refund request.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsRequestingRefund(false);
+    }
+  };
+
+  // Function to handle failing an order (New function for Phase 7 B.2)
+  const handleFailOrderClick = async (orderBookId: Id<'orderBook'>) => {
+    if (!dynamicWalletInfo?.address) {
+      toast({
+        title: 'Error',
+        description: 'Your Solana wallet not available.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setIsFailingOrder(true); // Local state for this specific order action
+    toast({ title: 'Processing Order Failure...', description: 'Please wait.' });
+
+    try {
+      const escrowDetails = await convex.query(api.transaction_queries.getEscrowDetailsForAction, {
+        orderBookId,
+      });
+
+      // Client-side checks:
+      if (
+        !escrowDetails?.escrowPdaAddress ||
+        !escrowDetails?.buyerSolanaPublicKey || // Need buyer PK to send funds back
+        !['initialized', 'confirmed'].includes(escrowDetails.onChainEscrowStatus!) // Fail possible if initialized or confirmed
+      ) {
+        toast({
+          title: 'Order Failure Not Possible',
+          description: 'Escrow details missing or status is not appropriate for failure.',
+          variant: 'destructive',
+        });
+        return; // Stop if details are missing or status is wrong
+      }
+
+      // Determine the authority (signer) - for now, let's assume the current user is the authority
+      // In a real app, this might depend on platform rules/dispute resolution outcome
+      const authorityPublicKey = dynamicWalletInfo.address;
+
+      // Client-side check: Ensure the current user's wallet matches the determined authority
+      if (dynamicWalletInfo.address !== authorityPublicKey) {
+        toast({
+          title: 'Unauthorized',
+          description: 'Your connected wallet is not authorized to fail this order.',
+          variant: 'destructive',
+        });
+        return; // Stop if wallet mismatch
+      }
+
+      toast({
+        title: 'Awaiting Wallet Confirmation...',
+        description: 'Please confirm the transaction in your wallet.',
+      });
+
+      await failOrder({
+        escrowPda: escrowDetails.escrowPdaAddress,
+        actorPublicKey: authorityPublicKey, // The signer (could be buyer or seller based on rules)
+        buyerAccountForRefund: escrowDetails.buyerSolanaPublicKey, // Buyer receives funds
+        onSuccess: async (txSig) => {
+          toast({
+            title: 'Order Marked as Failed On-Chain!',
+            description: `Tx: ${txSig.substring(0, 10)}... Funds returned to buyer.`,
+          });
+          // Call the Convex mutation to record the failure (Step 26 B.3)
+          await recordOrderFailedMutation({
+            orderBookId: orderBookId,
+            txHash: txSig,
+            onChainStatus: 'failed', // As per Step 26 B.3 instructions
+          });
+
+          // Optionally refetch orders or navigate
+        },
+        onError: (err) => {
+          toast({
+            title: 'Order Failure Failed',
+            description: err.message || 'Could not mark order as failed on-chain.',
+            variant: 'destructive',
+          });
+        },
+        onSubmitted: (txSig) => {
+          toast({
+            title: 'Transaction Submitted',
+            description: `Tx: ${txSig.substring(0, 10)}... Awaiting confirmation.`,
+          });
+        },
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: (error as Error).message || 'Failed to process order failure.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsFailingOrder(false);
+    }
+  };
+
   // Function to render status badge with appropriate color
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; className: string }> = {
@@ -360,6 +651,11 @@ const OrderBook = () => {
         // Added new status for Buyer
         label: 'Goods Received', // Or use translation key
         className: 'bg-green-500 text-white', // Example color
+      },
+      // Add new status for closed escrow
+      closed: {
+        label: 'Escrow Closed', // Or use translation key
+        className: 'bg-gray-500 text-white', // Example color
       },
     };
 
@@ -506,6 +802,26 @@ const OrderBook = () => {
                               >
                                 {/* Use an appropriate icon, e.g., DollarSign or Wallet */}
                                 💰 {/* Using a money bag emoji for now */}
+                              </Button>
+                            )}
+
+                          {/* Reclaim Escrow Rent Button (Phase 6) */}
+                          {orderBook.buyerId === userId && // Only for the buyer
+                            orderBook.financialTransactionId && // Must have a linked transaction
+                            orderBook.onChainEscrowStatus && // Must have an on-chain status
+                            ['completed', 'refunded', 'failed'].includes(orderBook.status) && // Order is in a final state
+                            ['completed', 'refunded', 'failed'].includes(
+                              orderBook.onChainEscrowStatus
+                            ) && // On-chain escrow is in a final state
+                            orderBook.onChainEscrowStatus !== 'closed' && ( // Escrow is not already closed
+                              <Button
+                                variant="outline" // Using outline variant as per original plan
+                                size="sm" // Using sm size as per original plan
+                                onClick={() => handleCloseEscrowClick(orderBook._id)}
+                                disabled={isClosingEscrow || isEscrowActionLoading}
+                              >
+                                <Wallet className="mr-2 h-4 w-4" /> {/* Using Wallet icon */}
+                                Reclaim Escrow Rent
                               </Button>
                             )}
                         </div>
