@@ -27,6 +27,8 @@ interface ConvexKomoditas {
   unit: string;
   pricePerUnit: number;
   stock: number;
+  address?: string;
+  grade?: string;
   imageUrl?: string;
   createdBy: string;
   updatedAt: number;
@@ -50,8 +52,8 @@ const mapToKomoditasItem = (item: ConvexKomoditas): KomoditasItem => ({
   id: item._id,
   type: item.category,
   quantity: item.stock,
-  location: 'Indonesia', // Default location
-  grade: 'Standard', // Default grade
+  location: item.address ?? 'Indonesia', // Default location
+  grade: item.grade ?? 'Standard', // Default grade
   createdAt: new Date(item._creationTime).toISOString().split('T')[0],
 });
 

@@ -11,6 +11,8 @@ export const create = mutation({
     pricePerUnit: v.number(),
     stock: v.number(),
     imageUrl: v.optional(v.string()),
+    harvestDate: v.optional(v.string()),
+    grade: v.optional(v.string()),
   },
   returns: v.id('komoditas'),
   handler: async (ctx, args) => {
@@ -49,6 +51,10 @@ export const create = mutation({
       unit: args.unit,
       pricePerUnit: args.pricePerUnit,
       stock: args.stock,
+      grade: args.grade ?? '',
+      farmersName: convexUser?.name,
+      address: convexUser?.address,
+      harvestDate: args.harvestDate ?? new Date().toDateString(),
       imageUrl: args.imageUrl,
       createdBy: convexUser._id, // Use the Convex User's _id
       sellerSolanaPublicKey: userSolanaPublicKey, // Store it

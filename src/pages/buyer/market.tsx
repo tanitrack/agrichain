@@ -158,14 +158,14 @@ const Market = () => {
                       {language === 'id' ? 'Petani:' : 'Farmer:'}
                     </span>
                     {/* Placeholder or fetch user data */}
-                    <span className="font-medium">N/A</span>
+                    <span className="font-medium">{commodity.farmersName ?? 'N/A'}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">
                       {language === 'id' ? 'Lokasi:' : 'Location:'}
                     </span>
                     {/* Placeholder or fetch user data */}
-                    <span>N/A</span>
+                    <span>{commodity.address ?? 'N/A'}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">
