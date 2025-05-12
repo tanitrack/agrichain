@@ -333,7 +333,15 @@ const MarketDetail = () => {
                     <p className="text-sm text-muted-foreground">
                       {language === 'id' ? 'Tanggal Panen' : 'Harvest Date'}
                     </p>
-                    <p className="font-medium">{formatDate(new Date(commodity.harvestDate))}</p>
+                    <p className="font-medium">
+                      {formatDate(
+                        new Date(
+                          commodity?.harvestDate && commodity.harvestDate.trim() !== ''
+                            ? commodity.harvestDate
+                            : '2024-05-01'
+                        )
+                      )}
+                    </p>
                   </div>
                 </div>
                 {/* <div className="col-span-2 flex items-start gap-2">
@@ -360,7 +368,7 @@ const MarketDetail = () => {
               )}
               {commodity_bulks && (
                 <div className="overflow-hidden rounded-lg border border-earth-light-brown/30 bg-white">
-                  <Tabs defaultValue={commodity_bulks[0].minQuantity} className="w-full">
+                  <Tabs defaultValue={commodity_bulks[0]?.minQuantity ?? '10'} className="w-full">
                     <TabsList className="w-full bg-earth-pale-green">
                       {commodity_bulks?.map((bulk) => (
                         <TabsTrigger key={bulk._id} value={bulk.minQuantity} className="flex-1">

@@ -52,10 +52,16 @@ export default function ButtonWithdrawFunds({ order }: { order: OrderBookType })
       await withdrawFunds({
         escrowPda: escrowDetails.escrowPdaAddress,
         actorPublicKey: dynamicWalletInfo.address,
-        onSuccess: (txSig: string) => {
+        onSuccess: async (txSig: string) => {
           toast({
             title: 'Withdrawal Successful!',
             description: `Tx: ${txSig.substring(0, 10)}...`,
+          });
+          // Call the Convex mutation to record the withdrawal (Step 19)
+          await convex.mutation(api.transaction_mutations.recordFundsWithdrawn, {
+            orderBookId: order._id,
+            txHash: txSig,
+            onChainStatus: 'completed', // As per Step 19 instructions
           });
         },
         onError: (err: unknown) => {
