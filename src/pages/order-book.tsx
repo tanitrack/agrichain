@@ -836,6 +836,20 @@ const OrderBook = () => {
                                 <Wallet className="h-4 w-4" /> {/* Using Wallet icon */}
                               </Button>
                             )}
+                          {/* Add Fail Order Button for Buyer */}
+                          {orderBook.buyerId === userId &&
+                            ['initialized', 'confirmed'].includes(
+                              orderBook.onChainEscrowStatus!
+                            ) && (
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleFailOrderClick(orderBook._id)}
+                                disabled={isFailingOrder || isEscrowActionLoading}
+                              >
+                                Fail Order
+                              </Button>
+                            )}
 
                           {/* Reclaim Escrow Rent Button (Phase 6) */}
                           {orderBook.buyerId === userId && // Only for the buyer
