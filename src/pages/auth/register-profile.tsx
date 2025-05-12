@@ -5,7 +5,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuthCheck } from '@/hooks/use-auth-check';
 
 export default function RegisterProfile() {
-  const [userType, setUserType] = useState('userType');
+  const [userType, setUserType] = useState<'farmer' | 'consumer'>('farmer');
 
   const { isSystemAuthenticated, userProfile, isLoadingAuth } = useAuthCheck();
 
