@@ -29,7 +29,8 @@ import { format } from 'date-fns';
 import { id as localeID } from 'date-fns/locale';
 
 // Sample commodity types - replace with API data
-const commodityTypes = ['Padi', 'Jagung', 'Kedelai', 'Cabai'];
+const commodityTypes = ['Sayuran', 'Buah-buahan', 'Daging', 'Ikan', 'Telur', 'Susu', 'Rempah-rempah', 'Biji-bijian', 'Kacang-kacangan', 'Umbi-umbian', 'Pupuk', 'Pakan Ternak'];
+;
 const units = ['kg', 'ton', 'kwintal'];
 
 export function AddOrderBookDialog() {
@@ -243,7 +244,7 @@ export function AddOrderBookDialog() {
           >
             {t('action.cancel')}
           </Button>
-          <Button onClick={() => {}} className="bg-earth-dark-green hover:bg-earth-medium-green">
+          <Button onClick={() => { }} className="bg-earth-dark-green hover:bg-earth-medium-green">
             {t('action.save')}
           </Button>
         </DialogFooter>

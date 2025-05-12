@@ -6,11 +6,18 @@ export type CommodityType =
   | 'Padi'
   | 'Jagung'
   | 'Kedelai'
-  | 'Kopi'
-  | 'Kakao'
-  | 'Gula'
   | 'Sayuran'
-  | 'Buah';
+  | 'Buah-buahan'
+  | 'Daging'
+  | 'Ikan'
+  | 'Telur'
+  | 'Susu'
+  | 'Rempah-rempah'
+  | 'Biji-bijian'
+  | 'Kacang-kacangan'
+  | 'Umbi-umbian'
+  | 'Pupuk'
+  | 'Pakan Ternak';
 
 export type CommodityGrade = 'A' | 'B' | 'C' | 'Premium' | 'Standar' | 'Ekonomi';
 

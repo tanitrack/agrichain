@@ -29,16 +29,8 @@ export const farmerLocations = [
 export const commodityUnits = ['kg', 'ton', 'karung', 'kuintal', 'gram', 'ikat'];
 
 // Mock commodity types
-export const commodityTypes = [
-  'Padi',
-  'Jagung',
-  'Kedelai',
-  'Kopi',
-  'Kakao',
-  'Gula',
-  'Sayuran',
-  'Buah',
-];
+export const commodityTypes = ['Sayuran', 'Buah-buahan', 'Daging', 'Ikan', 'Telur', 'Susu', 'Rempah-rempah', 'Biji-bijian', 'Kacang-kacangan', 'Umbi-umbian', 'Pupuk', 'Pakan Ternak'];
+
 
 // Mock commodity grades
 export const commodityGrades = ['A', 'B', 'C', 'Premium', 'Standar', 'Ekonomi'];
