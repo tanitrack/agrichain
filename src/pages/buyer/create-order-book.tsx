@@ -32,16 +32,7 @@ import {
 import { TransactionFlowExplorerDialog } from '@/components/transaction/transaction-flow-explorer-dialog';
 
 // Sample commodity types and units that would come from API
-const commodityTypes: CommodityType[] = [
-  'Padi',
-  'Jagung',
-  'Kedelai',
-  'Kopi',
-  'Kakao',
-  'Gula',
-  'Sayuran',
-  'Buah',
-];
+const commodityTypes: CommodityType[] = ['Sayuran', 'Buah-buahan', 'Daging', 'Ikan', 'Telur', 'Susu', 'Rempah-rempah', 'Biji-bijian', 'Kacang-kacangan', 'Umbi-umbian', 'Pupuk', 'Pakan Ternak'];
 
 const commodityUnits: CommodityUnit[] = ['kg', 'ton', 'karung', 'kuintal', 'gram', 'ikat'];
 

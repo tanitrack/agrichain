@@ -41,7 +41,7 @@ import { DatePicker } from '../ui/datepicker';
 
 // Mock data for units and categories
 const units = ['kg', 'ton', 'gram', 'liter'];
-const categories = ['Padi', 'Jagung', 'Kedelai', 'Gula', 'Kopi', 'Cabai', 'Bawang'];
+const categories = ['Sayuran', 'Buah-buahan', 'Daging', 'Ikan', 'Telur', 'Susu', 'Rempah-rempah', 'Biji-bijian', 'Kacang-kacangan', 'Umbi-umbian', 'Pupuk', 'Pakan Ternak'];
 
 interface AddKomoditasDialogProps {
   open: boolean;
