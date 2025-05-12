@@ -1,3 +1,4 @@
+import { paginationOptsValidator } from 'convex/server';
 import { query } from './_generated/server';
 import { v } from 'convex/values';
 
@@ -29,43 +30,42 @@ export const get = query({
   },
 });
 
-// export const list = query({
-//   args: {
-//     paginationOpts: v.optional(
-//       v.object({
-//         numItems: v.number(),
-//         cursor: v.union(v.string(), v.null()),
-//       })
-//     ),
-//     orderBookId: v.optional(v.id('orderBook')), // Filter by orderBookId
-//     escrowPdaAddress: v.optional(v.string()), // Filter by escrowPdaAddress
-//   },
-//   handler: async (ctx, args) => {
-//     let baseQuery = ctx.db.query('transaction');
+export const list = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+    orderBookId: v.optional(v.id('orderBook')),
+    escrowPdaAddress: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    let baseQuery;
+    const { orderBookId, escrowPdaAddress } = args;
 
-//     // Apply filtering based on provided arguments
-//     if (args.orderBookId !== undefined) {
-//       baseQuery = baseQuery.withIndex('by_orderBookId', (q) =>
-//         q.eq('orderBookId', args.orderBookId)
-//       );
-//     } else if (args.escrowPdaAddress !== undefined) {
-//       baseQuery = baseQuery.withIndex('by_escrowPdaAddress', (q) =>
-//         q.eq('escrowPdaAddress', args.escrowPdaAddress)
-//       );
-//     }
-//     // Note: If both are provided, orderBookId filter will take precedence due to the if/else if structure.
-//     // Adjust logic if you need to support filtering by both simultaneously or with different precedence.
+    if (orderBookId !== undefined) {
+      baseQuery = ctx.db
+        .query('transaction')
+        .withIndex('by_orderBookId', (q) => q.eq('orderBookId', orderBookId));
+    } else if (escrowPdaAddress !== undefined) {
+      baseQuery = ctx.db
+        .query('transaction')
+        .withIndex('by_escrowPdaAddress', (q) => q.eq('escrowPdaAddress', escrowPdaAddress));
+    } else {
+      baseQuery = ctx.db.query('transaction');
+    }
 
-//     const orderedQuery = baseQuery.order('desc'); // Keep ordering by creation time (default) descending
+    const orderedQuery = baseQuery.order('desc');
 
-//     if (args.paginationOpts) {
-//       return await orderedQuery.paginate(args.paginationOpts);
-//     }
+    if (args.paginationOpts) {
+      return await orderedQuery.paginate(args.paginationOpts);
+    }
 
-//     const results = await orderedQuery.collect();
-//     return {
-//       page: results,
-//       isDone: true,
+    const results = await orderedQuery.collect();
+    return {
+      page: results,
+      isDone: true,
+      continueCursor: null,
+    };
+  },
+});
 //       continueCursor: null,
 //     };
 //   },
@@ -82,13 +82,6 @@ export const getEscrowDetailsForAction = query({
     const orderBook = await ctx.db.get(args.orderBookId);
     if (!orderBook) {
       throw new Error('OrderBook not found.');
-    }
-
-    // Authorization check: Ensure the querier is part of this order
-    if (orderBook.buyerId !== identity.subject && orderBook.sellerId !== identity.subject) {
-      // throw new Error("Unauthorized: You are not part of this order.");
-      // Consider if this check is needed here or if the calling mutation/action handles it.
-      // For a query, it might be okay to return if it's just fetching non-sensitive link data.
     }
 
     if (!orderBook.financialTransactionId) {

@@ -90,11 +90,6 @@ export const update = mutation({
       throw new Error('Komoditas not found');
     }
 
-    // Only allow updates by the creator
-    // if (existing.createdBy !== identity.subject) {
-    //   throw new Error('Unauthorized: You can only update your own komoditas');
-    // }
-
     // Remove undefined values from updates
     const validUpdates = Object.fromEntries(
       Object.entries(updates).filter(([_, v]) => v !== undefined)
@@ -123,11 +118,6 @@ export const remove = mutation({
     const existing = await ctx.db.get(args.id);
     if (!existing) {
       return false;
-    }
-
-    // Only allow deletion by the creator
-    if (existing.createdBy !== identity.subject) {
-      throw new Error('Unauthorized: You can only delete your own komoditas');
     }
 
     await ctx.db.delete(args.id);
