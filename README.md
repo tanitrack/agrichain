@@ -1,5 +1,5 @@
 # TaniTrack 
-<img src="public/lovable-uploads/f7fb75ca-ee07-4d12-a8ab-4e5152e13679.png" alt="Preview" width="30"/>
+<img src="public/lgo.png" alt="Preview" width="80"/>
 
 [![X](https://img.shields.io/badge/Twitter-@tanitracks-%231DA1F2?logo=x&style=flat)](https://x.com/tanitracks)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-TaniTrack-%230077B5?logo=linkedin&style=flat)](https://www.linkedin.com/in/tanitrack-supply-chain-and-digital-marketplace-solution-060933361)
@@ -19,7 +19,6 @@ in Indonesia or Even the WORLD to the NEXT level!
 - Commodities Price Dashboard
 - Traceability (QR Code scan)
 
-## High Level System Design
 ![alt text](public/image.png)
 ## Getting Started
 ### Prerequisites
