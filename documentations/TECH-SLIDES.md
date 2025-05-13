@@ -51,7 +51,7 @@ Building a Hybrid Web3 Agricultural Marketplace
 
 ---
 
-![bg 80%](./tech-slides-images/architecture-overview.png)
+![bg 75%](./tech-slides-images/architecture-overview.png)
 
 <!--
 TaniTrack separates concerns for optimal performance, user experience, and security.
