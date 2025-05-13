@@ -206,6 +206,55 @@ export default function Login() {
     }
   };
 
+  const handleQrLogin = async (qrTaniId: string) => {
+    setLoading(true);
+    setError(undefined);
+    try {
+      const result = await fetch(`${clientEnv.VITE_CONVEX_SITE_URL}/auth/tani-id-login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ taniId: qrTaniId }),
+      });
+
+      if (!result.ok) {
+        throw new Error('Failed to login with TaniId');
+      }
+
+      const data = await result.json();
+
+      if (!data.taniId || !data.email) {
+        throw new Error('User not found');
+      }
+
+      await connectWithEmail(data.email);
+
+      toast({
+        title: language === 'id' ? 'Kode OTP telah dikirim!' : 'OTP code has been sent!',
+        description:
+          language === 'id'
+            ? 'Silakan masukkan kode OTP yang telah dikirim ke email Anda'
+            : 'Please enter the OTP code sent to your email',
+      });
+
+      setShowOtpInput(true);
+    } catch (error) {
+      setError(language === 'id' ? 'Gagal login dengan email' : 'Failed to login with email');
+      toast({
+        variant: 'destructive',
+        title: language === 'id' ? 'Gagal login dengan email' : 'Failed to login with email',
+        description:
+          language === 'id'
+            ? 'Terjadi kesalahan saat login dengan email'
+            : 'An error occurred while logging in with email',
+      });
+      console.error('Email login failed', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Auth redirects
   if (isSystemAuthenticated && userProfile) {
     return <Navigate to="/dashboard" replace />;
@@ -370,8 +419,8 @@ export default function Login() {
                 </h2>
                 <div className="w-full max-w-xs overflow-hidden rounded-lg border-2 border-earth-medium-green">
                   <QrScanner
-                    onScan={(detectedCodes) => {
-                      detectedCodes.forEach((code) => {
+                    onScan={async (detectedCodes) => {
+                      for (const code of detectedCodes) {
                         // Parse taniId from QR value (expecting .../login?taniId=XXX&mode=taniId)
                         const rawValue = code.rawValue;
                         setQrCodeRawValue(rawValue);
@@ -385,11 +434,12 @@ export default function Login() {
                         const modeParam = url.searchParams.get('mode');
                         const emailParam = url.searchParams.get('email');
                         if (modeParam === 'taniId' && taniIdParam && emailParam) {
-                          setTaniId(parseInt(taniIdParam));
-                          setEmail(emailParam);
-                          setMode('taniId');
+                          await setTaniId(parseInt(taniIdParam));
+                          await setEmail(emailParam);
+                          await setMode('taniId');
+                          await handleQrLogin(taniIdParam);
                         }
-                      });
+                      }
                     }}
                     onError={(error) => {
                       console.log(error);
