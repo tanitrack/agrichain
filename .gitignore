@@ -22,3 +22,7 @@ target
 .DS_Store
 **/*.rs.bk
 test-ledger
+
+# Package lock
+package-lock.json
+yarn.lock
