@@ -13,7 +13,6 @@
 TaniTrack Agrichain aims to revolutionize the agricultural ecosystem by directly connecting farmers with buyers. We leverage a hybrid Web2.5 approach, combining a seamless user experience with the robust security of blockchain technology for financial transactions. Our goal is to increase farmer welfare and improve the overall efficiency and transparency of agricultural trade.
 
 ![TaniTrack Platform Preview](public/image.png)
-_Note: This is a placeholder for a more representative screenshot of the platform._
 
 ## Table of Contents
 
@@ -88,49 +87,52 @@ Ensure you have the following installed:
 
 ### Installation
 
-1.  **Clone the repository:**
+1. **Clone the repository:**
 
-    ```shell
-    git clone https://github.com/tanitrack/agrichain.git
-    cd agrichain
-    ```
+   ```shell
+   git clone https://github.com/tanitrack/agrichain.git
+   cd agrichain
+   ```
 
-2.  **Install dependencies:**
-    ```shell
-    pnpm install
-    ```
+2. **Install dependencies:**
+
+   ```shell
+   pnpm install
+   ```
 
 ### Environment Setup
 
-1.  Copy the example environment file:
-    ```shell
-    cp .env.local.example .env.local
-    ```
-2.  Open `.env.local` and fill in the required environment variables:
-    - `CONVEX_DEPLOYMENT`: Your Convex deployment URL (from `npx convex deploy` or Convex dashboard).
-    - `VITE_CONVEX_URL`: Your Convex project URL.
-    - `VITE_CONVEX_SITE_URL`: The base URL for your Convex deployment (often `VITE_CONVEX_URL` with `.cloud` replaced by `.site`).
-    - `VITE_DYNAMIC_ENVIRONMENT_ID`: Your Environment ID from Dynamic.xyz.
-    - (Optional) `VITE_SOLANA_RPC_URL`: If you want to override the default Solana RPC endpoint.
+1. Copy the example environment file:
+
+   ```shell
+   cp .env.local.example .env.local
+   ```
+
+2. Open `.env.local` and fill in the required environment variables:
+   - `CONVEX_DEPLOYMENT`: Your Convex deployment URL (from `npx convex deploy` or Convex dashboard).
+   - `VITE_CONVEX_URL`: Your Convex project URL.
+   - `VITE_CONVEX_SITE_URL`: The base URL for your Convex deployment (often `VITE_CONVEX_URL` with `.cloud` replaced by `.site`).
+   - `VITE_DYNAMIC_ENVIRONMENT_ID`: Your Environment ID from Dynamic.xyz.
+   - (Optional) `VITE_SOLANA_RPC_URL`: If you want to override the default Solana RPC endpoint.
 
 ### Running the Application
 
-1.  **Deploy/Link your Convex backend:**
-    If this is your first time or you've pulled new backend changes:
+1. **Deploy/Link your Convex backend:**
+   If this is your first time or you've pulled new backend changes:
 
-    ```shell
-    npx convex deploy
-    ```
+   ```shell
+   npx convex deploy
+   ```
 
-    (Or link to an existing Convex project with `npx convex link`)
+2. **Start the development servers:**
+   This command will start the Vite frontend development server and the Convex backend development server concurrently.
 
-2.  **Start the development servers:**
-    This command will start the Vite frontend development server and the Convex backend development server concurrently.
-    ```shell
-    pnpm dev
-    ```
-    - Frontend will typically be available at `http://localhost:8080`.
-    - Convex dashboard will be available at the URL output by `convex dev`.
+   ```shell
+   pnpm dev
+   ```
+
+   - Frontend will typically be available at `http://localhost:8080`.
+   - Convex dashboard will be available at the URL output by `convex dev`.
 
 ## Project Structure
 
@@ -143,21 +145,29 @@ Located in the `programs/agrichain/` directory. This is the Solana smart contrac
 **Key Commands (run from the root directory):**
 
 - **Build the program:**
+
   ```shell
   anchor build
   ```
+
 - **Deploy the program:**
+
   ```shell
   anchor deploy
   ```
+
 - **Test the program:**
+
   ```shell
   anchor test
   ```
+
 - **Sync Program ID:** After deploying or generating a new keypair for the program, run:
+
   ```shell
   anchor sync
   ```
+
   This updates the program ID in `Anchor.toml` and the `declare_id!` macro in `programs/agrichain/src/lib.rs`.
 
 ### Web Application (`web`)
@@ -176,14 +186,19 @@ Located primarily in the `src/` directory. This is a React application built wit
 **Key Commands (run from the root directory):**
 
 - **Start frontend development server:** (Usually done via `pnpm dev`)
+
   ```shell
   pnpm dev:frontend
   ```
+
 - **Build for production:**
+
   ```shell
   pnpm build
   ```
+
 - **Lint and Format:**
+
   ```shell
   pnpm lint
   pnpm format
