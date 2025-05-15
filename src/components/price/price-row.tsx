@@ -45,9 +45,7 @@ export const PriceRow = ({ item, onViewDetail, onEdit, onDelete, onShowQR }: Pri
       <TableRow className="hover:bg-earth-pale-green">
         <TableCell>
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded bg-earth-light-green/20">
 
-            </div>
             <div>
               <div className="font-medium text-earth-dark-green">{item.name}</div>
               <div className="text-xs text-earth-medium-green">{item._id}</div>
