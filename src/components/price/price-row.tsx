@@ -46,7 +46,7 @@ export const PriceRow = ({ item, onViewDetail, onEdit, onDelete, onShowQR }: Pri
         <TableCell>
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded bg-earth-light-green/20">
-              <img src={''} alt={item.name} className="h-full w-full object-cover" />
+
             </div>
             <div>
               <div className="font-medium text-earth-dark-green">{item.name}</div>
