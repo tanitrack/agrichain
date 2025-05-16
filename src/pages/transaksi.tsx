@@ -151,11 +151,11 @@ const TransaksiPage = () => {
                     )}
                   </div>
                   <div className="mt-4 flex items-center justify-between text-xs text-gray-400">
-                    <Link to={`/transaction/${tx._id}`}>
+                    {/* <Link to={`/transaction/${tx._id}`}>
                       <Button variant="outline" size="sm">
                         <Eye className="mr-2 h-4 w-4" /> {t('transactions.detail')}
                       </Button>
-                    </Link>
+                    </Link> */}
                   </div>
                 </div>
               ))
