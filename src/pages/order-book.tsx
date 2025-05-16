@@ -33,14 +33,13 @@ export default function OrderBookPage() {
 
   return (
     <MainLayout>
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle>{t('orderbook.title')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <OrderTable orders={allOrders} />
-        </CardContent>
-      </Card>
+      <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-earth-dark-green">{t('orderbook.title')}</h1>
+          <p className="text-earth-medium-green">{t('orderbook.subtitle')}</p>
+        </div>
+      </div>
+      <OrderTable orders={allOrders} />
     </MainLayout>
   );
 }
