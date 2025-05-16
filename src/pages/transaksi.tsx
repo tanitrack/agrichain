@@ -97,12 +97,12 @@ const TransaksiPage = () => {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md ">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {filteredTransactions.length > 0 ? (
               filteredTransactions.map((tx) => (
                 <div
                   key={tx._id}
-                  className="flex flex-col gap-4 rounded-xl border border-earth-light-green bg-white p-6 shadow"
+                  className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-mono text-xs font-semibold text-earth-dark-green">
@@ -133,7 +133,7 @@ const TransaksiPage = () => {
                     </div>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <SolExplorerLink hash={tx.initializeTxHash} label="Init Tx" />
+                    <SolExplorerLink hash={tx.initializeTxHash} label="Initial Tx" />
                     {tx.confirmOrderTxHash && (
                       <SolExplorerLink hash={tx.confirmOrderTxHash} label="Confirm Tx" />
                     )}
@@ -150,10 +150,10 @@ const TransaksiPage = () => {
                       <SolExplorerLink hash={tx.closeEscrowTxHash} label="Close Escrow Tx" />
                     )}
                   </div>
-                  <div className="flex justify-end">
+                  <div className="mt-4 flex items-center justify-between text-xs text-gray-400">
                     <Link to={`/transaction/${tx._id}`}>
                       <Button variant="outline" size="sm">
-                        <Eye className="mr-2 h-4 w-4" /> {t('transactions.details')}
+                        <Eye className="mr-2 h-4 w-4" /> {t('transactions.detail')}
                       </Button>
                     </Link>
                   </div>
