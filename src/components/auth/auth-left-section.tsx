@@ -1,4 +1,3 @@
-import { useLanguage } from '@/contexts/language-context';
 import { AuthHeader } from './auth-header';
 import { AuthBenefits } from './auth-benefits';
 import { AuthCardDisplay } from './auth-card-display';
@@ -9,8 +8,6 @@ interface AuthLeftSectionProps {
 }
 
 export function AuthLeftSection({ userType }: AuthLeftSectionProps) {
-  const { language } = useLanguage();
-
   return (
     <div className="relative flex w-full items-center justify-center p-8 md:w-1/2">
       <div className="absolute -bottom-64 -left-64 h-96 w-96 rounded-full bg-earth-light-green/20 blur-3xl" />

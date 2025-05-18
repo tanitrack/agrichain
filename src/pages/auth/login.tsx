@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { parseAsInteger, useQueryState } from 'nuqs'; // nuqs for URL query state management
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import {
@@ -23,7 +23,6 @@ import LoginModeSwitcher from '@/components/auth/login-mode-switcher';
 import EmailLoginForm from '@/components/auth/email-login-form';
 import TaniIdLoginForm from '@/components/auth/taniid-login-form';
 import { clientEnv } from '@/lib/client-env-variables';
-import React from 'react';
 import { Scanner as QrScanner } from '@yudiel/react-qr-scanner';
 
 export default function Login() {
@@ -41,7 +40,7 @@ export default function Login() {
   const [error, setError] = useState<string | undefined>(undefined);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { language, t } = useLanguage();
+  const { t } = useLanguage();
   const { connectWithEmail, verifyOneTimePassword, retryOneTimePassword } = useConnectWithOtp();
   const { convex, isLoadingAuth, isSystemAuthenticated, userProfile } = useAuthCheck();
 

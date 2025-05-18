@@ -58,7 +58,7 @@ export function UserProfileForm({
   initialData = emptyInitialData,
 }: UserProfileFormProps) {
   const [loading, setLoading] = useState(false);
-  const { language } = useLanguage();
+  const { t } = useLanguage();
   const { updateUser } = useUserUpdateRequest();
   const createConvexUser = useMutation(api.users_mutations.createUser);
   const updateConvexUser = useMutation(api.users_mutations.updateUser);
@@ -145,11 +145,11 @@ export function UserProfileForm({
               <FormItem>
                 <FormLabel className="flex items-center font-medium text-earth-dark-green">
                   <UserCircle2 className="mr-2 h-4 w-4 text-earth-medium-green" />
-                  {language === 'id' ? 'No. KTP' : 'ID Card Number'}
+                  {t('profile.nationalId')}
                 </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={language === 'id' ? 'Masukkan nomor KTP' : 'Enter ID card number'}
+                    placeholder={t('profile.nationalIdPlaceholder')}
                     className="border-earth-light-brown focus-visible:ring-earth-dark-green"
                     {...field}
                   />
@@ -166,11 +166,11 @@ export function UserProfileForm({
               <FormItem>
                 <FormLabel className="flex items-center font-medium text-earth-dark-green">
                   <User className="mr-2 h-4 w-4 text-earth-medium-green" />
-                  {language === 'id' ? 'Nama Lengkap' : 'Full Name'}
+                  {t('profile.fullName')}
                 </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={language === 'id' ? 'Masukkan nama lengkap' : 'Enter full name'}
+                    placeholder={t('profile.fullNamePlaceholder')}
                     className="border-earth-light-brown focus-visible:ring-earth-dark-green"
                     {...field}
                   />
@@ -187,11 +187,11 @@ export function UserProfileForm({
               <FormItem>
                 <FormLabel className="flex items-center font-medium text-earth-dark-green">
                   <Phone className="mr-2 h-4 w-4 text-earth-medium-green" />
-                  {language === 'id' ? 'No. HP/Whatsapp' : 'Phone/Whatsapp Number'}
+                  {t('profile.phone')}
                 </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={language === 'id' ? 'Masukkan nomor HP' : 'Enter phone number'}
+                    placeholder={t('profile.phonePlaceholder')}
                     className="border-earth-light-brown focus-visible:ring-earth-dark-green"
                     {...field}
                   />
@@ -208,11 +208,11 @@ export function UserProfileForm({
               <FormItem>
                 <FormLabel className="flex items-center font-medium text-earth-dark-green">
                   <MapPin className="mr-2 h-4 w-4 text-earth-medium-green" />
-                  {language === 'id' ? 'Alamat Utama' : 'Main Address'}
+                  {t('profile.address')}
                 </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={language === 'id' ? 'Masukkan alamat' : 'Enter address'}
+                    placeholder={t('profile.addressPlaceholder')}
                     className="border-earth-light-brown focus-visible:ring-earth-dark-green"
                     {...field}
                   />
@@ -229,13 +229,7 @@ export function UserProfileForm({
             disabled={loading}
             type="submit"
           >
-            {loading
-              ? language === 'id'
-                ? 'Memproses...'
-                : 'Processing...'
-              : language === 'id'
-                ? 'Simpan Profil'
-                : 'Save Profile'}
+            {loading ? t('profile.processing') : t('profile.save')}
             {!loading && <ArrowRightIcon className="ml-2 h-5 w-5" />}
           </Button>
         </CardFooter>

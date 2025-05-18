@@ -23,7 +23,7 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
   );
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { language } = useLanguage();
+  const { t } = useLanguage();
 
   // Handle email registration completion
   const handleEmailRegistrationComplete = () => {
@@ -43,11 +43,8 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
 
     // Show success toast
     toast({
-      title: language === 'id' ? 'Registrasi Berhasil' : 'Registration Successful',
-      description:
-        language === 'id'
-          ? 'Profil Anda telah berhasil disimpan'
-          : 'Your profile has been successfully saved',
+      title: t('register.success'),
+      description: t('register.profileSaved'),
     });
 
     // Navigate to dashboard after a short delay
@@ -55,7 +52,6 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
       navigate('/dashboard');
     }, 1500);
   };
-
   // Handle going back to role selection
   const handleBackToRoleSelection = () => {
     setRegistrationStep('userType');
@@ -70,7 +66,7 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
         return (
           <div className="p-6">
             <h3 className="mb-4 text-center text-xl font-semibold text-earth-dark-green">
-              {language === 'id' ? 'Daftar Sebagai' : 'Register as'}
+              {t('register.as')}
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <button
@@ -81,16 +77,8 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
                 <div className="absolute left-2 top-2 mr-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
                   <Leaf className="h-4 w-4 text-white" />
                 </div>
-                {/* <h4 className="font-medium text-earth-dark-green"> */}
-                <h4 className="font-medium text-white">
-                  {language === 'id' ? 'Petani' : 'Farmer'}
-                </h4>
-                {/* <p className="mt-1 text-sm text-gray-600"> */}
-                <p className="mt-1 text-sm text-gray-200">
-                  {language === 'id'
-                    ? 'Daftar sebagai petani untuk menjual produk pertanian'
-                    : 'Register as a farmer to sell agricultural products'}
-                </p>
+                <h4 className="font-medium text-white">{t('register.farmer')}</h4>
+                <p className="mt-1 text-sm text-gray-200">{t('register.farmerDesc')}</p>
               </button>
               <button
                 type="button"
@@ -100,14 +88,8 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
                 <div className="absolute left-2 top-2 mr-2 flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
                   <ShoppingBasket className="h-4 w-4 text-white" />
                 </div>
-                <h4 className="font-medium text-white">
-                  {language === 'id' ? 'Konsumen' : 'Buyer'}
-                </h4>
-                <p className="mt-1 text-sm text-gray-200">
-                  {language === 'id'
-                    ? 'Daftar sebagai konsumen untuk membeli produk pertanian'
-                    : 'Register as a buyer to purchase agricultural products'}
-                </p>
+                <h4 className="font-medium text-white">{t('register.buyer')}</h4>
+                <p className="mt-1 text-sm text-gray-200">{t('register.buyerDesc')}</p>
               </button>
             </div>
           </div>
@@ -122,20 +104,14 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
                 className="mb-4 text-earth-dark-green hover:bg-earth-pale-green hover:text-earth-medium-green"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                {language === 'id' ? 'Kembali ke pilihan peran' : 'Back to role selection'}
+                {t('register.backToRole')}
               </Button>
 
               <div className="mb-6 flex items-center justify-center">
                 <div className="inline-flex items-center rounded-full bg-earth-pale-green px-4 py-2 text-earth-dark-green">
                   <span className="mr-2 text-lg">👤</span>
                   <span className="font-medium">
-                    {userType === 'farmer'
-                      ? language === 'id'
-                        ? 'Petani'
-                        : 'Farmer'
-                      : language === 'id'
-                        ? 'Pembeli'
-                        : 'Buyer'}
+                    {userType === 'farmer' ? t('register.farmer') : t('register.buyer')}
                   </span>
                 </div>
               </div>
@@ -146,12 +122,8 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
       case 'complete':
         return (
           <div className="p-6 text-center">
-            <h3 className="text-xl font-semibold text-earth-dark-green">
-              {language === 'id' ? 'Registrasi Berhasil!' : 'Registration Successful!'}
-            </h3>
-            <p className="mt-2 text-gray-600">
-              {language === 'id' ? 'Mengalihkan ke dashboard...' : 'Redirecting to dashboard...'}
-            </p>
+            <h3 className="text-xl font-semibold text-earth-dark-green">{t('register.success')}</h3>
+            <p className="mt-2 text-gray-600">{t('register.redirecting')}</p>
           </div>
         );
       default:
@@ -165,37 +137,21 @@ export function AuthRightSection({ userType, setUserType }: AuthRightSectionProp
         <CardHeader className="bg-gradient-to-r from-earth-dark-green to-earth-medium-green py-6 text-white">
           <CardTitle className="text-center text-2xl text-white">
             {registrationStep === 'email'
-              ? language === 'id'
-                ? 'Pendaftaran'
-                : 'Registration'
+              ? t('register.title')
               : registrationStep === 'userType'
-                ? language === 'id'
-                  ? 'Daftar Sebagai'
-                  : 'Register as'
+                ? t('register.as')
                 : registrationStep === 'profile'
-                  ? language === 'id'
-                    ? 'Lengkapi Profil'
-                    : 'Complete Profile'
-                  : language === 'id'
-                    ? 'Registrasi Berhasil'
-                    : 'Registration Successful'}
+                  ? t('register.completeProfile')
+                  : t('register.success')}
           </CardTitle>
           <CardDescription className="mt-2 text-center text-white/90">
             {registrationStep === 'email'
-              ? language === 'id'
-                ? 'Pendaftaran dengan email'
-                : 'Registration with email'
+              ? t('register.withEmail')
               : registrationStep === 'userType'
-                ? language === 'id'
-                  ? 'Pilih peran Anda dalam platform'
-                  : 'Choose your role on the platform'
+                ? t('register.chooseRole')
                 : registrationStep === 'profile'
-                  ? language === 'id'
-                    ? 'Lengkapi informasi profil Anda'
-                    : 'Complete your profile information'
-                  : language === 'id'
-                    ? 'Mengalihkan ke dashboard...'
-                    : 'Redirecting to dashboard...'}
+                  ? t('register.completeProfileDesc')
+                  : t('register.redirecting')}
           </CardDescription>
         </CardHeader>
         {renderRegistrationForm()}
