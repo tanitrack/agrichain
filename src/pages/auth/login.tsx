@@ -41,7 +41,7 @@ export default function Login() {
   const [error, setError] = useState<string | undefined>(undefined);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { connectWithEmail, verifyOneTimePassword, retryOneTimePassword } = useConnectWithOtp();
   const { convex, isLoadingAuth, isSystemAuthenticated, userProfile } = useAuthCheck();
 
@@ -57,22 +57,16 @@ export default function Login() {
     try {
       await connectWithEmail(email);
       toast({
-        title: language === 'id' ? 'Kode OTP telah dikirim!' : 'OTP code has been sent!',
-        description:
-          language === 'id'
-            ? 'Silakan masukkan kode OTP yang telah dikirim ke email Anda'
-            : 'Please enter the OTP code sent to your email',
+        title: t('login.otpSentTitle'),
+        description: t('login.otpSentDesc'),
       });
       setShowOtpInput(true);
     } catch (error) {
-      setError(language === 'id' ? 'Gagal login dengan email' : 'Failed to login with email');
+      setError(t('login.emailFailed'));
       toast({
         variant: 'destructive',
-        title: language === 'id' ? 'Gagal login dengan email' : 'Failed to login with email',
-        description:
-          language === 'id'
-            ? 'Terjadi kesalahan saat login dengan email'
-            : 'An error occurred while logging in with email',
+        title: t('login.emailFailed'),
+        description: t('login.emailFailedDesc'),
       });
       console.error('Email login failed', error);
     } finally {
@@ -92,27 +86,23 @@ export default function Login() {
       });
       if (!userProfile) {
         toast({
-          title: language === 'id' ? 'Profil belum terdaftar' : 'Profile not registered',
-          description:
-            language === 'id'
-              ? 'Silakan lengkapi profil Anda terlebih dahulu'
-              : 'Please complete your profile first',
+          title: t('login.profileNotRegistered'),
+          description: t('login.completeProfileFirst'),
         });
         navigate('/register-profile?registrationStep=userType', { replace: true });
         return;
       }
       toast({
-        title: language === 'id' ? 'Login berhasil!' : 'Login successful!',
-        description:
-          language === 'id' ? 'Selamat datang kembali di TaniTrack' : 'Welcome back to TaniTrack',
+        title: t('login.success'),
+        description: t('login.welcome'),
       });
       navigate('/dashboard', { replace: true });
     } catch (error) {
-      setError(language === 'id' ? 'Kode OTP tidak valid' : 'Invalid OTP code');
+      setError(t('login.invalidOtp'));
       toast({
         variant: 'destructive',
-        title: language === 'id' ? 'Gagal masuk' : 'Login failed',
-        description: language === 'id' ? 'Kode OTP tidak valid' : 'Invalid OTP code',
+        title: t('login.failed'),
+        description: t('login.invalidOtp'),
       });
       console.error('OTP verification failed', error);
     } finally {
@@ -126,18 +116,15 @@ export default function Login() {
     try {
       await retryOneTimePassword();
       toast({
-        title: language === 'id' ? 'Kode OTP telah dikirim ulang' : 'OTP has been resent',
-        description: language === 'id' ? 'Silakan cek email Anda' : 'Please check your email',
+        title: t('login.otpResentTitle'),
+        description: t('login.otpResentDesc'),
       });
     } catch (error) {
-      setError(language === 'id' ? 'Gagal mengirim ulang OTP' : 'Failed to resend OTP');
+      setError(t('login.otpResendFailed'));
       toast({
         variant: 'destructive',
-        title: language === 'id' ? 'Gagal mengirim ulang OTP' : 'Failed to resend OTP',
-        description:
-          language === 'id'
-            ? 'Terjadi kesalahan saat mengirim ulang OTP'
-            : 'An error occurred while resending OTP',
+        title: t('login.otpResendFailed'),
+        description: t('login.otpResendFailedDesc'),
       });
       console.error('OTP resend failed', error);
     } finally {
@@ -167,11 +154,8 @@ export default function Login() {
     await connectWithEmail(data.email);
 
     toast({
-      title: language === 'id' ? 'Kode OTP telah dikirim!' : 'OTP code has been sent!',
-      description:
-        language === 'id'
-          ? 'Silakan masukkan kode OTP yang telah dikirim ke email Anda'
-          : 'Please enter the OTP code sent to your email',
+      title: t('login.otpSentTitle'),
+      description: t('login.otpSentDesc'),
     });
 
     setShowOtpInput(true);
@@ -181,7 +165,7 @@ export default function Login() {
     e.preventDefault();
 
     if (!taniId) {
-      setError(language === 'id' ? 'TaniId is required' : 'TaniId is required');
+      setError(t('login.taniIdRequired'));
       return;
     }
 
@@ -191,14 +175,11 @@ export default function Login() {
     try {
       await serverSideTaniIdLogin();
     } catch (error) {
-      setError(language === 'id' ? 'Gagal login dengan TaniId' : 'Failed to login with TaniId');
+      setError(t('login.taniIdFailed'));
       toast({
         variant: 'destructive',
-        title: language === 'id' ? 'Gagal login dengan TaniId' : 'Failed to login with TaniId',
-        description:
-          language === 'id'
-            ? 'Terjadi kesalahan saat login dengan TaniId, periksa kembali TaniId Anda. Atau gunakan login dengan email'
-            : 'An error occurred while logging in with TaniId, please check your TaniId or use email login',
+        title: t('login.taniIdFailed'),
+        description: t('login.taniIdFailedDesc'),
       });
       console.error('TaniId login failed', error);
     } finally {
@@ -231,23 +212,17 @@ export default function Login() {
       await connectWithEmail(data.email);
 
       toast({
-        title: language === 'id' ? 'Kode OTP telah dikirim!' : 'OTP code has been sent!',
-        description:
-          language === 'id'
-            ? 'Silakan masukkan kode OTP yang telah dikirim ke email Anda'
-            : 'Please enter the OTP code sent to your email',
+        title: t('login.otpSentTitle'),
+        description: t('login.otpSentDesc'),
       });
 
       setShowOtpInput(true);
     } catch (error) {
-      setError(language === 'id' ? 'Gagal login dengan email' : 'Failed to login with email');
+      setError(t('login.emailFailed'));
       toast({
         variant: 'destructive',
-        title: language === 'id' ? 'Gagal login dengan email' : 'Failed to login with email',
-        description:
-          language === 'id'
-            ? 'Terjadi kesalahan saat login dengan email'
-            : 'An error occurred while logging in with email',
+        title: t('login.emailFailed'),
+        description: t('login.emailFailedDesc'),
       });
       console.error('Email login failed', error);
     } finally {
@@ -286,47 +261,29 @@ export default function Login() {
                 className="h-full w-full object-contain"
               />
             </div>
-            <h1 className="text-4xl font-bold text-earth-dark-green">TaniTrack</h1>
+            <h1 className="text-4xl font-bold text-earth-dark-green">{t('app.name')}</h1>
           </div>
           <h2 className="mb-6 text-2xl font-bold text-earth-dark-green">
-            {language === 'id'
-              ? 'Aplikasi Pengelolaan Pertanian untuk Kesejahteraan Petani'
-              : "Agricultural Management App for Farmers' Prosperity"}
+            {t('login.description')}
           </h2>
           <div className="space-y-6">
             <div className="flex items-start rounded-lg border border-earth-light-green/50 bg-white p-4 shadow-md">
               <QrCode className="mr-3 mt-1 h-6 w-6 flex-shrink-0 text-earth-medium-green" />
               <div>
-                <h3 className="mb-1 font-semibold text-earth-dark-green">
-                  {language === 'id' ? 'Cara Login' : 'How to Login'}
-                </h3>
+                <h3 className="mb-1 font-semibold text-earth-dark-green">{t('login.howTo')}</h3>
                 <p className="text-sm text-earth-medium-green">
                   1.{' '}
-                  {language === 'id'
-                    ? `${mode === 'email' ? 'Masukkan Email' : mode === 'taniId' ? 'Masukkan TaniId' : 'Scan Tani Card'} yang terdaftar di TaniTrack`
-                    : `${mode === 'email' ? 'Enter your registered Email in TaniTrack' : mode === 'taniId' ? 'Enter your registered TaniId in TaniTrack' : 'Scan your registered Tani Card in TaniTrack'} yang terdaftar di TaniTrack`}
+                  {t(
+                    mode === 'email'
+                      ? 'login.step1.email'
+                      : mode === 'taniId'
+                        ? 'login.step1.taniId'
+                        : 'login.step1.qr'
+                  )}
                 </p>
-                <p className="mt-1 text-sm text-earth-medium-green">
-                  2.{' '}
-                  {language === 'id'
-                    ? 'Masukkan kode OTP yang dikirim ke email Anda'
-                    : 'Enter the OTP code sent to your email'}
-                </p>
+                <p className="mt-1 text-sm text-earth-medium-green">2. {t('login.step2')}</p>
               </div>
             </div>
-            {/* <div className="flex items-start rounded-lg border border-earth-light-green/50 bg-white p-4 shadow-md">
-              <Smartphone className="mr-3 mt-1 h-6 w-6 flex-shrink-0 text-earth-medium-green" />
-              <div>
-                <h3 className="mb-1 font-semibold text-earth-dark-green">
-                  {language === 'id' ? 'Keamanan Tinggi' : 'High Security'}
-                </h3>
-                <p className="text-sm text-earth-medium-green">
-                  {language === 'id'
-                    ? 'TaniTrack menjamin keamanan akun Anda dengan sistem OTP yang terproteksi.'
-                    : 'TaniTrack ensures your account security with protected OTP system.'}
-                </p>
-              </div>
-            </div> */}
             {/* Stacked cards in perspective view */}
             <div className="mt-8 flex justify-center">
               <div className="relative mx-auto h-60 w-72">
@@ -350,21 +307,13 @@ export default function Login() {
       <div className="flex w-full flex-1 items-center justify-center bg-white p-8 md:w-1/2 md:bg-transparent">
         <Card className="w-full max-w-md overflow-hidden border-earth-light-brown/40 bg-white shadow-lg backdrop-blur-sm md:bg-white/95">
           <CardHeader className="bg-gradient-to-r from-earth-dark-green to-earth-medium-green py-6 text-white">
-            <CardTitle className="text-center text-2xl text-white">
-              {language === 'id' ? 'Masuk ke TaniTrack' : 'Login to TaniTrack'}
-            </CardTitle>
+            <CardTitle className="text-center text-2xl text-white">{t('login.title')}</CardTitle>
             <CardDescription className="mt-2 text-center text-white/90">
               {mode === 'email'
                 ? showOtpInput
-                  ? language === 'id'
-                    ? 'Masukkan kode OTP yang dikirim ke email Anda'
-                    : 'Enter the OTP code sent to your email'
-                  : language === 'id'
-                    ? 'Masukkan email untuk memulai'
-                    : 'Enter your email to get started'
-                : language === 'id'
-                  ? 'Masukkan TaniId Anda untuk login'
-                  : 'Enter your TaniId to login'}
+                  ? t('login.otpPrompt')
+                  : t('login.emailPrompt')
+                : t('login.taniIdPrompt')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 px-8 pt-6">
@@ -415,7 +364,7 @@ export default function Login() {
             {mode === 'qrcode' && (
               <div className="flex flex-col items-center gap-6 py-8">
                 <h2 className="text-xl font-semibold text-earth-dark-green">
-                  Scan QR Code Tani Card
+                  {t('login.qrscan.title')}
                 </h2>
                 <div className="w-full max-w-xs overflow-hidden rounded-lg border-2 border-earth-medium-green">
                   <QrScanner
@@ -448,23 +397,21 @@ export default function Login() {
                 </div>
                 <p className="text-xs text-earth-brown">{qrCodeRawValue}</p>
                 <div className="text-center text-sm text-earth-dark-green">
-                  Arahkan kamera ke QR code pada Tani Card Anda.
+                  {t('login.qrscan.command')}
                   <br />
-                  <span className="text-xs text-earth-brown">
-                    QR code akan mengisi TaniId dan Email secara otomatis.
-                  </span>
+                  <span className="text-xs text-earth-brown">{t('login.qrscan.result')}</span>
                 </div>
               </div>
             )}
           </CardContent>
           <CardFooter className="flex flex-col gap-4 px-8 py-8">
             <div className="text-center text-sm text-earth-dark-green">
-              {language === 'id' ? 'Belum punya akun? ' : "Don't have an account? "}
+              {t('login.noAccount')}
               <Link
                 to="/register"
                 className="font-semibold text-earth-medium-green hover:underline"
               >
-                {language === 'id' ? 'Daftar sekarang' : 'Register now'}
+                {t('login.registerNow')}
               </Link>
             </div>
           </CardFooter>

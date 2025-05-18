@@ -275,7 +275,7 @@ const KomoditasDetail = () => {
                       <p className="text-sm text-earth-medium-green">{t('commodities.location')}</p>
                       <p className="flex items-center font-medium text-earth-dark-green">
                         <MapPin className="mr-1 h-4 w-4 text-earth-medium-green" />
-                        {'Indonesia'}
+                        {komoditas.address ?? 'Indonesia'}
                       </p>
                     </div>
                   </div>
@@ -283,26 +283,30 @@ const KomoditasDetail = () => {
                   <div className="mt-4">
                     <p className="mb-2 text-sm text-earth-medium-green">{'Harga Grosir'}</p>
                     <div className=" overflow-hidden rounded-lg border border-earth-light-brown/30 bg-white">
-                      <Tabs defaultValue={komoditas_bulks[0].minQuantity} className="w-full">
+                      <Tabs defaultValue={komoditas_bulks[0]?.minQuantity} className="w-full">
                         <TabsList className="w-full bg-earth-pale-green">
-                          {komoditas_bulks.map((bulk) => (
-                            <TabsTrigger key={bulk._id} value={bulk.minQuantity} className="flex-1">
-                              {`${bulk.minQuantity} ${komoditas.unit}`}
+                          {komoditas_bulks?.map((bulk) => (
+                            <TabsTrigger
+                              key={bulk?._id}
+                              value={bulk?.minQuantity}
+                              className="flex-1"
+                            >
+                              {`${bulk?.minQuantity} ${komoditas.unit}`}
                             </TabsTrigger>
                           ))}
                         </TabsList>
                         {komoditas_bulks.map((bulk) => (
                           <TabsContent
-                            key={bulk._id}
-                            value={bulk.minQuantity}
+                            key={bulk?._id}
+                            value={bulk?.minQuantity}
                             className="space-y-4 p-4"
                           >
                             <p>
-                              Harga: Rp {bulk.price.toLocaleString()} / {komoditas.unit}
+                              Harga: Rp {bulk?.price.toLocaleString()} / {komoditas.unit}
                             </p>
                             <p>
                               Harga Total: Rp{' '}
-                              {(bulk.price * parseInt(bulk.minQuantity)).toLocaleString()}
+                              {(bulk?.price * parseInt(bulk?.minQuantity)).toLocaleString()}
                             </p>
                             {/* <p>{komoditas.description}</p> */}
                           </TabsContent>
