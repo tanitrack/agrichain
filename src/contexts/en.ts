@@ -38,6 +38,11 @@ export const en = {
   'nav.settings': 'Settings',
   'nav.notifications': 'Notifications',
   'nav.home': 'Home',
+  'nav.orderBook': 'Order Book',
+  'nav.price': 'Commodity Prices',
+  'nav.market': 'Market',
+  'nav.farmer': 'Farmer',
+  'nav.buyer': 'Buyer',
 
   // Login
   'login.description': "Agricultural Management App for Farmers' Prosperity",
@@ -325,6 +330,7 @@ export const en = {
   'dashboard.quickActions': 'Quick Actions',
   'dashboard.alerts': 'Alerts',
   'dashboard.recommendations': 'Recommendations',
+  'dashboard.expenseSummary': 'Expense Summary',
   'transactions.inDelivery': 'In Delivery',
   'transactions.status.selesai': 'Completed',
   'transactions.status.dibatalkan': 'Cancelled',

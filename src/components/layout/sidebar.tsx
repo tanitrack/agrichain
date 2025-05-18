@@ -12,6 +12,7 @@ import {
   Wheat,
   Sprout,
   Store,
+  Wallet,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -33,26 +34,22 @@ interface SidebarProps {
 
 // Links for farmers (default role)
 const farmerLinks = [
-  { name: 'Dashboard', href: '/dashboard', icon: Home },
-  { name: 'Komoditas', href: '/komoditas', icon: Wheat },
-  // { name: 'Saldo', href: '/saldo', icon: Wallet },
-  { name: 'Transaksi', href: '/transaksi', icon: ShoppingCart },
-  { name: 'Order Book', href: '/order-book', icon: ClipboardList },
-  { name: 'Harga Komoditas', href: '/harga', icon: TrendingUp },
-  // { name: 'Pengiriman', href: '/pengiriman', icon: Truck },
-  // { name: 'Profil', href: '/profile', icon: User },
+  { name: 'dashboard', href: '/dashboard', icon: Home },
+  { name: 'commodities', href: '/komoditas', icon: Wheat },
+  { name: 'balance', href: '/saldo', icon: Wallet },
+  { name: 'transactions', href: '/transaksi', icon: ShoppingCart },
+  { name: 'orderBook', href: '/order-book', icon: ClipboardList },
+  { name: 'price', href: '/harga', icon: TrendingUp },
 ];
 
 // New links specifically for buyers
 const buyerLinks = [
-  { name: 'Dashboard', href: '/dashboard', icon: Home },
-  { name: 'Pasar', href: '/market', icon: Store },
-  { name: 'Order Book', href: '/order-book', icon: ClipboardList },
-  // { name: 'Saldo', href: '/saldo', icon: Wallet },
-  { name: 'Transaksi', href: '/transaksi', icon: ShoppingCart },
-  // { name: 'Pengiriman', href: '/pengiriman', icon: Truck },
-  { name: 'Harga Komoditas', href: '/harga', icon: TrendingUp },
-  // { name: 'Profil', href: '/profile', icon: User },
+  { name: 'dashboard', href: '/dashboard', icon: Home },
+  { name: 'market', href: '/market', icon: Store },
+  { name: 'orderBook', href: '/order-book', icon: ClipboardList },
+  { name: 'balance', href: '/saldo', icon: Wallet },
+  { name: 'transactions', href: '/transaksi', icon: ShoppingCart },
+  { name: 'price', href: '/harga', icon: TrendingUp },
 ];
 
 export function Sidebar({ open, setOpen }: SidebarProps) {
@@ -60,16 +57,6 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
   const [isMobile, setIsMobile] = useState(false);
   const { t } = useLanguage();
   const { userProfile } = useAuthCheck();
-  // Use localStorage to persist the user role
-  // const [userRole, setUserRole] = useState<'farmer' | 'buyer'>(() => {
-  //   const savedRole = localStorage.getItem('userRole');
-  //   return savedRole === 'buyer' ? 'buyer' : 'farmer';
-  // });
-
-  // Save role to localStorage whenever it changes
-  // useEffect(() => {
-  //   localStorage.setItem('userRole', userRole);
-  // }, [userRole]);
 
   // Determine which links to show based on user role
   const links = userProfile?.userType === 'farmer' ? farmerLinks : buyerLinks;
@@ -139,40 +126,6 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
           )}
         </div>
 
-        {/* Role Switcher - For demonstration purposes */}
-        {/* {open && (
-          <div className="px-3 py-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full border-[#588157]/30 bg-[#588157]/20 text-white hover:bg-[#588157]/30 hover:text-white"
-                >
-                  {userRole === 'farmer' ? 'Petani' : 'Pembeli'}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48">
-                <DropdownMenuLabel>Pilih Peran</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className={cn(userRole === 'farmer' && 'bg-accent')}
-                  onClick={() => setUserRole('farmer')}
-                >
-                  <Wheat className="mr-2 h-4 w-4" />
-                  <span>Petani</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className={cn(userRole === 'buyer' && 'bg-accent')}
-                  onClick={() => setUserRole('buyer')}
-                >
-                  <ShoppingBasket className="mr-2 h-4 w-4" />
-                  <span>Pembeli</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        )} */}
-
         <div className="flex-1 overflow-y-auto py-4">
           <nav className="space-y-1 px-2">
             {links.map((link) => {
@@ -193,7 +146,7 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
                   )}
                 >
                   <link.icon className="h-5 w-5" />
-                  {open && <span>{link.name}</span>}
+                  {open && <span>{t(`nav.${link.name}`)}</span>}
                 </Link>
               );
             })}
@@ -215,7 +168,7 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
                   <div className="flex flex-col items-start text-sm">
                     <span className="text-wrap text-start font-medium">{userProfile?.name}</span>
                     <span className="text-xs text-[#a3b18a]">
-                      {userProfile?.userType === 'farmer' ? 'Petani' : 'Pembeli'}
+                      {userProfile?.userType === 'farmer' ? t('nav.farmer') : t('nav.buyer')}
                     </span>
                   </div>
                 </Button>
@@ -224,20 +177,20 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
                 <DropdownMenuItem>
                   <Link to="/profile" className="flex w-full items-center">
                     <User className="mr-2 h-4 w-4" />
-                    <span>Profil</span>
+                    <span>{t('nav.profile')}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <div className="flex w-full items-center">
                     <Sprout className="mr-2 h-4 w-4" />
-                    <span>Pengaturan</span>
+                    <span>{t('nav.settings')}</span>
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Link to="/login" className="flex w-full items-center">
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Keluar</span>
+                    <span>{t('nav.logout')}</span>
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -260,20 +213,20 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
                 <DropdownMenuItem>
                   <Link to="/profile" className="flex w-full items-center">
                     <User className="mr-2 h-4 w-4" />
-                    <span>Profil</span>
+                    <span>{t('nav.profile')}</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <div className="flex w-full items-center">
                     <Sprout className="mr-2 h-4 w-4" />
-                    <span>Pengaturan</span>
+                    <span>{t('nav.settings')}</span>
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Link to="/login" className="flex w-full items-center">
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Keluar</span>
+                    <span>{t('nav.logout')}</span>
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>

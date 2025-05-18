@@ -39,6 +39,11 @@ export const id = {
   'nav.settings': 'Pengaturan',
   'nav.notifications': 'Notifikasi',
   'nav.home': 'Beranda',
+  'nav.orderBook': 'Order Book',
+  'nav.price': 'Harga Komoditas',
+  'nav.market': 'Pasar',
+  'nav.farmer': 'Petani',
+  'nav.buyer': 'Pembeli',
 
   // Login
   'login.description': 'Aplikasi Pengelolaan Pertanian untuk Kemakmuran Petani',
