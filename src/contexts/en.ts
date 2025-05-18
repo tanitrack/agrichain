@@ -283,7 +283,7 @@ export const en = {
 
   // Dashboard
   'dashboard.title': 'Dashboard',
-  'dashboard.welcome': 'Welcome to TaniTrack',
+  'dashboard.welcome': 'Welcome back,',
   'dashboard.summary': 'Summary Income',
   'dashboard.recentTransactions': 'Recent Transactions',
   'dashboard.pendingOrders': 'Pending Orders',
@@ -294,6 +294,17 @@ export const en = {
   'dashboard.quickActions': 'Quick Actions',
   'dashboard.alerts': 'Alerts',
   'dashboard.recommendations': 'Recommendations',
+  'transactions.inDelivery': 'In Delivery',
+  'transactions.status.selesai': 'Completed',
+  'transactions.status.dibatalkan': 'Cancelled',
+  'transactions.status.negosiasi': 'Negotiation',
+  'transactions.status.menunggu_konfirmasi': 'Awaiting Confirmation',
+  'transactions.status.dikonfirmasi': 'Confirmed',
+  'transactions.status.dibayar': 'Paid',
+  'transactions.status.persiapan_pengiriman': 'Preparing Shipment',
+  'transactions.status.sedang_dikirim': 'Shipping',
+  'transactions.status.sudah_dikirim': 'Shipped',
+  'transactions.status.diterima': 'Received',
 
   // Profile/Account
   'profile.title': 'Profile',
