@@ -41,7 +41,20 @@ import { DatePicker } from '../ui/datepicker';
 
 // Mock data for units and categories
 const units = ['kg', 'ton', 'gram', 'liter'];
-const categories = ['Sayuran', 'Buah-buahan', 'Daging', 'Ikan', 'Telur', 'Susu', 'Rempah-rempah', 'Biji-bijian', 'Kacang-kacangan', 'Umbi-umbian', 'Pupuk', 'Pakan Ternak'];
+const categories = [
+  'Sayuran',
+  'Buah-buahan',
+  'Daging',
+  'Ikan',
+  'Telur',
+  'Susu',
+  'Rempah-rempah',
+  'Biji-bijian',
+  'Kacang-kacangan',
+  'Umbi-umbian',
+  'Pupuk',
+  'Pakan Ternak',
+];
 
 interface AddKomoditasDialogProps {
   open: boolean;
@@ -104,11 +117,11 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
 
       if (!formData.name) {
         toast({
-          title: 'Error',
-          description: 'Name is required',
+          title: t('commodities.error'),
+          description: t('commodities.nameRequired'),
           variant: 'destructive',
         });
-        setIsSubmitting(false); // Ensure loading is set to false on error
+        setIsSubmitting(false);
         return;
       }
 
@@ -140,9 +153,9 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
         });
       }); // Use the mutation
 
-      await toast({
-        title: 'Komoditas berhasil ditambahkan',
-        description: `${formData.name} telah ditambahkan ke daftar komoditas Anda`,
+      toast({
+        title: t('commodities.addSuccessTitle'),
+        description: `${t('commodities.addSuccessDesc')} ${formData.name}`,
       });
 
       onSuccess(formData.name);
@@ -164,10 +177,10 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
 
       onOpenChange(false);
     } catch (error) {
-      console.error('Failed to add komoditas:', error); // Log the error for debugging
+      console.error('Failed to add komoditas:', error);
       toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to add komoditas',
+        title: t('commodities.error'),
+        description: error instanceof Error ? error.message : t('commodities.addFailed'),
         variant: 'destructive',
       });
     } finally {
@@ -220,8 +233,8 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
   const handleOpenBulkPricing = () => {
     if (!formData.basePrice || !formData.unit) {
       toast({
-        title: 'Perhatian',
-        description: 'Harap isi harga dasar dan satuan terlebih dahulu',
+        title: t('commodities.attention'),
+        description: t('commodities.fillBasePriceAndUnit'),
       });
       return;
     }
@@ -241,9 +254,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
         <DialogContent className="border-earth-light-green sm:max-w-[625px]">
           <DialogHeader className="earth-header-moss">
             <DialogTitle>{t('commodities.add')}</DialogTitle>
-            <DialogDescription className="text-white">
-              Isi formulir di bawah ini untuk menambahkan komoditas baru ke daftar Anda.
-            </DialogDescription>
+            <DialogDescription className="text-white">{t('commodities.addDesc')}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 p-6 py-4">
             <div className="grid grid-cols-2 gap-4">
@@ -253,7 +264,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                 </Label>
                 <Input
                   id="name"
-                  placeholder="Masukkan nama komoditas"
+                  placeholder={t('commodities.namePlaceholder')}
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   className="border-earth-medium-green focus:border-earth-dark-green"
@@ -268,7 +279,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                   onValueChange={(value) => handleInputChange('unit', value)}
                 >
                   <SelectTrigger className="border-earth-medium-green">
-                    <SelectValue placeholder="Pilih satuan" />
+                    <SelectValue placeholder={t('commodities.unitPlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
                     {units.map((unit) => (
@@ -291,7 +302,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                   onValueChange={(value) => handleInputChange('category', value)}
                 >
                   <SelectTrigger className="border-earth-medium-green">
-                    <SelectValue placeholder="Pilih kategori" />
+                    <SelectValue placeholder={t('commodities.categoryPlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map((category) => (
@@ -308,7 +319,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                 </Label>
                 <Input
                   id="imageUrl"
-                  placeholder="URL gambar komoditas"
+                  placeholder={t('commodities.imageUrlPlaceholder')}
                   value={formData.imageUrl}
                   onChange={(e) => handleInputChange('imageUrl', e.target.value)}
                   className="border-earth-medium-green focus:border-earth-dark-green"
@@ -319,21 +330,21 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="grade" className="text-earth-dark-green">
-                  {'Grade'}
+                  {t('commodities.grade')}
                 </Label>
                 <Input
-                  id="imageUrl"
-                  placeholder="Level Grade cth: A, B, C"
+                  id="grade"
+                  placeholder={t('commodities.gradePlaceholder')}
                   value={formData.grade}
                   onChange={(e) => handleInputChange('grade', e.target.value)}
                   className="border-earth-medium-green focus:border-earth-dark-green"
                 />
               </div>
               <DatePicker
-                label={language === 'id' ? 'Tanggal Panen' : 'Harvest Date'}
+                label={t('commodities.harvestDate')}
                 date={formData.harvestDate}
                 onDateChange={(date) => handleInputChange('harvestDate', date)}
-                placeholder={language === 'id' ? 'Pilih tanggal' : 'Pick a date'}
+                placeholder={t('commodities.harvestDatePlaceholder')}
                 locale={language}
               />
             </div>
@@ -344,7 +355,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
               </Label>
               <Input
                 id="description"
-                placeholder="Deskripsi komoditas"
+                placeholder={t('commodities.descriptionPlaceholder')}
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 className="border-earth-medium-green focus:border-earth-dark-green"
@@ -355,7 +366,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="basePrice" className="text-earth-dark-green">
-                  Harga Dasar
+                  {t('commodities.basePrice')}
                 </Label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -371,7 +382,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                   />
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                     <span className="text-sm text-earth-medium-green">
-                      /{formData.unit || 'unit'}
+                      /{formData.unit || t('commodities.unit')}
                     </span>
                   </div>
                 </div>
@@ -383,7 +394,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                 <Input
                   id="stock"
                   type="number"
-                  placeholder="Masukkan stok"
+                  placeholder={t('commodities.stockPlaceholder')}
                   value={formData.stock}
                   onChange={(e) => handleInputChange('stock', e.target.value)}
                   className="border-earth-medium-green focus:border-earth-dark-green"
@@ -397,7 +408,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                 className="h-10 w-full gap-2 border-earth-medium-green text-earth-dark-green hover:bg-earth-light-green/20"
               >
                 <Tag className="h-4 w-4" />
-                Atur Harga Grosir
+                {t('commodities.setBulkPrice')}
               </Button>
             </div>
 
@@ -413,7 +424,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                     onClick={handleOpenBulkPricing}
                   >
                     <Pencil className="h-5 w-5" />
-                    Ubah
+                    {t('action.edit')}
                   </Button>
                 </div>
                 <div className="space-y-1">
@@ -454,7 +465,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
               className="bg-earth-dark-green hover:bg-earth-medium-green"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Saving...' : t('action.save')}
+              {isSubmitting ? t('action.saving') : t('action.save')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -466,14 +477,13 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
             <SheetHeader className="earth-header-forest rounded-t-md p-6">
               <SheetTitle className="flex items-center gap-2 text-white">
                 <Tag className="h-5 w-5" />
-                Atur Harga Grosir
+                {t('commodities.setBulkPrice')}
               </SheetTitle>
               <SheetDescription className="text-white/80">
-                Tambahkan harga khusus untuk pembelian dalam jumlah besar
+                {t('commodities.addBulkPriceHint')}
               </SheetDescription>
             </SheetHeader>
 
-            {/* Fix: Using ScrollArea with proper styles to ensure scrolling works */}
             <div className="flex-1 overflow-hidden">
               <ScrollArea className="h-[calc(100vh-240px)]">
                 <div className="space-y-6 px-6 py-4">
@@ -481,28 +491,33 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                   <div className="rounded-md border border-earth-light-green bg-earth-pale-green p-4">
                     <div className="mb-2 flex items-center gap-2">
                       <DollarSign className="h-5 w-5 text-earth-dark-green" />
-                      <h3 className="font-medium text-earth-dark-green">Harga Dasar</h3>
+                      <h3 className="font-medium text-earth-dark-green">
+                        {t('commodities.basePrice')}
+                      </h3>
                     </div>
                     <div className="pl-7">
                       <p className="text-sm text-earth-medium-green">
-                        Harga dasar:{' '}
+                        {t('commodities.basePrice')}:{' '}
                         <span className="font-medium text-earth-dark-green">
-                          Rp {Number(formData.basePrice).toLocaleString()}/{formData.unit || 'unit'}
+                          Rp {Number(formData.basePrice).toLocaleString()}/
+                          {formData.unit || t('commodities.unit')}
                         </span>
                       </p>
                       <p className="mt-1 text-xs text-earth-medium-green">
-                        Harga ini berlaku untuk pembelian standar.
+                        {t('commodities.basePriceInfo')}
                       </p>
                     </div>
                   </div>
 
-                  {/* Add bulk price form - Improved formatting */}
+                  {/* Add bulk price form */}
                   <div className="space-y-4">
-                    <h3 className="font-medium text-earth-dark-green">Tambah Harga Grosir</h3>
+                    <h3 className="font-medium text-earth-dark-green">
+                      {t('commodities.addBulkPrice')}
+                    </h3>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-2">
                         <Label htmlFor="minQuantity" className="text-sm text-earth-medium-green">
-                          Jumlah Minimal
+                          {t('commodities.minQuantity')}
                         </Label>
                         <div className="relative">
                           <Input
@@ -510,7 +525,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                             type="text"
                             inputMode="numeric"
                             pattern="[0-9]*"
-                            placeholder="100"
+                            placeholder={t('commodities.minQuantityPlaceholder')}
                             value={newBulkPrice.minQuantity}
                             onChange={(e) => {
                               // Only allow numeric input
@@ -521,14 +536,15 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                           />
                           <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                             <span className="text-sm text-earth-medium-green">
-                              {formData.unit || 'unit'}
+                              {formData.unit || t('commodities.unit')}
                             </span>
                           </div>
                         </div>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="bulkPrice" className="text-sm text-earth-medium-green">
-                          Harga per {formData.unit || 'unit'}
+                          {t('commodities.bulkPricePerUnit')}{' '}
+                          {formData.unit || t('commodities.unit')}
                         </Label>
                         <div className="relative">
                           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -550,26 +566,29 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                       onClick={handleAddBulkPrice}
                       className="w-full bg-earth-dark-green hover:bg-earth-medium-green"
                     >
-                      Tambah Harga Grosir
+                      {t('commodities.addBulkPrice')}
                     </Button>
                   </div>
 
                   {/* Bulk prices list */}
                   {bulkPrices.length > 0 ? (
                     <div className="space-y-3">
-                      <h3 className="font-medium text-earth-dark-green">Daftar Harga Grosir</h3>
+                      <h3 className="font-medium text-earth-dark-green">
+                        {t('commodities.bulkPriceList')}
+                      </h3>
                       <div className="overflow-hidden rounded-md border border-earth-light-green">
                         <table className="w-full">
                           <thead className="bg-earth-light-green/30">
                             <tr>
                               <th className="px-4 py-2 text-left text-sm font-medium text-earth-dark-green">
-                                Min. Jumlah
+                                {t('commodities.minQuantity')}
                               </th>
                               <th className="px-4 py-2 text-left text-sm font-medium text-earth-dark-green">
-                                Harga/{formData.unit || 'unit'}
+                                {t('commodities.bulkPricePerUnit')}{' '}
+                                {formData.unit || t('commodities.unit')}
                               </th>
                               <th className="px-4 py-2 text-right text-sm font-medium text-earth-dark-green">
-                                Aksi
+                                {t('action.action')}
                               </th>
                             </tr>
                           </thead>
@@ -577,7 +596,8 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                             {bulkPrices.map((price) => (
                               <tr key={price.id} className="border-t border-earth-light-green">
                                 <td className="px-4 py-2 text-sm text-earth-dark-green">
-                                  {price.minQuantity.toLocaleString()} {formData.unit || 'unit'}
+                                  {price.minQuantity.toLocaleString()}{' '}
+                                  {formData.unit || t('commodities.unit')}
                                 </td>
                                 <td className="px-4 py-2 text-sm text-earth-dark-green">
                                   Rp {price.price.toLocaleString()}
@@ -598,16 +618,14 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                         </table>
                       </div>
                       <p className="text-xs text-earth-medium-green">
-                        Harga akan otomatis diterapkan berdasarkan jumlah pembelian.
+                        {t('commodities.bulkPriceAuto')}
                       </p>
                     </div>
                   ) : (
                     <div className="py-6 text-center text-earth-medium-green">
                       <Tag className="mx-auto mb-2 h-10 w-10 opacity-50" />
-                      <p>Belum ada harga grosir</p>
-                      <p className="mt-1 text-xs">
-                        Tambahkan harga grosir untuk menarik pembeli dalam jumlah besar
-                      </p>
+                      <p>{t('commodities.noBulkPrice')}</p>
+                      <p className="mt-1 text-xs">{t('commodities.addBulkPriceHint')}</p>
                     </div>
                   )}
                 </div>
@@ -617,7 +635,7 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
             <SheetFooter className="mt-auto border-t border-earth-light-green p-4">
               <SheetClose asChild>
                 <Button className="bg-earth-dark-green hover:bg-earth-medium-green">
-                  Simpan Harga Grosir
+                  {t('commodities.saveBulkPrice')}
                 </Button>
               </SheetClose>
             </SheetFooter>

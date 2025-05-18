@@ -30,13 +30,9 @@ export const KomoditasTable = ({
   onDelete,
   onShowQR,
 }: KomoditasTableProps) => {
-  const { t, language } = useLanguage();
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const { t } = useLanguage();
 
-  console.log('====================================');
-  console.log('DATA ---> ', data);
-  console.log('====================================');
+  const [searchQuery, setSearchQuery] = useState('');
 
   return (
     <Card className="">
@@ -59,7 +55,7 @@ export const KomoditasTable = ({
           <div className=" flex flex-col gap-4 sm:flex-row">
             <Button variant="outline" className="flex gap-2 text-tani-green-dark">
               <Filter className="h-4 w-4" />
-              {language === 'id' ? 'Filter' : 'Filter'}
+              {t('action.filter')}
             </Button>
           </div>
         </div>

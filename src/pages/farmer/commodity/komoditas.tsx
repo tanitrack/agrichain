@@ -63,7 +63,7 @@ const Komoditas = () => {
   const [addKomoditasOpen, setAddKomoditasOpen] = useState(false);
   const [qrCodeDialogOpen, setQrCodeDialogOpen] = useState(false);
   const [selectedKomoditas, setSelectedKomoditas] = useState<string | null>(null);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   // Fetch komoditas data using Convex query
   const komoditasData = useQuery(api.komoditas_queries.list, {
@@ -113,7 +113,7 @@ const Komoditas = () => {
             <DialogHeader className="earth-header-moss">
               <DialogTitle>{t('commodities.qrcode')}</DialogTitle>
               <DialogDescription className="text-white">
-                Gunakan QR Code ini untuk melacak komoditas Anda.
+                {t('commodities.qrcodeDesc')}
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col items-center py-4">
@@ -126,7 +126,9 @@ const Komoditas = () => {
                 ID: <span className="font-medium">KM00{Math.floor(Math.random() * 1000)}</span>
                 <br />
                 {t('commodities.created')}:{' '}
-                <span className="font-medium">{new Date().toLocaleDateString('id-ID')}</span>
+                <span className="font-medium">
+                  {new Date().toLocaleDateString(language === 'id' ? 'id-ID' : 'en-US')}
+                </span>
               </p>
             </div>
             <DialogFooter>
@@ -140,29 +142,6 @@ const Komoditas = () => {
           </DialogContent>
         </Dialog>
       </div>
-
-      {/* <Card className="earth-card-green mb-6">
-        <CardContent className="p-6">
-          <div className="flex flex-col gap-4 sm:flex-row">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 transform text-earth-medium-green" />
-              <Input
-                className="border-earth-medium-green pl-10 focus:border-earth-dark-green"
-                placeholder={t('commodities.search')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <Button
-              variant="outline"
-              className="gap-2 border-earth-medium-green text-earth-dark-green hover:bg-earth-light-green/20"
-            >
-              <Filter className="h-4 w-4" />
-              {t('action.filter')}
-            </Button>
-          </div>
-        </CardContent>
-      </Card> */}
 
       <KomoditasTable
         data={displayData}
