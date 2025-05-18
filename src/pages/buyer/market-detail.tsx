@@ -33,7 +33,7 @@ import { formatDate } from '@/lib/utils';
 
 const MarketDetail = () => {
   const { id } = useParams<{ id: Id<'komoditas'> }>();
-  const { language } = useLanguage();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   // Fetch the selected commodity by ID from Convex
@@ -66,8 +66,8 @@ const MarketDetail = () => {
   const handlePlaceOrderAndPay = async () => {
     if (!userProfile?._id) {
       toast({
-        title: 'Error',
-        description: 'User not logged in or profile incomplete.',
+        title: t('marketDetail.error'),
+        description: t('marketDetail.notLoggedIn'),
         variant: 'destructive',
       });
       return;
@@ -75,27 +75,27 @@ const MarketDetail = () => {
     // Ensure commodity data is loaded and quantity is selected
     if (!commodity || !selectedQuantity) {
       toast({
-        title: 'Error',
-        description: 'Commodity data not loaded or quantity not selected.',
+        title: t('marketDetail.error'),
+        description: t('marketDetail.noCommodityOrQuantity'),
         variant: 'destructive',
       });
       return;
     }
 
     setIsProcessing(true);
-    toast({ title: 'Processing Order...', description: 'Please wait.' });
+    toast({ title: t('marketDetail.processingOrder'), description: t('marketDetail.pleaseWait') });
 
     try {
       // Step 1: Call Convex to create OrderBook record (Revised Step 4)
       const orderPrepResult = await createOrderBookFromListing({
-        komoditasId: commodity._id, // Use Convex _id
+        komoditasId: commodity._id,
         quantity: selectedQuantity,
-        buyerUserId: userProfile._id, // Use Convex _id
-        buyerSolanaPublicKey: userProfile.solanaPublicKey, // Use Convex solanaPublicKey
+        buyerUserId: userProfile._id,
+        buyerSolanaPublicKey: userProfile.solanaPublicKey,
       });
 
       if (!orderPrepResult || !orderPrepResult.orderBookId) {
-        throw new Error('Failed to prepare order on server.');
+        throw new Error(t('marketDetail.failedPrepareOrder'));
       }
 
       console.log('OrderBook created:', orderPrepResult.orderBookId);
@@ -103,8 +103,8 @@ const MarketDetail = () => {
 
       // Step 2: Call Solana to initialize escrow (Step 5)
       toast({
-        title: 'Awaiting Payment...',
-        description: 'Please confirm the transaction in your wallet.',
+        title: t('marketDetail.awaitingPayment'),
+        description: t('marketDetail.confirmInWallet'),
       });
 
       // TODO: Change the amount to lamport by data
@@ -120,16 +120,16 @@ const MarketDetail = () => {
         onSuccess: async (txSig, pdaAddress) => {
           console.log('Escrow initialized on-chain. Tx Signature:', txSig, 'PDA:', pdaAddress);
           toast({
-            title: 'Payment Secured!',
-            description: `Escrow initialized. Tx: ${txSig.substring(0, 10)}...`,
+            title: t('marketDetail.paymentSecured'),
+            description: `${t('marketDetail.escrowInitialized')} ${txSig.substring(0, 10)}`,
           });
 
           // Step 3: Record escrow initialization and link in Convex (New Step 7)
           if (!pdaAddress) {
             console.error('PDA address is missing after successful transaction.');
             toast({
-              title: 'Error',
-              description: 'Missing PDA address after transaction.',
+              title: t('marketDetail.error'),
+              description: t('marketDetail.missingPda'),
               variant: 'destructive',
             });
             // Optionally call a Convex mutation to mark the orderBook as "payment_failed"
@@ -147,14 +147,17 @@ const MarketDetail = () => {
               amountLamports: orderPrepResult.amountLamports,
             });
             console.log('Escrow initialization recorded in Convex.');
-            toast({ title: 'Order Updated', description: 'Convex records updated.' });
+            toast({
+              title: t('marketDetail.orderUpdated'),
+              description: t('marketDetail.convexUpdated'),
+            });
             // Navigate to a success/pending page or update UI
             // navigate(`/order/${orderPrepResult.orderBookId}/status`);
           } catch (convexErr) {
             console.error('Error recording escrow initialization in Convex:', convexErr);
             toast({
-              title: 'Error',
-              description: 'Failed to update order status in Convex.',
+              title: t('marketDetail.error'),
+              description: t('marketDetail.failedUpdateConvex'),
               variant: 'destructive',
             });
             // This is a critical state: on-chain succeeded, but off-chain failed to update.
@@ -164,8 +167,8 @@ const MarketDetail = () => {
         onError: (err) => {
           console.error('Escrow initialization failed:', err);
           toast({
-            title: 'Payment Failed',
-            description: err.message || 'Could not initialize escrow.',
+            title: t('marketDetail.paymentFailed'),
+            description: err.message || t('marketDetail.couldNotInitEscrow'),
             variant: 'destructive',
           });
           // Optionally: Call a Convex mutation to mark the orderBook as "payment_failed"
@@ -174,8 +177,8 @@ const MarketDetail = () => {
         onSubmitted: (txSig) => {
           console.log('InitializeEscrow tx submitted:', txSig);
           toast({
-            title: 'Transaction Submitted',
-            description: `Tx: ${txSig.substring(0, 10)}... Awaiting confirmation.`,
+            title: t('marketDetail.txSubmitted'),
+            description: `${t('marketDetail.txAwaiting')} ${txSig.substring(0, 10)}`,
           });
         },
       });
@@ -188,8 +191,8 @@ const MarketDetail = () => {
     } catch (err) {
       console.error('Order placement failed:', err);
       toast({
-        title: 'Order Failed',
-        description: (err as Error).message || 'Could not place order.',
+        title: t('marketDetail.orderFailed'),
+        description: (err as Error).message || t('marketDetail.couldNotPlaceOrder'),
         variant: 'destructive',
       });
     } finally {
@@ -202,7 +205,7 @@ const MarketDetail = () => {
     return (
       <MainLayout>
         <div className="flex h-[60vh] flex-col items-center justify-center">
-          <p>{language === 'id' ? 'Memuat detail komoditas...' : 'Loading commodity details...'}</p>
+          <p>{t('marketDetail.loading')}</p>
         </div>
       </MainLayout>
     );
@@ -213,12 +216,8 @@ const MarketDetail = () => {
     return (
       <MainLayout>
         <div className="flex h-[60vh] flex-col items-center justify-center">
-          <h2 className="mb-4 text-xl font-semibold">
-            {language === 'id' ? 'Komoditas tidak ditemukan' : 'Commodity not found'}
-          </h2>
-          <Button onClick={() => navigate('/market')}>
-            {language === 'id' ? 'Kembali ke Pasar' : 'Back to Market'}
-          </Button>
+          <h2 className="mb-4 text-xl font-semibold">{t('marketDetail.notFound')}</h2>
+          <Button onClick={() => navigate('/market')}>{t('marketDetail.backToMarket')}</Button>
         </div>
       </MainLayout>
     );
@@ -236,7 +235,7 @@ const MarketDetail = () => {
             className="border-earth-light-brown/30"
           >
             <ArrowLeft className="mr-1 h-4 w-4" />
-            {language === 'id' ? 'Kembali ke Pasar' : 'Back to Market'}
+            {t('marketDetail.backToMarket')}
           </Button>
         </div>
 
@@ -244,7 +243,6 @@ const MarketDetail = () => {
           {/* Left side - Images */}
           <div className="space-y-4">
             <div className="aspect-square overflow-hidden rounded-lg border border-earth-light-brown/30 bg-white">
-              {/* Use imageUrl from Convex, handle optional */}
               {commodity.imageUrl ? (
                 <img
                   src={commodity.imageUrl}
@@ -253,11 +251,10 @@ const MarketDetail = () => {
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-gray-200 text-muted-foreground">
-                  No Image
+                  {t('marketDetail.noImage')}
                 </div>
               )}
             </div>
-            {/* Image gallery commented out */}
           </div>
 
           {/* Right side - Details */}
@@ -277,14 +274,12 @@ const MarketDetail = () => {
                 </div>
                 <div className="mt-1 flex items-center gap-2">
                   <Wheat className="h-4 w-4 text-earth-medium-green" />
-                  {/* Use category instead of variety */}
                   <span className="font-medium text-earth-medium-green">{commodity.category}</span>
                 </div>
 
                 <div className="mt-4 flex items-center">
                   <Badge className="border border-earth-clay/50 bg-[#FEF7CD] px-3 py-1 text-earth-brown">
                     <CircleDollarSign className="mr-1 h-3.5 w-3.5" />
-                    {/* Use pricePerUnit */}
                     Rp {commodity.pricePerUnit.toLocaleString()} / {commodity.unit}
                   </Badge>
                 </div>
@@ -297,42 +292,30 @@ const MarketDetail = () => {
                 <div className="flex items-start gap-2">
                   <User className="mt-0.5 h-5 w-5 text-earth-medium-green" />
                   <div>
-                    <p className="text-sm text-muted-foreground">
-                      {language === 'id' ? 'Petani' : 'Farmer'}
-                    </p>
-                    {/* Farmer name is not directly available, use placeholder or fetch user data */}
+                    <p className="text-sm text-muted-foreground">{t('marketDetail.farmer')}</p>
                     <p className="font-medium">{commodity.farmersName ?? 'N/A'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
                   <MapPin className="mt-0.5 h-5 w-5 text-earth-medium-green" />
                   <div>
-                    <p className="text-sm text-muted-foreground">
-                      {language === 'id' ? 'Lokasi' : 'Location'}
-                    </p>
-                    {/* Location is not directly available, use placeholder or fetch user data */}
+                    <p className="text-sm text-muted-foreground">{t('marketDetail.location')}</p>
                     <p className="font-medium">{commodity.address ?? 'N/A'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">
                   <Package className="mt-0.5 h-5 w-5 text-earth-medium-green" />
                   <div>
-                    <p className="text-sm text-muted-foreground">
-                      {language === 'id' ? 'Stok' : 'Stock'}
-                    </p>
-                    {/* Use stock */}
+                    <p className="text-sm text-muted-foreground">{t('marketDetail.stock')}</p>
                     <p className="font-medium">
                       {commodity.stock} {commodity.unit}
                     </p>
                   </div>
                 </div>
-                {/* Harvest Date, Grade, Certifications are not in Convex schema */}
                 <div className="flex items-start gap-2">
                   <Calendar className="mt-0.5 h-5 w-5 text-earth-medium-green" />
                   <div>
-                    <p className="text-sm text-muted-foreground">
-                      {language === 'id' ? 'Tanggal Panen' : 'Harvest Date'}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{t('marketDetail.harvestDate')}</p>
                     <p className="font-medium">
                       {formatDate(
                         new Date(
@@ -344,26 +327,11 @@ const MarketDetail = () => {
                     </p>
                   </div>
                 </div>
-                {/* <div className="col-span-2 flex items-start gap-2">
-                  <BadgeCheck className="mt-0.5 h-5 w-5 text-earth-medium-green" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      {language === 'id' ? 'Sertifikasi' : 'Certifications'}
-                    </p>
-                    <div className="mt-1 flex flex-wrap gap-2">
-                      {commodity.certifications.map((cert) => (
-                        <Badge key={cert} variant="outline" className="bg-[#F2FCE2]">
-                          {cert}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </div> */}
               </div>
-              {/* Tabs for quantity/price variations - need to implement logic based on pricePerUnit and potentially minOrder */}
+              {/* Tabs for quantity/price variations */}
               {commodity_bulks === undefined && (
                 <div className="overflow-hidden rounded-lg border border-earth-light-brown/30 bg-white">
-                  Memuat harga...
+                  {t('marketDetail.loadingPrice')}
                 </div>
               )}
               {commodity_bulks && (
@@ -383,10 +351,11 @@ const MarketDetail = () => {
                         className="space-y-4 p-4"
                       >
                         <p>
-                          Harga: Rp {bulk.price.toLocaleString()} / {commodity.unit}
+                          {t('marketDetail.price')}: Rp {bulk.price.toLocaleString()} /{' '}
+                          {commodity.unit}
                         </p>
                         <p>
-                          Harga Total: Rp{' '}
+                          {t('marketDetail.totalPrice')}: Rp{' '}
                           {(bulk.price * parseInt(bulk.minQuantity)).toLocaleString()}
                         </p>
                       </TabsContent>
@@ -404,19 +373,12 @@ const MarketDetail = () => {
                   !selectedQuantity ||
                   selectedQuantity > commodity.stock
                 }
-                className="w-full" // Make button full width
+                className="w-full"
               >
                 {isProcessing || isEscrowLoading
-                  ? 'Processing...'
-                  : `Place Order & Pay (${selectedQuantity} ${commodity.unit})`}
+                  ? t('marketDetail.processing')
+                  : `${t('marketDetail.placeOrder')} (${selectedQuantity} ${commodity.unit})`}
               </Button>
-
-              {/* Minimum order info - need to get minOrder from somewhere, not in current schema */}
-              {/* <p className="mt-2 text-center text-xs text-muted-foreground">
-                {language === 'id'
-                  ? `Pembelian minimum ${commodity.minOrder} ${commodity.unit}`
-                  : `Minimum order ${commodity.minOrder} ${commodity.unit}`}
-              </p> */}
             </div>
 
             {/* Additional Information - Description */}
@@ -424,24 +386,12 @@ const MarketDetail = () => {
               <Tabs defaultValue="description" className="w-full">
                 <TabsList className="w-full bg-earth-pale-green">
                   <TabsTrigger value="description" className="flex-1">
-                    {language === 'id' ? 'Deskripsi' : 'Description'}
+                    {t('marketDetail.description')}
                   </TabsTrigger>
-                  {/* Nutritional Info and Storage Info are not in Convex schema */}
-                  {/* <TabsTrigger value="nutrition" className="flex-1">
-                    {language === 'id' ? 'Nutrisi' : 'Nutrition'}
-                  </TabsTrigger>
-                  <TabsTrigger value="storage" className="flex-1">
-                    {language === 'id' ? 'Penyimpanan' : 'Storage'}
-                  </TabsTrigger> */}
                 </TabsList>
                 <TabsContent value="description" className="p-4">
-                  {/* Use description from Convex, handle optional */}
-                  <p>
-                    {commodity.description ||
-                      (language === 'id' ? 'Tidak ada deskripsi.' : 'No description available.')}
-                  </p>
+                  <p>{commodity.description || t('marketDetail.noDescription')}</p>
                 </TabsContent>
-                {/* Nutritional Info and Storage Info tabs commented out */}
               </Tabs>
             </div>
           </div>
@@ -450,9 +400,7 @@ const MarketDetail = () => {
         {/* Farmer Information */}
         <Card className="border-earth-light-brown/30">
           <CardHeader className="bg-[#F2FCE2]">
-            <CardTitle className="text-lg">
-              {language === 'id' ? 'Informasi Petani' : 'Farmer Information'}
-            </CardTitle>
+            <CardTitle className="text-lg">{t('marketDetail.farmerInfo')}</CardTitle>
           </CardHeader>
           <CardContent className="p-6">
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -461,16 +409,12 @@ const MarketDetail = () => {
                   <User className="h-8 w-8 text-earth-medium-green" />
                 </div>
                 <div>
-                  {/* Farmer name is not directly available, use placeholder or fetch user data */}
                   <h3 className="font-semibold">{commodity.farmersName ?? 'N/A'}</h3>
-                  {/* Member since, rating, transactions are not directly available */}
-                  <p className="text-sm text-muted-foreground">
-                    {language === 'id' ? 'Bergabung sejak' : 'Member since'}
-                  </p>
+                  <p className="text-sm text-muted-foreground">{t('marketDetail.memberSince')}</p>
                   <div className="mt-1 flex items-center gap-1">
                     <span className="font-medium text-amber-600">★ N/A</span>
                     <span className="text-sm text-muted-foreground">
-                      (N/A {language === 'id' ? 'transaksi' : 'transactions'})
+                      (N/A {t('marketDetail.transactions')})
                     </span>
                   </div>
                 </div>
@@ -480,54 +424,18 @@ const MarketDetail = () => {
                   variant="outline"
                   className="mb-2 border-earth-medium-green/50 text-earth-dark-green"
                 >
-                  {language === 'id' ? 'Hubungi Petani' : 'Contact Farmer'}
+                  {t('marketDetail.contactFarmer')}
                 </Button>
                 <Button
                   variant="outline"
                   className="border-earth-medium-green/50 text-earth-dark-green"
                 >
-                  {language === 'id' ? 'Lihat Semua Produk' : 'View All Products'}
+                  {t('marketDetail.viewAllProducts')}
                 </Button>
               </div>
             </div>
           </CardContent>
         </Card>
-
-        {/* Reviews - Reviews are not in Convex schema */}
-        {/* <Card className="border-earth-light-brown/30">
-          <CardHeader className="bg-[#FDE1D3]">
-            <CardTitle className="text-lg">
-              {language === 'id' ? 'Ulasan Pembeli' : 'Customer Reviews'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            {commodity.reviews.length > 0 ? (
-              <div className="space-y-4">
-                {commodity.reviews.map((review) => (
-                  <div
-                    key={review.date + review.user}
-                    className="rounded-lg border border-earth-light-brown/30 p-4"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="font-medium">{review.user}</h4>
-                        <div className="mt-1 flex items-center gap-1">
-                          <span className="text-amber-500">{'★'.repeat(review.rating)}</span>
-                          <span className="text-sm text-muted-foreground">{review.date}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="mt-2">{review.comment}</p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted-foreground">
-                {language === 'id' ? 'Belum ada ulasan.' : 'No reviews yet.'}
-              </p>
-            )}
-          </CardContent>
-        </Card> */}
       </div>
     </MainLayout>
   );
