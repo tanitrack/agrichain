@@ -5,7 +5,7 @@
 [![Website](https://img.shields.io/badge/Website-TaniTrack-%230077B5?logo=web&style=flat)](https://agrichain.pages.dev/)
 
 <div align="center">
-  <img src="./public/lovable-uploads/f7fb75ca-ee07-4d12-a8ab-4e5152e13679.png" alt="TaniTrack Logo">
+  <img src="./public/lgo.png" alt="TaniTrack Logo">
 </div>
 
 **Secure, efficient, and transparent supply chain and digital marketplace solution for farmers and consumers.**
