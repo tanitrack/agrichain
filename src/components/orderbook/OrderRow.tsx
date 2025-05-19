@@ -12,17 +12,17 @@ interface OrderRowProps {
 }
 
 export default function OrderRow({ order }: OrderRowProps) {
-  // Placeholder for counterparty and commodity name
-  const counterpartyName = 'Counterparty Name';
-  const commodityName = 'Commodity Name';
+
 
   console.log({ order });
 
   return (
     <tr>
       <td className="text-center font-medium">{order._id.slice(0, 6)}</td>
-      <td>{counterpartyName}</td>
-      <td>{commodityName}</td>
+      <td>{order.buyerId}</td>
+      <td> {order.komoditasId === 'j97db8yeq5etzext4jpxvgg75h7frkdw'
+        ? 'Telur Boiler'
+        : 'Padi IR'}</td>
       <td>{order.quantity}</td>
       <td>{order.totalAmount}</td>
       <td>{order.status}</td>

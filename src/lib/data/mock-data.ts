@@ -151,7 +151,7 @@ export const transactions: Transaction[] = [
     id: 't1',
     type: 'regular',
     commodityId: 'c1',
-    commodityName: 'Beras Putih',
+    commodityName: 'Beras IR',
     quantity: 100,
     unit: 'kg',
     price: 12000,
@@ -171,7 +171,7 @@ export const transactions: Transaction[] = [
     id: 't2',
     type: 'order_book',
     commodityId: 'c2',
-    commodityName: 'Jagung Manis',
+    commodityName: 'Jagung',
     quantity: 150,
     unit: 'kg',
     price: 8500,
@@ -211,14 +211,14 @@ export const transactions: Transaction[] = [
     id: 'TRX-2023-005',
     type: 'regular',
     commodityId: 'c1',
-    commodityName: 'Padi Organik',
-    quantity: 2000,
+    commodityName: 'Ayam Boiler',
+    quantity: 60000,
     unit: 'kg',
-    price: 10000, // Not yet set
-    totalPrice: 2000 * 10000, // Not yet set
+    price: 21000, // Not yet set
+    totalPrice: 2000 * 21000, // Not yet set
     status: 'menunggu_konfirmasi',
     buyerId: 'b5',
-    buyerName: 'PT Beras Sejahtera',
+    buyerName: 'PT Charoen Pokphand',
     sellerId: currentUser.id,
     sellerName: currentUser.name,
     createdAt: new Date('2025-04-05'),
@@ -226,9 +226,9 @@ export const transactions: Transaction[] = [
     termsDocUrl: null,
     signatureUrl: null,
     shippingStatus: 'belum_dikirim',
-    buyerLocation: 'Surabaya, Jawa Timur',
-    buyerPhone: '+628123456789',
-    notes: 'Membutuhkan padi organik untuk produksi beras premium.',
+    buyerLocation: 'Semarang, Jawa Tengah',
+    buyerPhone: '(024) 6580235',
+    notes: 'Membutuhkan ayam boiler.',
     history: [
       {
         date: new Date('2025-04-05'),
