@@ -9,6 +9,7 @@ import type { PriceItem } from '@/components/price/price-row';
 import { PriceTable } from '@/components/price/price-table';
 import { api } from '@/lib/convex';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '@/contexts/language-context';
 
 interface ConvexPrice {
   _id: string;
@@ -119,10 +120,10 @@ const regionalPriceComparison = {
     { region: 'Sumatra Utara', price: 8300 },
     { region: 'Sulawesi Selatan', price: 7900 },
   ],
-
 };
 
 const Harga = () => {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPrice, setSelectedPrice] = useState<CommodityPrice | null>(null);
@@ -154,7 +155,6 @@ const Harga = () => {
 
   // Get unique regions for filter
 
-
   // Function to render trend indicator
   const getTrendIndicator = (change: number) => {
     if (change > 0) {
@@ -185,10 +185,8 @@ const Harga = () => {
   return (
     <MainLayout>
       <div className="mb-8">
-        <h1 className="text-earth-dark-green mb-2 text-2xl font-bold">Harga Komoditas</h1>
-        <p className="text-earth-medium-green font-medium">
-          Pantau harga komoditas pertanian terkini
-        </p>
+        <h1 className="mb-2 text-2xl font-bold text-earth-dark-green">{t('prices.title')}</h1>
+        <p className="font-medium text-earth-medium-green">{t('prices.subtitle')}</p>
       </div>
 
       <PriceTable
@@ -199,7 +197,6 @@ const Harga = () => {
         onShowQR={(id) => {
           const item = displayData.find((k) => k._id === id);
           if (item) {
-            // setSelectedPrice(item._id);
             setQrCodeDialogOpen(true);
           }
         }}

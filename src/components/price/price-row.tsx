@@ -45,7 +45,6 @@ export const PriceRow = ({ item, onViewDetail, onEdit, onDelete, onShowQR }: Pri
       <TableRow className="hover:bg-earth-pale-green">
         <TableCell>
           <div className="flex items-center gap-3">
-
             <div>
               <div className="font-medium text-earth-dark-green">{item.name}</div>
               <div className="text-xs text-earth-medium-green">{item._id}</div>
@@ -87,7 +86,7 @@ export const PriceRow = ({ item, onViewDetail, onEdit, onDelete, onShowQR }: Pri
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Lihat detail harga</p>
+                <p>{t('prices.viewDetail')}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

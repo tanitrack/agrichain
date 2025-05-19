@@ -133,7 +133,7 @@ export const PriceTable = ({
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-earth-dark-green" />
             <Input
               type="search"
-              placeholder="Cari komoditas atau wilayah..."
+              placeholder={t('prices.searchPlaceholder')}
               className="border-earth-medium-green pl-8 focus:ring-2 focus:ring-earth-dark-green"
               value={searchQuery}
               onChange={(e) => {}}
@@ -171,7 +171,7 @@ export const PriceTable = ({
               className="flex gap-2 border-earth-medium-green bg-earth-pale-green text-earth-dark-green hover:bg-earth-light-green/40"
             >
               <Filter className="h-4 w-4" />
-              Filter
+              {t('action.filter')}
             </Button>
           </div>
         </div>
@@ -190,7 +190,7 @@ export const PriceTable = ({
                   {t('prices.forecast')}
                 </TableHead>
                 <TableHead className="text-earth-dark-green">{t('prices.grade')}</TableHead>
-                <TableHead className="text-earth-dark-green">{t('prices.region')}</TableHead>
+                {/* <TableHead className="text-earth-dark-green">{t('prices.region')}</TableHead> */}
                 <TableHead className="text-right text-earth-dark-green">
                   {t('prices.action')}
                 </TableHead>
@@ -209,13 +209,11 @@ export const PriceTable = ({
                   />
                 ))
               ) : (
-                <TableRow>
-                  <TableCell colSpan={7} className="py-8 text-center text-earth-medium-green">
-                    {searchQuery
-                      ? `${t('prices.notfound')} "${searchQuery}"`
-                      : `${t('prices.notfound')}.`}
-                  </TableCell>
-                </TableRow>
+                <TableCell colSpan={7} className="py-8 text-center text-earth-medium-green">
+                  {searchQuery
+                    ? `${t('prices.notfound')} "${searchQuery}"`
+                    : `${t('prices.notfound')}.`}
+                </TableCell>
               )}
             </TableBody>
           </Table>

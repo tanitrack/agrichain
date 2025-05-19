@@ -380,6 +380,8 @@ export const id = {
   'prices.watchlist': 'Tambah ke Watchlist',
   'prices.trends': 'Tren Pasar',
   'prices.notifications': 'Notifikasi Harga',
+  'prices.searchPlaceholder': 'Cari komoditas atau wilayah...',
+  'prices.viewDetail': 'Lihat detail harga',
 
   // Status labels
   'status.open': 'Terbuka',

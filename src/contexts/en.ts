@@ -369,6 +369,14 @@ export const en = {
   'prices.watchlist': 'Add to Watchlist',
   'prices.trends': 'Market Trends',
   'prices.notifications': 'Price Alerts',
+  'prices.name': 'Name',
+  'prices.price': 'Price',
+  'prices.unit': 'Unit',
+  'prices.grade': 'Grade',
+  'prices.action': 'Action',
+  'prices.notfound': 'No commodities found',
+  'prices.searchPlaceholder': 'Search commodity or region...',
+  'prices.viewDetail': 'View price details',
 
   // Status labels
   'status.open': 'Open',
