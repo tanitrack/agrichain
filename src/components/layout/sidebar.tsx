@@ -72,11 +72,9 @@ export function Sidebar({ open, setOpen }: SidebarProps) {
     };
 
     window.addEventListener('resize', handleResize);
-    window.addEventListener('load', handleResize);
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('load', handleResize);
     };
   }, [setOpen]); // setOpen is a dependency
 
