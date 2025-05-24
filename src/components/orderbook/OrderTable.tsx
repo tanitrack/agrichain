@@ -1,4 +1,4 @@
-import type { OrderBookType } from '@/types/order-book';
+import type { OrderBookListItemType } from '@/types/order-book';
 import OrderRow from './OrderRow';
 import { Filter, Package, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useLanguage } from '@/contexts/language-context';
 interface OrderTableProps {
-  orders: OrderBookType[];
+  orders: OrderBookListItemType[];
   isSeller: boolean;
   isBuyer: boolean;
 }

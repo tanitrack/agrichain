@@ -6,6 +6,8 @@ import { api } from '../../convex/_generated/api';
  * to accommodate the combined list in the OrderBook page.
  * Use this type in all order-related components for strict type safety.
  */
-export type OrderBookType =
+export type OrderBookListItemType =
   | (typeof api.orderbook_queries.listByBuyer._returnType)[number]
   | (typeof api.orderbook_queries.listBySeller._returnType)[number];
+
+export type OrderBookDetailType = typeof api.orderbook_queries.get._returnType;

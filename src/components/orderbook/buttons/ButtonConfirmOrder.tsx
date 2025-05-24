@@ -6,7 +6,7 @@ import { useAuthCheck } from '@/hooks/use-auth-check';
 import { useConvex, useMutation } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
 import { useEscrowTransaction } from '@/hooks/use-escrow-transaction';
-import { OrderBookType } from '@/types/order-book';
+import { OrderBookListItemType } from '@/types/order-book';
 
 /**
  * ButtonConfirmOrder
@@ -16,7 +16,7 @@ import { OrderBookType } from '@/types/order-book';
  */
 const CONFIRMABLE_STATUSES = ['escrow_funded', 'awaiting_seller_confirmation'];
 
-export default function ButtonConfirmOrder({ order }: { order: OrderBookType }) {
+export default function ButtonConfirmOrder({ order }: { order: OrderBookListItemType }) {
   const { userProfile, wallet: dynamicWalletInfo } = useAuthCheck();
   const userId = userProfile?._id;
   const [loading, setLoading] = useState(false);

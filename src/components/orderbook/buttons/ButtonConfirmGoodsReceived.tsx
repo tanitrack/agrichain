@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuthCheck } from '@/hooks/use-auth-check';
 import { useMutation } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
-import type { OrderBookType } from '@/types/order-book';
+import type { OrderBookListItemType } from '@/types/order-book';
 
 /**
  * ButtonConfirmGoodsReceived
@@ -13,7 +13,7 @@ import type { OrderBookType } from '@/types/order-book';
  * Handles its own loading state and mutation logic.
  * Returns null if not buyer or status is not correct.
  */
-export default function ButtonConfirmGoodsReceived({ order }: { order: OrderBookType }) {
+export default function ButtonConfirmGoodsReceived({ order }: { order: OrderBookListItemType }) {
   const { userProfile } = useAuthCheck();
   const userId = userProfile?._id;
   const [loading, setLoading] = useState(false);

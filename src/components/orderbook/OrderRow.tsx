@@ -1,4 +1,4 @@
-import type { OrderBookType } from '@/types/order-book';
+import type { OrderBookListItemType } from '@/types/order-book';
 import ButtonConfirmGoodsReceived from '@/components/orderbook/buttons/ButtonConfirmGoodsReceived';
 import ButtonConfirmOrder from '@/components/orderbook/buttons/ButtonConfirmOrder';
 import ButtonFailOrder from '@/components/orderbook/buttons/ButtonFailOrder';
@@ -8,7 +8,7 @@ import ButtonRequestRefund from '@/components/orderbook/buttons/ButtonRequestRef
 import ButtonWithdrawFunds from '@/components/orderbook/buttons/ButtonWithdrawFunds';
 
 interface OrderRowProps {
-  order: OrderBookType;
+  order: OrderBookListItemType;
 }
 
 export default function OrderRow({ order }: OrderRowProps) {
