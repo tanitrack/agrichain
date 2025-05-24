@@ -26,3 +26,6 @@ test-ledger
 # Package lock
 package-lock.json
 yarn.lock
+
+# Vite local config
+vite.config.ts.timestapmp*

@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuthCheck } from '@/hooks/use-auth-check';
 import { useMutation } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
-import type { OrderBookType } from '@/types/order-book';
+import type { OrderBookListItemType } from '@/types/order-book';
 
 /**
  * ButtonConfirmGoodsReceived
@@ -13,12 +13,14 @@ import type { OrderBookType } from '@/types/order-book';
  * Handles its own loading state and mutation logic.
  * Returns null if not buyer or status is not correct.
  */
-export default function ButtonConfirmGoodsReceived({ order }: { order: OrderBookType }) {
+export default function ButtonConfirmGoodsReceived({ order }: { order: OrderBookListItemType }) {
   const { userProfile } = useAuthCheck();
   const userId = userProfile?._id;
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const buyerConfirmsGoodsReceiptMutation = useMutation(api.orderbook_mutations.buyerConfirmsGoodsReceipt);
+  const buyerConfirmsGoodsReceiptMutation = useMutation(
+    api.orderbook_mutations.buyerConfirmsGoodsReceipt
+  );
 
   const isBuyer = order.buyerId === userId;
   const canConfirmReceipt = order.status === 'shipped';
@@ -30,7 +32,10 @@ export default function ButtonConfirmGoodsReceived({ order }: { order: OrderBook
     toast({ title: 'Processing Confirmation...', description: 'Please wait.' });
     try {
       await buyerConfirmsGoodsReceiptMutation({ orderBookId: order._id });
-      toast({ title: 'Goods Receipt Confirmed!', description: 'Thank you for confirming receipt.' });
+      toast({
+        title: 'Goods Receipt Confirmed!',
+        description: 'Thank you for confirming receipt.',
+      });
     } catch (error: unknown) {
       let message = 'Failed to confirm goods receipt.';
       if (error instanceof Error) {
@@ -57,12 +62,9 @@ export default function ButtonConfirmGoodsReceived({ order }: { order: OrderBook
       disabled={loading}
       aria-busy={loading}
       aria-label="Confirm Goods Received"
+      title="Confirm Goods Received"
     >
-      {loading ? (
-        <span className="animate-pulse">…</span>
-      ) : (
-        <CheckCircle className="h-4 w-4" />
-      )}
+      {loading ? <span className="animate-pulse">…</span> : <CheckCircle className="h-4 w-4" />}
     </Button>
   );
 }

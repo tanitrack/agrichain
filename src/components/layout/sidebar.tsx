@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home,
-  ShoppingCart,
   ClipboardList,
   TrendingUp,
   User,
@@ -37,7 +36,6 @@ const farmerLinks = [
   { name: 'dashboard', href: '/dashboard', icon: Home },
   { name: 'commodities', href: '/komoditas', icon: Wheat },
   { name: 'balance', href: '/saldo', icon: Wallet },
-  { name: 'transactions', href: '/transaksi', icon: ShoppingCart },
   { name: 'orderBook', href: '/order-book', icon: ClipboardList },
   { name: 'price', href: '/harga', icon: TrendingUp },
 ];
@@ -48,33 +46,37 @@ const buyerLinks = [
   { name: 'market', href: '/market', icon: Store },
   { name: 'orderBook', href: '/order-book', icon: ClipboardList },
   { name: 'balance', href: '/saldo', icon: Wallet },
-  { name: 'transactions', href: '/transaksi', icon: ShoppingCart },
   { name: 'price', href: '/harga', icon: TrendingUp },
 ];
 
 export function Sidebar({ open, setOpen }: SidebarProps) {
   const location = useLocation();
-  const [isMobile, setIsMobile] = useState(false);
+  // Set initial state, checking if window is defined for SSR compatibility
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < 768 : false
+  );
   const { t } = useLanguage();
   const { userProfile } = useAuthCheck();
 
   // Determine which links to show based on user role
   const links = userProfile?.userType === 'farmer' ? farmerLinks : buyerLinks;
 
-  // Check if mobile
+  // Handle resize events
   useEffect(() => {
-    const checkIfMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-      if (window.innerWidth < 768) {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) {
         setOpen(false);
       }
     };
 
-    window.addEventListener('resize', checkIfMobile);
-    checkIfMobile();
+    window.addEventListener('resize', handleResize);
 
-    return () => window.removeEventListener('resize', checkIfMobile);
-  }, [setOpen]);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [setOpen]); // setOpen is a dependency
 
   return (
     <>

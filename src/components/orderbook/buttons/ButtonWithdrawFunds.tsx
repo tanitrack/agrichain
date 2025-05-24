@@ -6,7 +6,7 @@ import { useAuthCheck } from '@/hooks/use-auth-check';
 import { useConvex } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
 import { useEscrowTransaction } from '@/hooks/use-escrow-transaction';
-import type { OrderBookType } from '@/types/order-book';
+import type { OrderBookListItemType } from '@/types/order-book';
 
 /**
  * ButtonWithdrawFunds
@@ -14,7 +14,7 @@ import type { OrderBookType } from '@/types/order-book';
  * Handles its own loading state and on-chain withdrawal logic.
  * Returns null if not seller or status is not correct.
  */
-export default function ButtonWithdrawFunds({ order }: { order: OrderBookType }) {
+export default function ButtonWithdrawFunds({ order }: { order: OrderBookListItemType }) {
   const { userProfile, wallet: dynamicWalletInfo } = useAuthCheck();
   const userId = userProfile?._id;
   const [loading, setLoading] = useState(false);
@@ -110,6 +110,7 @@ export default function ButtonWithdrawFunds({ order }: { order: OrderBookType })
       disabled={loading || isEscrowActionLoading}
       aria-busy={loading || isEscrowActionLoading}
       aria-label="Withdraw Funds"
+      title="Withdraw Funds"
     >
       {loading || isEscrowActionLoading ? (
         <span className="animate-pulse">…</span>

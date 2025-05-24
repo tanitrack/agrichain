@@ -297,6 +297,7 @@ export const id = {
   'orderbook.subtitle': 'Lihat dan terima permintaan komoditas dari pembeli',
   'orderbook.id': 'ID Order',
   'orderbook.counterparty': 'Counterparty',
+  'orderbook.seller': 'Penjual',
   'orderbook.amount': 'Harga Total',
   'orderbook.buyer': 'Pembeli',
   'orderbook.commodity': 'Komoditas',

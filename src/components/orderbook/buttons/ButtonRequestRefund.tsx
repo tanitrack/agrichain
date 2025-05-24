@@ -6,7 +6,7 @@ import { useAuthCheck } from '@/hooks/use-auth-check';
 import { useConvex } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
 import { useEscrowTransaction } from '@/hooks/use-escrow-transaction';
-import type { OrderBookType } from '@/types/order-book';
+import type { OrderBookListItemType } from '@/types/order-book';
 
 /**
  * ButtonRequestRefund
@@ -14,7 +14,7 @@ import type { OrderBookType } from '@/types/order-book';
  * Handles its own loading state and on-chain refund logic.
  * Returns null if not buyer or status is not correct.
  */
-export default function ButtonRequestRefund({ order }: { order: OrderBookType }) {
+export default function ButtonRequestRefund({ order }: { order: OrderBookListItemType }) {
   const { userProfile, wallet: dynamicWalletInfo } = useAuthCheck();
   const userId = userProfile?._id;
   const [loading, setLoading] = useState(false);
@@ -23,7 +23,8 @@ export default function ButtonRequestRefund({ order }: { order: OrderBookType })
   const convex = useConvex();
 
   const isBuyer = order.buyerId === userId;
-  const canRequestRefund = order.status === 'escrow_funded' || order.status === 'awaiting_seller_confirmation';
+  const canRequestRefund =
+    order.status === 'escrow_funded' || order.status === 'awaiting_seller_confirmation';
 
   if (!isBuyer || !canRequestRefund) return null;
 
@@ -104,6 +105,7 @@ export default function ButtonRequestRefund({ order }: { order: OrderBookType })
       disabled={loading || isEscrowActionLoading}
       aria-busy={loading || isEscrowActionLoading}
       aria-label="Request Refund"
+      title="Request Refund"
     >
       {loading || isEscrowActionLoading ? (
         <span className="animate-pulse">…</span>

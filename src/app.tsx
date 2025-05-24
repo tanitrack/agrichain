@@ -30,7 +30,6 @@ import TransactionNegotiation from './pages/buyer/transaction-negotiation';
 
 // New farmer-specific pages
 import TransactionManagement from './pages/farmer/transaction-management';
-import OrderBookApproval from './pages/farmer/order-book-approval';
 import TransactionPriceSubmitted from './pages/farmer/transaction-price-submitted';
 
 import { ConvexDynamicProvider } from '@/contexts/convex-auth-context';
@@ -168,22 +167,6 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/order-book/"
-                element={
-                  <ProtectedRoute>
-                    <OrderBook />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/farmer/order-book/:id"
-                element={
-                  <ProtectedRoute>
-                    <OrderBookApproval />
-                  </ProtectedRoute>
-                }
-              />
 
               {/* Buyer routes */}
               <Route
@@ -219,8 +202,18 @@ const App = () => (
                 }
               />
 
+              {/* Order Book for Farmer and Consumer */}
               <Route
-                path="/buyer/order-book/:id"
+                path="/order-book/"
+                element={
+                  <ProtectedRoute>
+                    <OrderBook />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/order-book/:id"
                 element={
                   <ProtectedRoute>
                     <OrderBookDetail />

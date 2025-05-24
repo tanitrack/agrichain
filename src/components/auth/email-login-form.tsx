@@ -42,7 +42,7 @@ const EmailLoginForm: React.FC<EmailLoginFormProps> = ({
         <Input
           id="email"
           type="email"
-          value={email}
+          value={email ?? ''}
           onChange={(e) => onEmailChange(e.target.value)}
           autoComplete="email"
           required
@@ -60,7 +60,7 @@ const EmailLoginForm: React.FC<EmailLoginFormProps> = ({
     )}
     {showOtpInput && (
       <OTPInput
-        otp={otp}
+        otp={otp ?? ''}
         setOtp={onOtpChange}
         loading={loading}
         onVerify={onVerifyOtp}

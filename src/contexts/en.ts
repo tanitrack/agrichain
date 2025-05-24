@@ -293,6 +293,7 @@ export const en = {
   'orderbook.subtitle': 'View and accept commodity requests from buyers',
   'orderbook.id': 'Order ID',
   'orderbook.counterparty': 'Counterparty',
+  'orderbook.seller': 'Seller',
   'orderbook.amount': 'Total Amount',
   'orderbook.buyer': 'Buyer',
   'orderbook.commodity': 'Commodity',

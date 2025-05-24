@@ -5,27 +5,6 @@ import { v } from 'convex/values';
 // Get a single orderBook by ID
 export const get = query({
   args: { id: v.id('orderBook') },
-  returns: v.union(
-    v.object({
-      _id: v.id('orderBook'),
-      _creationTime: v.number(),
-      buyerId: v.id('users'),
-      sellerId: v.optional(v.id('users')),
-      komoditasId: v.id('komoditas'),
-      quantity: v.number(),
-      agreedPricePerUnit: v.number(),
-      totalAmount: v.number(),
-      status: v.string(),
-      buyerSolanaPublicKey: v.string(),
-      sellerSolanaPublicKey: v.string(),
-      financialTransactionId: v.optional(v.id('transaction')),
-      shippingAddress: v.optional(v.string()),
-      shippingNotes: v.optional(v.string()),
-      termsAndConditions: v.optional(v.string()),
-      updatedAt: v.number(),
-    }),
-    v.null()
-  ),
   handler: async (ctx, args) => {
     // check user
     const auth = await ctx.auth.getUserIdentity();
@@ -35,12 +14,38 @@ export const get = query({
     }
 
     const orderBook = await ctx.db.get(args.id);
-    return orderBook;
+
+    if (!orderBook) {
+      return null; // Handle case where order book is not found
+    }
+
+    // Fetch related documents
+    const [transaction, buyer, seller, komoditas] = await Promise.all([
+      orderBook.financialTransactionId
+        ? ctx.db.get(orderBook.financialTransactionId)
+        : Promise.resolve(null),
+      ctx.db.get(orderBook.buyerId),
+      orderBook.sellerId ? ctx.db.get(orderBook.sellerId) : Promise.resolve(null),
+      ctx.db.get(orderBook.komoditasId),
+    ]);
+
+    // Get onChainEscrowStatus from transaction
+    const onChainEscrowStatus = transaction?.onChainEscrowStatus || null;
+
+    return {
+      ...orderBook,
+      transaction,
+      buyer,
+      seller,
+      komoditas,
+      onChainEscrowStatus,
+    };
   },
 });
 
 export const listBySeller = query({
   args: { sellerId: v.id('users') },
+
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
@@ -52,24 +57,31 @@ export const listBySeller = query({
       .withIndex('by_sellerId', (q) => q.eq('sellerId', args.sellerId))
       .collect();
 
-    // Join with transaction data to get onChainEscrowStatus
-    const orderBooksWithTxStatus = await Promise.all(
+    const orderBooksWithBuyer = await Promise.all(
       orderBooks.map(async (orderBook) => {
+        // Fetch the buyer's user document
+        const buyer = await ctx.db.get(orderBook.buyerId);
+
+        // Join with transaction data to get onChainEscrowStatus
+        let onChainEscrowStatus = null;
         if (orderBook.financialTransactionId) {
           const transaction = await ctx.db.get(orderBook.financialTransactionId);
-          return {
-            ...orderBook,
-            onChainEscrowStatus: transaction?.onChainEscrowStatus || null,
-          };
+          onChainEscrowStatus = transaction?.onChainEscrowStatus || null;
         }
+
+        // Fetch the komoditas document
+        const komoditas = await ctx.db.get(orderBook.komoditasId);
+
         return {
           ...orderBook,
-          onChainEscrowStatus: null,
+          buyer, // Include the buyer information
+          onChainEscrowStatus,
+          komoditas, // Include the komoditas information
         };
       })
     );
 
-    return orderBooksWithTxStatus;
+    return orderBooksWithBuyer;
   },
 });
 
@@ -87,22 +99,30 @@ export const listByBuyer = query({
       .collect();
 
     // Join with transaction data to get onChainEscrowStatus
-    const orderBooksWithTxStatus = await Promise.all(
+    const orderBooksWithSeller = await Promise.all(
       orderBooks.map(async (orderBook) => {
+        // Fetch the seller's user document
+        const seller = orderBook.sellerId ? await ctx.db.get(orderBook.sellerId) : null;
+
+        // Join with transaction data to get onChainEscrowStatus
+        let onChainEscrowStatus = null;
         if (orderBook.financialTransactionId) {
           const transaction = await ctx.db.get(orderBook.financialTransactionId);
-          return {
-            ...orderBook,
-            onChainEscrowStatus: transaction?.onChainEscrowStatus || null,
-          };
+          onChainEscrowStatus = transaction?.onChainEscrowStatus || null;
         }
+
+        // Fetch the komoditas document
+        const komoditas = await ctx.db.get(orderBook.komoditasId);
+
         return {
           ...orderBook,
-          onChainEscrowStatus: null,
+          seller, // Include the seller information
+          onChainEscrowStatus,
+          komoditas, // Include the komoditas information
         };
       })
     );
 
-    return orderBooksWithTxStatus;
+    return orderBooksWithSeller;
   },
 });

@@ -9,7 +9,9 @@ interface MainLayoutProps {
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(
+    typeof window !== 'undefined' ? window.innerWidth > 768 : false
+  );
 
   return (
     <div className="flex min-h-screen bg-earth-pale-green/50">

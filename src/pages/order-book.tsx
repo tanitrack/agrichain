@@ -1,5 +1,4 @@
 import { MainLayout } from '@/components/layout/main-layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/language-context';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
@@ -16,16 +15,18 @@ export default function OrderBookPage() {
   // Get logged-in user info
   const { userProfile } = useAuthCheck();
   const userId = userProfile?._id;
+  const isSeller = userProfile?.userType === 'farmer';
+  const isBuyer = userProfile?.userType === 'consumer';
 
   // Fetch orders where the logged-in user is the seller
   const sellerOrders = useQuery(
     api.orderbook_queries.listBySeller,
-    userId ? { sellerId: userId } : 'skip'
+    isSeller ? { sellerId: userId } : 'skip'
   );
   // Fetch orders where the logged-in user is the buyer
   const buyerOrders = useQuery(
     api.orderbook_queries.listByBuyer,
-    userId ? { buyerId: userId } : 'skip'
+    isBuyer ? { buyerId: userId } : 'skip'
   );
 
   // Combine orders
@@ -39,7 +40,7 @@ export default function OrderBookPage() {
           <p className="text-earth-medium-green">{t('orderbook.subtitle')}</p>
         </div>
       </div>
-      <OrderTable orders={allOrders} />
+      <OrderTable orders={allOrders} isBuyer={isBuyer} isSeller={isSeller} />
     </MainLayout>
   );
 }

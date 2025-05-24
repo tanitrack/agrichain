@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-agrichain = "coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF"
+agrichain = "49BKpDeZKKAGt6cRn5fGb3DizL64XSyHpbta3xdbSEKq"
 
 [programs.devnet]
 agrichain = "49BKpDeZKKAGt6cRn5fGb3DizL64XSyHpbta3xdbSEKq"
