@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "npm-run-all2 --parallel dev:frontend dev:backend",
+    "dev": "run-p dev:frontend dev:backend",
     "dev:frontend": "vite",
     "dev:backend": "convex dev",
     "build": "vite build",
@@ -99,7 +99,7 @@
     "jose": "^5.1.0",
     "lint-staged": "^15.0.0",
     "lovable-tagger": "^1.1.7",
-    "npm-run-all2": "^7.0.0",
+    "npm-run-all2": "8.0.3",
     "postcss": "^8.4.47",
     "prettier": "^3.2.0",
     "prettier-plugin-tailwindcss": "^0.5.0",
