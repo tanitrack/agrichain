@@ -5,27 +5,6 @@ import { v } from 'convex/values';
 // Get a single orderBook by ID
 export const get = query({
   args: { id: v.id('orderBook') },
-  returns: v.union(
-    v.object({
-      _id: v.id('orderBook'),
-      _creationTime: v.number(),
-      buyerId: v.id('users'),
-      sellerId: v.optional(v.id('users')),
-      komoditasId: v.id('komoditas'),
-      quantity: v.number(),
-      agreedPricePerUnit: v.number(),
-      totalAmount: v.number(),
-      status: v.string(),
-      buyerSolanaPublicKey: v.string(),
-      sellerSolanaPublicKey: v.string(),
-      financialTransactionId: v.optional(v.id('transaction')),
-      shippingAddress: v.optional(v.string()),
-      shippingNotes: v.optional(v.string()),
-      termsAndConditions: v.optional(v.string()),
-      updatedAt: v.number(),
-    }),
-    v.null()
-  ),
   handler: async (ctx, args) => {
     // check user
     const auth = await ctx.auth.getUserIdentity();
@@ -35,7 +14,32 @@ export const get = query({
     }
 
     const orderBook = await ctx.db.get(args.id);
-    return orderBook;
+
+    if (!orderBook) {
+      return null; // Handle case where order book is not found
+    }
+
+    // Fetch related documents
+    const [transaction, buyer, seller, komoditas] = await Promise.all([
+      orderBook.financialTransactionId
+        ? ctx.db.get(orderBook.financialTransactionId)
+        : Promise.resolve(null),
+      ctx.db.get(orderBook.buyerId),
+      orderBook.sellerId ? ctx.db.get(orderBook.sellerId) : Promise.resolve(null),
+      ctx.db.get(orderBook.komoditasId),
+    ]);
+
+    // Get onChainEscrowStatus from transaction
+    const onChainEscrowStatus = transaction?.onChainEscrowStatus || null;
+
+    return {
+      ...orderBook,
+      transaction,
+      buyer,
+      seller,
+      komoditas,
+      onChainEscrowStatus,
+    };
   },
 });
 

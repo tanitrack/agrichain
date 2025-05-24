@@ -6,6 +6,8 @@ import ButtonMarkAsShipped from '@/components/orderbook/buttons/ButtonMarkAsShip
 import ButtonReclaimEscrowRent from '@/components/orderbook/buttons/ButtonReclaimEscrowRent';
 import ButtonRequestRefund from '@/components/orderbook/buttons/ButtonRequestRefund';
 import ButtonWithdrawFunds from '@/components/orderbook/buttons/ButtonWithdrawFunds';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 interface OrderRowProps {
   order: OrderBookListItemType;
@@ -24,6 +26,9 @@ export default function OrderRow({ order }: OrderRowProps) {
       <td>{order.status}</td>
       <td className="text-center">
         {/* Action buttons: let each button handle its own visibility */}
+        <Button asChild>
+          <Link to={`/order-book/${order._id}`}>Detail</Link>
+        </Button>
         <ButtonConfirmOrder order={order} />
         <ButtonMarkAsShipped order={order} />
         <ButtonConfirmGoodsReceived order={order} />
