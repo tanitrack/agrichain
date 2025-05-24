@@ -105,6 +105,7 @@ export default function ButtonReclaimEscrowRent({ order }: { order: OrderBookTyp
       disabled={loading || isEscrowActionLoading}
       aria-busy={loading || isEscrowActionLoading}
       aria-label="Reclaim Escrow Rent"
+      title="Reclaim Escrow Rent"
     >
       {loading || isEscrowActionLoading ? (
         <span className="animate-pulse">…</span>

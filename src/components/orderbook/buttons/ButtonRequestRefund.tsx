@@ -23,7 +23,8 @@ export default function ButtonRequestRefund({ order }: { order: OrderBookType })
   const convex = useConvex();
 
   const isBuyer = order.buyerId === userId;
-  const canRequestRefund = order.status === 'escrow_funded' || order.status === 'awaiting_seller_confirmation';
+  const canRequestRefund =
+    order.status === 'escrow_funded' || order.status === 'awaiting_seller_confirmation';
 
   if (!isBuyer || !canRequestRefund) return null;
 
@@ -104,6 +105,7 @@ export default function ButtonRequestRefund({ order }: { order: OrderBookType })
       disabled={loading || isEscrowActionLoading}
       aria-busy={loading || isEscrowActionLoading}
       aria-label="Request Refund"
+      title="Request Refund"
     >
       {loading || isEscrowActionLoading ? (
         <span className="animate-pulse">…</span>

@@ -112,6 +112,7 @@ export default function ButtonConfirmOrder({ order }: { order: OrderBookType }) 
       disabled={loading || isEscrowActionLoading}
       aria-busy={loading || isEscrowActionLoading}
       aria-label="Confirm Order"
+      title="Confirm Order"
     >
       {loading || isEscrowActionLoading ? (
         <span className="animate-pulse">…</span>

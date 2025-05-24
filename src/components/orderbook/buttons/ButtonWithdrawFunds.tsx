@@ -110,6 +110,7 @@ export default function ButtonWithdrawFunds({ order }: { order: OrderBookType })
       disabled={loading || isEscrowActionLoading}
       aria-busy={loading || isEscrowActionLoading}
       aria-label="Withdraw Funds"
+      title="Withdraw Funds"
     >
       {loading || isEscrowActionLoading ? (
         <span className="animate-pulse">…</span>

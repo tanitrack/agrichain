@@ -57,12 +57,9 @@ export default function ButtonMarkAsShipped({ order }: { order: OrderBookType })
       disabled={loading}
       aria-busy={loading}
       aria-label="Mark as Shipped"
+      title="Mark as Shipped"
     >
-      {loading ? (
-        <span className="animate-pulse">…</span>
-      ) : (
-        <Package className="h-4 w-4" />
-      )}
+      {loading ? <span className="animate-pulse">…</span> : <Package className="h-4 w-4" />}
     </Button>
   );
 }

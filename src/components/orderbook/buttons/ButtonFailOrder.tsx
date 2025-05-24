@@ -23,7 +23,8 @@ export default function ButtonFailOrder({ order }: { order: OrderBookType }) {
   const convex = useConvex();
 
   const isBuyer = order.buyerId === userId;
-  const canFailOrder = order.status === 'escrow_funded' || order.status === 'awaiting_seller_confirmation';
+  const canFailOrder =
+    order.status === 'escrow_funded' || order.status === 'awaiting_seller_confirmation';
 
   if (!isBuyer || !canFailOrder) return null;
 
@@ -105,6 +106,7 @@ export default function ButtonFailOrder({ order }: { order: OrderBookType }) {
       disabled={loading || isEscrowActionLoading}
       aria-busy={loading || isEscrowActionLoading}
       aria-label="Fail Order"
+      title="Fail Order"
     >
       {loading || isEscrowActionLoading ? (
         <span className="animate-pulse">…</span>
