@@ -12,13 +12,13 @@ interface OrderRowProps {
 }
 
 export default function OrderRow({ order }: OrderRowProps) {
+  const participant = 'buyer' in order ? order.buyer : order.seller;
+
   return (
     <tr>
       <td className="text-center font-medium">{order._id.slice(0, 6)}</td>
-      <td>{order.buyerId}</td>
-      <td>
-        {order.komoditasId === 'j97db8yeq5etzext4jpxvgg75h7frkdw' ? 'Telur Boiler' : 'Padi IR'}
-      </td>
+      <td>{participant.name}</td>
+      <td>{order.komoditas?.name}</td>
       <td>{order.quantity}</td>
       <td>{order.totalAmount}</td>
       <td>{order.status}</td>
