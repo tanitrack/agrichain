@@ -42,6 +42,53 @@ export const getFarmerOrderSummary = query({
   },
 });
 
+export const getFarmerCompletedOrderSummary = query({
+  args: {
+    farmerId: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Return default jika farmerId tidak ada
+    if (!args.farmerId) {
+      return {
+        totalAmount: 0,
+        totalTransactions: 0,
+        distinctCommodities: 0
+      };
+    }
+
+    // Ambil semua order milik farmer dengan status completed
+    const completedOrders = await ctx.db
+      .query('orderBook')
+      .filter((q) =>
+        q.and(
+          q.eq(q.field('sellerId'), args.farmerId),
+          q.eq(q.field('status'), 'completed')
+        )
+      )
+      .collect();
+
+    // Hitung total amount
+    const totalAmount = completedOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+
+    // Hitung total transaksi
+    const totalTransactions = completedOrders.length;
+
+    // Hitung distinct komoditasId
+    const uniqueKomoditasIds = new Set(
+      completedOrders
+        .filter(order => order.komoditasId)
+        .map(order => order.komoditasId)
+    );
+    const distinctCommodities = uniqueKomoditasIds.size;
+
+    return {
+      totalAmount,
+      totalTransactions,
+      distinctCommodities
+    };
+  },
+});
+
 // List all komoditas with optional pagination
 export const list = query({
   args: {

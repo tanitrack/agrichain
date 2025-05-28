@@ -26,8 +26,6 @@ import Market from './pages/buyer/market';
 import MarketDetail from './pages/buyer/market-detail';
 import BuyTransaction from './pages/buyer/buy-transaction';
 import TransactionNegotiation from './pages/buyer/transaction-negotiation';
-// import OrderBookList from './pages/buyer/order-book-list'; // Buyer order book list
-
 // New farmer-specific pages
 import TransactionManagement from './pages/farmer/transaction-management';
 import TransactionPriceSubmitted from './pages/farmer/transaction-price-submitted';

@@ -1,35 +1,59 @@
 import { BarChart3, ShoppingCart, Wallet, Sun, Leaf } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MainLayout } from '@/components/layout/main-layout';
-import { transactions, commodities, commodityPrices, currentUser } from '@/lib/data/mock-data';
+import { transactions, commodityPrices, currentUser } from '@/lib/data/mock-data';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useLanguage } from '@/contexts/language-context';
 import { useAuthCheck } from '@/hooks/use-auth-check';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { useEffect } from 'react';
 
 export default function Dashboard() {
   const { t, language } = useLanguage();
   const { userProfile } = useAuthCheck();
 
+  //handling browser extension errors
+  useEffect(() => {
+    const handleError = (event: ErrorEvent) => {
+      if (event.message?.includes('ethereum') ||
+        event.message?.includes('runtime.lastError') ||
+        event.message?.includes('Could not establish connection')) {
+        event.preventDefault();
+      }
+    };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      if (event.reason?.message?.includes('runtime.lastError') ||
+        event.reason?.message?.includes('Could not establish connection')) {
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener('error', handleError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
+
   // Calculate total commodities
-  const getFarmOrderSummary = useQuery(api.komoditas_queries.getFarmerOrderSummary, {
-    farmerId: userProfile?._id
-  });
+  const getFarmOrderSummary = useQuery(api.komoditas_queries.getFarmerOrderSummary, userProfile?._id ? { farmerId: userProfile._id } : "skip");
+
+  // Calculate completed orders summary - untuk card sales
+  const getCompletedOrderSummary = useQuery(
+    api.komoditas_queries.getFarmerCompletedOrderSummary,
+    userProfile?._id ? { farmerId: userProfile._id } : "skip"
+  );
 
   const totalCommoditiesFromOrder = getFarmOrderSummary?.totalQuantity ?? 0;
   const commodityTypesFromOrder = getFarmOrderSummary?.distinctCommodities ?? 0;
 
-  // Get completed transactions
-  const completedTransactions = transactions.filter(
-    (transaction) => transaction.status === 'selesai'
-  );
-
-  // Calculate total sales
-  const totalSales = completedTransactions.reduce(
-    (sum, transaction) => sum + (transaction.totalPrice || 0),
-    0
-  );
+  // Data untuk sales card dari completed orders
+  const totalSalesAmount = getCompletedOrderSummary?.totalAmount ?? 0;
+  const totalSalesTransactions = getCompletedOrderSummary?.totalTransactions ?? 0;
 
   // Get pending transactions
   const pendingTransactions = transactions.filter(
@@ -70,10 +94,10 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-earth-dark-green">
-                {formatCurrency(totalSales)}
+                {formatCurrency(totalSalesAmount)}
               </div>
               <p className="mt-1 text-sm font-medium text-earth-dark-green">
-                {completedTransactions.length} {t('transactions.completed').toLowerCase()}
+                {totalSalesTransactions} {t('transactions.completed').toLowerCase()}
               </p>
               <div className="mt-3 h-2 w-full rounded-full bg-earth-pale-green">
                 <div
@@ -102,13 +126,13 @@ export default function Dashboard() {
                     `${totalCommoditiesFromOrder} kg`
                   )}
                 </div>
-                <p className="mt-1 text-sm font-medium text-earth-brown">
+                <div className="mt-1 text-sm font-medium text-earth-brown">
                   {getFarmOrderSummary === undefined ? (
                     <div className="animate-pulse bg-earth-light-brown h-4 w-16 rounded"></div>
                   ) : (
                     `${commodityTypesFromOrder} ${t('commodities.type').toLowerCase()}`
                   )}
-                </p>
+                </div>
                 <div className="mt-3 h-2 w-full rounded-full bg-earth-light-brown">
                   <div className="h-2 rounded-full bg-earth-brown" style={{ width: '60%' }}></div>
                 </div>
