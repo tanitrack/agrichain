@@ -89,6 +89,102 @@ export const getFarmerCompletedOrderSummary = query({
   },
 });
 
+export const getFarmerPendingOrderSummary = query({
+  args: {
+    farmerId: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    if (!args.farmerId) {
+      return {
+        waitingOrders: 0,
+        shippedOrders: 0,
+        totalPendingAmount: 0,
+        waitingAmount: 0,
+        shippedAmount: 0
+      };
+    }
+
+    // Ambil semua order pending milik farmer
+    const pendingOrders = await ctx.db
+      .query('orderBook')
+      .filter((q) =>
+        q.and(
+          q.eq(q.field('sellerId'), args.farmerId),
+          q.or(
+            q.eq(q.field('status'), 'awaiting_escrow_payment'),
+            q.eq(q.field('status'), 'shipped')
+          )
+        )
+      )
+      .collect();
+
+    // Pisahkan berdasarkan status
+    const waitingOrders = pendingOrders.filter(order => order.status === 'awaiting_escrow_payment');
+    const shippedOrders = pendingOrders.filter(order => order.status === 'shipped');
+
+    // Hitung amounts
+    const waitingAmount = waitingOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+    const shippedAmount = shippedOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+
+    return {
+      waitingOrders: waitingOrders.length,
+      shippedOrders: shippedOrders.length,
+      totalPendingAmount: waitingAmount + shippedAmount,
+      waitingAmount,
+      shippedAmount
+    };
+  },
+});
+
+export const getFarmerOrdersWithDetails = query({
+  args: {
+    farmerId: v.optional(v.string()),
+    limit: v.optional(v.number())
+  },
+  handler: async (ctx, args) => {
+    if (!args.farmerId) {
+      return [];
+    }
+
+    // Ambil orders milik farmer
+    const orders = await ctx.db
+      .query('orderBook')
+      .filter((q) => q.eq(q.field('sellerId'), args.farmerId))
+      .order('desc')
+      .take(args.limit || 10);
+
+    // Join dengan komoditas dan users
+    const ordersWithDetails = await Promise.all(
+      orders.map(async (order) => {
+        // Get komoditas details
+        const komoditas = order.komoditasId
+          ? await ctx.db.get(order.komoditasId)
+          : null;
+
+        // Get buyer details
+        const buyer = order.buyerId
+          ? await ctx.db.get(order.buyerId)
+          : null;
+
+        return {
+          id: order._id,
+          commodityName: komoditas?.name || 'Unknown',
+          commodityId: order.komoditasId,
+          buyerName: buyer?.name || 'Unknown Buyer',
+          buyerId: order.buyerId,
+          quantity: order.quantity,
+          totalAmount: order.totalAmount,
+          status: order.status,
+          createdAt: order._creationTime,
+          updatedAt: order.updatedAt || order._creationTime
+        };
+      })
+    );
+
+    return ordersWithDetails;
+  },
+});
+
 // List all komoditas with optional pagination
 export const list = query({
   args: {
