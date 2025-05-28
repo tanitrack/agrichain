@@ -12,6 +12,36 @@ export const get = query({
   },
 });
 
+export const getFarmerOrderSummary = query({
+  args: {
+    farmerId: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Ambil semua order milik farmer
+    const farmerOrders = await ctx.db
+      .query('orderBook')
+      .filter((q) => q.eq(q.field('sellerId'), args.farmerId))
+      .collect();
+
+    // Hitung total quantity
+    const totalQuantity = farmerOrders.reduce((sum, order) => sum + (order.quantity || 0), 0);
+
+    // Hitung distinct komoditasId
+    const uniqueKomoditasIds = new Set(
+      farmerOrders
+        .filter(order => order.komoditasId)
+        .map(order => order.komoditasId)
+    );
+    const distinctCommodities = uniqueKomoditasIds.size;
+
+    return {
+      totalQuantity,
+      distinctCommodities,
+      totalOrders: farmerOrders.length
+    };
+  },
+});
+
 // List all komoditas with optional pagination
 export const list = query({
   args: {

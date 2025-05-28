@@ -5,9 +5,20 @@ import { transactions, commodities, commodityPrices, currentUser } from '@/lib/d
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useLanguage } from '@/contexts/language-context';
 import { useAuthCheck } from '@/hooks/use-auth-check';
+import { useQuery } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 
 export default function Dashboard() {
   const { t, language } = useLanguage();
+  const { userProfile } = useAuthCheck();
+
+  // Calculate total commodities
+  const getFarmOrderSummary = useQuery(api.komoditas_queries.getFarmerOrderSummary, {
+    farmerId: userProfile?._id
+  });
+
+  const totalCommoditiesFromOrder = getFarmOrderSummary?.totalQuantity ?? 0;
+  const commodityTypesFromOrder = getFarmOrderSummary?.distinctCommodities ?? 0;
 
   // Get completed transactions
   const completedTransactions = transactions.filter(
@@ -25,15 +36,10 @@ export default function Dashboard() {
     (transaction) => transaction.status !== 'selesai' && transaction.status !== 'dibatalkan'
   );
 
-  // Calculate total commodities
-  const totalCommodities = commodities.reduce((sum, commodity) => sum + commodity.quantity, 0);
-
   // Get trending commodities
   const trendingCommodities = [...commodityPrices]
     .sort((a, b) => b.predictedChange - a.predictedChange)
     .slice(0, 3);
-
-  const { userProfile } = useAuthCheck();
 
   return (
     <MainLayout>
@@ -89,9 +95,19 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-earth-brown">{totalCommodities} kg</div>
+                <div className="text-2xl font-bold text-earth-brown">
+                  {getFarmOrderSummary === undefined ? (
+                    <div className="animate-pulse bg-earth-light-brown h-8 w-20 rounded"></div>
+                  ) : (
+                    `${totalCommoditiesFromOrder} kg`
+                  )}
+                </div>
                 <p className="mt-1 text-sm font-medium text-earth-brown">
-                  {commodities.length} {t('commodities.type').toLowerCase()}
+                  {getFarmOrderSummary === undefined ? (
+                    <div className="animate-pulse bg-earth-light-brown h-4 w-16 rounded"></div>
+                  ) : (
+                    `${commodityTypesFromOrder} ${t('commodities.type').toLowerCase()}`
+                  )}
                 </p>
                 <div className="mt-3 h-2 w-full rounded-full bg-earth-light-brown">
                   <div className="h-2 rounded-full bg-earth-brown" style={{ width: '60%' }}></div>
@@ -195,22 +211,20 @@ export default function Dashboard() {
                         <td className="p-4 align-middle">
                           <div className="flex items-center">
                             <div
-                              className={`mr-2 h-2.5 w-2.5 rounded-full ${
-                                transaction.status === 'selesai'
-                                  ? 'bg-green-600'
-                                  : transaction.status === 'dibatalkan'
-                                    ? 'bg-red-600'
-                                    : 'bg-yellow-600'
-                              }`}
+                              className={`mr-2 h-2.5 w-2.5 rounded-full ${transaction.status === 'selesai'
+                                ? 'bg-green-600'
+                                : transaction.status === 'dibatalkan'
+                                  ? 'bg-red-600'
+                                  : 'bg-yellow-600'
+                                }`}
                             />
                             <span
-                              className={`font-medium capitalize ${
-                                transaction.status === 'selesai'
-                                  ? 'text-green-700'
-                                  : transaction.status === 'dibatalkan'
-                                    ? 'text-red-700'
-                                    : 'text-yellow-700'
-                              }`}
+                              className={`font-medium capitalize ${transaction.status === 'selesai'
+                                ? 'text-green-700'
+                                : transaction.status === 'dibatalkan'
+                                  ? 'text-red-700'
+                                  : 'text-yellow-700'
+                                }`}
                             >
                               {language === 'id'
                                 ? transaction.status.replace('_', ' ')
