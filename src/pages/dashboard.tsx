@@ -1,7 +1,6 @@
 import { BarChart3, ShoppingCart, Wallet, Sun, Leaf } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MainLayout } from '@/components/layout/main-layout';
-import { transactions, commodityPrices, currentUser } from '@/lib/data/mock-data';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { useLanguage } from '@/contexts/language-context';
 import { useAuthCheck } from '@/hooks/use-auth-check';
@@ -68,16 +67,6 @@ export default function Dashboard() {
   // Data untuk sales card dari completed orders
   const totalSalesAmount = getCompletedOrderSummary?.totalAmount ?? 0;
   const totalSalesTransactions = getCompletedOrderSummary?.totalTransactions ?? 0;
-
-  // Get pending transactions
-  const pendingTransactions = transactions.filter(
-    (transaction) => transaction.status !== 'selesai' && transaction.status !== 'dibatalkan'
-  );
-
-  // Get trending commodities
-  const trendingCommodities = [...commodityPrices]
-    .sort((a, b) => b.predictedChange - a.predictedChange)
-    .slice(0, 3);
 
   return (
     <MainLayout>
