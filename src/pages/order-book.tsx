@@ -32,6 +32,13 @@ export default function OrderBookPage() {
   // Combine orders
   const allOrders = [...(sellerOrders || []), ...(buyerOrders || [])];
 
+  // TODO: Implement markOrderAsFailedMutation in orderbook_mutations.ts
+  // filter the initial record order
+  const filteredAllOrders = allOrders.filter((order) => {
+    // awaiting_escrow_payment
+    return order.status !== 'awaiting_escrow_payment';
+  });
+
   return (
     <MainLayout>
       <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
@@ -40,7 +47,7 @@ export default function OrderBookPage() {
           <p className="text-earth-medium-green">{t('orderbook.subtitle')}</p>
         </div>
       </div>
-      <OrderTable orders={allOrders} isBuyer={isBuyer} isSeller={isSeller} />
+      <OrderTable orders={filteredAllOrders} isBuyer={isBuyer} isSeller={isSeller} />
     </MainLayout>
   );
 }
