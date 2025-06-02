@@ -8,6 +8,9 @@ import ButtonRequestRefund from '@/components/orderbook/buttons/ButtonRequestRef
 import ButtonWithdrawFunds from '@/components/orderbook/buttons/ButtonWithdrawFunds';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { EscrowState, getEscrowStateInfo } from '@/lib/solana-lib/states-text';
+import { Info } from 'lucide-react';
 
 interface OrderRowProps {
   order: OrderBookListItemType;
@@ -15,6 +18,7 @@ interface OrderRowProps {
 
 export default function OrderRow({ order }: OrderRowProps) {
   const participant = 'buyer' in order ? order.buyer : order.seller;
+  const escrowStateInfo = getEscrowStateInfo(order.status as EscrowState);
 
   return (
     <tr>
@@ -23,7 +27,21 @@ export default function OrderRow({ order }: OrderRowProps) {
       <td>{order.komoditas?.name}</td>
       <td>{order.quantity}</td>
       <td>{order.totalAmount}</td>
-      <td>{order.status}</td>
+      <td>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="inline-flex items-center gap-1">
+                {escrowStateInfo?.title || order.status}
+                <Info className="h-4 w-4 text-gray-500" />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{escrowStateInfo?.description || 'Unknown status'}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </td>
       <td className="text-center">
         {/* Action buttons: let each button handle its own visibility */}
         <Button asChild>
