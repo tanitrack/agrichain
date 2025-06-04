@@ -1,6 +1,32 @@
 import { paginationOptsValidator } from 'convex/server';
 import { query } from './_generated/server';
 import { v } from 'convex/values';
+import { api } from './_generated/api';
+
+import { Id } from './_generated/dataModel';
+
+// Using DataModel to prevent auto-formatting issues: type _ = DataModel;
+
+interface KomoditasWithImageUrl {
+  _id: Id<'komoditas'>;
+  _creationTime: number;
+  name: string;
+  description?: string;
+  category: string;
+  unit: string;
+  pricePerUnit: number;
+  stock: number;
+  grade?: string;
+  harvestDate?: string;
+  farmersName?: string;
+  address?: string;
+  imageUrl?: string;
+  imageStorageId?: Id<'_storage'>;
+  createdBy: Id<'users'>;
+  sellerSolanaPublicKey: string;
+  updatedAt: number;
+  publicImageUrl?: string | null;
+}
 
 // Get a single komoditas by ID
 export const get = query({
@@ -28,16 +54,14 @@ export const getFarmerOrderSummary = query({
 
     // Hitung distinct komoditasId
     const uniqueKomoditasIds = new Set(
-      farmerOrders
-        .filter(order => order.komoditasId)
-        .map(order => order.komoditasId)
+      farmerOrders.filter((order) => order.komoditasId).map((order) => order.komoditasId)
     );
     const distinctCommodities = uniqueKomoditasIds.size;
 
     return {
       totalQuantity,
       distinctCommodities,
-      totalOrders: farmerOrders.length
+      totalOrders: farmerOrders.length,
     };
   },
 });
@@ -52,7 +76,7 @@ export const getFarmerCompletedOrderSummary = query({
       return {
         totalAmount: 0,
         totalTransactions: 0,
-        distinctCommodities: 0
+        distinctCommodities: 0,
       };
     }
 
@@ -60,10 +84,7 @@ export const getFarmerCompletedOrderSummary = query({
     const completedOrders = await ctx.db
       .query('orderBook')
       .filter((q) =>
-        q.and(
-          q.eq(q.field('sellerId'), args.farmerId),
-          q.eq(q.field('status'), 'completed')
-        )
+        q.and(q.eq(q.field('sellerId'), args.farmerId), q.eq(q.field('status'), 'completed'))
       )
       .collect();
 
@@ -75,16 +96,14 @@ export const getFarmerCompletedOrderSummary = query({
 
     // Hitung distinct komoditasId
     const uniqueKomoditasIds = new Set(
-      completedOrders
-        .filter(order => order.komoditasId)
-        .map(order => order.komoditasId)
+      completedOrders.filter((order) => order.komoditasId).map((order) => order.komoditasId)
     );
     const distinctCommodities = uniqueKomoditasIds.size;
 
     return {
       totalAmount,
       totalTransactions,
-      distinctCommodities
+      distinctCommodities,
     };
   },
 });
@@ -100,7 +119,7 @@ export const getFarmerPendingOrderSummary = query({
         shippedOrders: 0,
         totalPendingAmount: 0,
         waitingAmount: 0,
-        shippedAmount: 0
+        shippedAmount: 0,
       };
     }
 
@@ -119,8 +138,10 @@ export const getFarmerPendingOrderSummary = query({
       .collect();
 
     // Pisahkan berdasarkan status
-    const waitingOrders = pendingOrders.filter(order => order.status === 'awaiting_escrow_payment');
-    const shippedOrders = pendingOrders.filter(order => order.status === 'shipped');
+    const waitingOrders = pendingOrders.filter(
+      (order) => order.status === 'awaiting_escrow_payment'
+    );
+    const shippedOrders = pendingOrders.filter((order) => order.status === 'shipped');
 
     // Hitung amounts
     const waitingAmount = waitingOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
@@ -131,7 +152,7 @@ export const getFarmerPendingOrderSummary = query({
       shippedOrders: shippedOrders.length,
       totalPendingAmount: waitingAmount + shippedAmount,
       waitingAmount,
-      shippedAmount
+      shippedAmount,
     };
   },
 });
@@ -139,7 +160,7 @@ export const getFarmerPendingOrderSummary = query({
 export const getFarmerOrdersWithDetails = query({
   args: {
     farmerId: v.optional(v.string()),
-    limit: v.optional(v.number())
+    limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     if (!args.farmerId) {
@@ -157,14 +178,10 @@ export const getFarmerOrdersWithDetails = query({
     const ordersWithDetails = await Promise.all(
       orders.map(async (order) => {
         // Get komoditas details
-        const komoditas = order.komoditasId
-          ? await ctx.db.get(order.komoditasId)
-          : null;
+        const komoditas = order.komoditasId ? await ctx.db.get(order.komoditasId) : null;
 
         // Get buyer details
-        const buyer = order.buyerId
-          ? await ctx.db.get(order.buyerId)
-          : null;
+        const buyer = order.buyerId ? await ctx.db.get(order.buyerId) : null;
 
         return {
           id: order._id,
@@ -176,7 +193,7 @@ export const getFarmerOrdersWithDetails = query({
           totalAmount: order.totalAmount,
           status: order.status,
           createdAt: order._creationTime,
-          updatedAt: order.updatedAt || order._creationTime
+          updatedAt: order.updatedAt || order._creationTime,
         };
       })
     );
@@ -206,12 +223,35 @@ export const list = query({
 
     // Apply pagination or return all results
     if (args.paginationOpts) {
-      return await orderedQuery.paginate(args.paginationOpts);
+      const paginatedResults = await orderedQuery.paginate(args.paginationOpts);
+      const komoditasWithImages: KomoditasWithImageUrl[] = await Promise.all(
+        paginatedResults.page.map(async (komoditas) => {
+          if (komoditas.imageStorageId) {
+            const publicImageUrl = await ctx.runQuery(api.upload_mutations.getImageUrl, {
+              storageId: komoditas.imageStorageId,
+            });
+            return { ...komoditas, imageUrl: publicImageUrl ?? komoditas.imageUrl };
+          }
+          return komoditas;
+        })
+      );
+      return { ...paginatedResults, page: komoditasWithImages };
     }
 
     const results = await orderedQuery.collect();
+    const komoditasWithImages: KomoditasWithImageUrl[] = await Promise.all(
+      results.map(async (komoditas) => {
+        if (komoditas.imageStorageId) {
+          const publicImageUrl = await ctx.runQuery(api.upload_mutations.getImageUrl, {
+            storageId: komoditas.imageStorageId,
+          });
+          return { ...komoditas, imageUrl: publicImageUrl ?? komoditas.imageUrl };
+        }
+        return komoditas;
+      })
+    );
     return {
-      page: results,
+      page: komoditasWithImages,
       isDone: true,
       continueCursor: null,
     };

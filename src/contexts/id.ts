@@ -25,6 +25,7 @@ export const id = {
   'action.showMore': 'Tampilkan Lebih',
   'action.print': 'Cetak',
   'action.saving': 'Menyimpan...',
+  'action.remove': 'Hapus',
 
   // Navigation
   'nav.dashboard': 'Dasbor',
@@ -138,7 +139,7 @@ export const id = {
   'commodities.harvest': 'Tanggal Panen',
   'commodities.origin': 'Asal',
   'commodities.category': 'Kategori',
-  'commodities.imageUrl': 'URL Gambar',
+  'commodities.imageUrl': 'Gambar Komoditas',
   'commodities.stock': 'Total Stok',
   'commodities.pricePerUnit': 'Harga per Unit',
   'commodities.price': 'Harga',
@@ -150,7 +151,6 @@ export const id = {
   'commodities.namePlaceholder': 'Masukkan nama komoditas',
   'commodities.unitPlaceholder': 'Pilih satuan',
   'commodities.categoryPlaceholder': 'Pilih kategori',
-  'commodities.imageUrlPlaceholder': 'URL gambar komoditas',
   'commodities.gradePlaceholder': 'Level Grade cth: A, B, C',
   'commodities.harvestDatePlaceholder': 'Pilih tanggal',
   'commodities.descriptionPlaceholder': 'Deskripsi komoditas',
@@ -175,6 +175,13 @@ export const id = {
   'commodities.addFailed': 'Gagal menambahkan komoditas',
   'commodities.attention': 'Perhatian',
   'commodities.fillBasePriceAndUnit': 'Harap isi harga dasar dan satuan terlebih dahulu',
+  'commodities.uploadSuccessTitle': 'Unggah Berhasil',
+  'commodities.uploadSuccessDesc': 'Gambar komoditas berhasil diunggah',
+  'commodities.uploadFailed': 'Gagal mengunggah gambar',
+  'commodities.uploadingImage': 'Mengunggah gambar...',
+  'commodities.selectedFile': 'File terpilih',
+  'commodities.dropHere': 'Jatuhkan file di sini...',
+  'commodities.dragDropOrClick': 'Seret dan lepas file di sini, atau klik untuk memilih file',
 
   // Market
   'market.title': 'Pasar Komoditas',

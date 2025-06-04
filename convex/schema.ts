@@ -16,6 +16,7 @@ export default defineSchema({
     farmersName: v.optional(v.string()),
     address: v.optional(v.string()),
     imageUrl: v.optional(v.string()),
+    imageStorageId: v.optional(v.id('_storage')), // Added new field for storage ID
     createdBy: v.id('users'), // Link to the farmer's user record in Convex
     sellerSolanaPublicKey: v.string(), // Farmer's Solana public key
     updatedAt: v.number(),
