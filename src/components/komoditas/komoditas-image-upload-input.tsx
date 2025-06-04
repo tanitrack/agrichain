@@ -121,7 +121,7 @@ export const KomoditasImageUploadInput = ({
         >
           <input {...getInputProps()} />
           {uploading ? (
-            <p>{t('commodities.uploading')}</p>
+            <p>{t('commodities.uploadingImage')}</p>
           ) : selectedFile ? (
             <p>
               {t('commodities.selectedFile')}: {selectedFile.name}

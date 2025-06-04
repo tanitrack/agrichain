@@ -11,6 +11,7 @@ import { DatePicker } from '../ui/datepicker';
 import { useLanguage } from '@/contexts/language-context';
 import { formatPriceInput, parsePriceInput } from '@/lib/utils';
 import { useState } from 'react';
+import { Textarea } from '@/components/ui/textarea';
 
 // Mock data for units and categories - These should probably be fetched or passed as props in a real app
 const units = ['kg', 'ton', 'gram', 'liter'];
@@ -98,7 +99,7 @@ export const KomoditasForm = ({ formData, onInputChange, language }: KomoditasFo
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid  gap-4">
         <div className="space-y-2">
           <Label htmlFor="category" className="text-earth-dark-green">
             {t('commodities.category')}
@@ -118,15 +119,6 @@ export const KomoditasForm = ({ formData, onInputChange, language }: KomoditasFo
               ))}
             </SelectContent>
           </Select>
-        </div>
-        {/* Image Upload Section Placeholder - This will be a separate component */}
-        <div className="space-y-2">
-          <Label htmlFor="imageUrl" className="text-earth-dark-green">
-            {t('commodities.imageUrl')}
-          </Label>
-          <div className="flex h-10 items-center rounded-md border border-earth-medium-green px-3 text-sm text-earth-medium-green">
-            Image Upload Component Placeholder
-          </div>
         </div>
       </div>
 
@@ -156,7 +148,7 @@ export const KomoditasForm = ({ formData, onInputChange, language }: KomoditasFo
         <Label htmlFor="description" className="text-earth-dark-green">
           {t('commodities.description')}
         </Label>
-        <Input
+        <Textarea
           id="description"
           placeholder={t('commodities.descriptionPlaceholder')}
           value={formData.description}
