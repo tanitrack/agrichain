@@ -24,6 +24,7 @@ export const en = {
   'action.showAll': 'Show All',
   'action.showMore': 'Show More',
   'action.saving': 'Saving...',
+  'action.remove': 'Remove',
 
   // Navigation
   'nav.dashboard': 'Dashboard',
@@ -137,7 +138,7 @@ export const en = {
   'commodities.harvest': 'Harvest Date',
   'commodities.origin': 'Origin',
   'commodities.category': 'Category',
-  'commodities.imageUrl': 'Image URL',
+  'commodities.imageUrl': 'Commodity Image',
   'commodities.stock': 'Total Stock',
   'commodities.pricePerUnit': 'Price per Unit',
   'commodities.price': 'Price',
@@ -148,7 +149,6 @@ export const en = {
   'commodities.namePlaceholder': 'Enter commodity name',
   'commodities.unitPlaceholder': 'Select unit',
   'commodities.categoryPlaceholder': 'Select category',
-  'commodities.imageUrlPlaceholder': 'Commodity image URL',
   'commodities.gradePlaceholder': 'Grade level e.g. A, B, C',
   'commodities.harvestDatePlaceholder': 'Pick a date',
   'commodities.descriptionPlaceholder': 'Commodity description',
@@ -173,6 +173,13 @@ export const en = {
   'commodities.addFailed': 'Failed to add commodity',
   'commodities.attention': 'Attention',
   'commodities.fillBasePriceAndUnit': 'Please fill in the base price and unit first',
+  'commodities.uploadSuccessTitle': 'Upload Successful',
+  'commodities.uploadSuccessDesc': 'Commodity image uploaded successfully',
+  'commodities.uploadFailed': 'Failed to upload image',
+  'commodities.uploadingImage': 'Uploading image...',
+  'commodities.selectedFile': 'Selected file',
+  'commodities.dropHere': 'Drop the files here...',
+  'commodities.dragDropOrClick': 'Drag and drop some files here, or click to select files',
 
   // Market
   'market.title': 'Commodity Market',
