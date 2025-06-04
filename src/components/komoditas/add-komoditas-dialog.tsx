@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react'; // Added useEffect
 import { DollarSign, Pencil, Plus, Tag, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/input'; // Keep Input import
 import { Label } from '@/components/ui/label';
 import {
   Dialog,
@@ -21,8 +21,9 @@ import {
 } from '@/components/ui/select';
 import { useLanguage } from '@/contexts/language-context';
 import { useToast } from '@/hooks/use-toast';
-import { useMutation } from 'convex/react';
+import { useMutation, useAction, useQuery } from 'convex/react'; // Added useQuery
 import { api } from '@/lib/convex';
+import { Id } from 'convex/_generated/dataModel'; // Import Id type
 import { BulkPrice } from '@/lib/data/types';
 import { formatPriceInput, parsePriceInput } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -36,6 +37,7 @@ import {
   SheetClose,
 } from '@/components/ui/sheet';
 import { DatePicker } from '../ui/datepicker';
+import { useDropzone } from 'react-dropzone'; // Import useDropzone
 // Import useDynamicContext
 // Import isSolanaWallet
 
@@ -68,6 +70,18 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
   const createKomoditasMutation = useMutation(api.komoditas_mutations.create);
   const createKomoditasBulkMutation = useMutation(api.komoditas_bulk_mutations.create);
 
+  // State for image upload
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadedStorageId, setUploadedStorageId] = useState<Id<'_storage'> | null>(null);
+
+  const generateUploadUrl = useAction(api.upload_mutations.generateUploadUrl); // Use the Convex action
+  const saveImageMutation = useMutation(api.upload_mutations.saveKomoditasImage); // Use the Convex mutation
+  const uploadedImageUrl = useQuery(
+    api.upload_mutations.getImageUrl,
+    uploadedStorageId ? { storageId: uploadedStorageId } : 'skip'
+  ); // Use the Convex query
+
   // Bulk pricing state
   const [bulkPrices, setBulkPrices] = useState<BulkPrice[]>([]);
   const [newBulkPrice, setNewBulkPrice] = useState({
@@ -84,8 +98,6 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
     grade: '',
     // pricePerUnit: '',
     stock: '',
-    imageUrl: '',
-
     basePrice: '',
     harvestDate: undefined as Date | undefined,
   });
@@ -97,19 +109,74 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string | Date | undefined) => {
     if (field === 'basePrice') {
       // Format the input as currency
-      const formattedValue = formatPriceInput(value);
+      // Ensure value is treated as string for formatting/parsing
+      const formattedValue = formatPriceInput(value as string);
       setDisplayPrice(formattedValue);
 
       // Store raw value in formData
-      const numericValue = parsePriceInput(value);
+      const numericValue = parsePriceInput(value as string);
       setFormData((prev) => ({ ...prev, [field]: numericValue.toString() }));
     } else {
       setFormData((prev) => ({ ...prev, [field]: value }));
     }
   };
+
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      if (acceptedFiles.length > 0) {
+        const file = acceptedFiles[0];
+        setSelectedFile(file);
+        setUploading(true);
+
+        try {
+          // 1. Get upload URL from Convex
+          const uploadUrl = await generateUploadUrl();
+
+          // 2. Upload the file to the URL
+          const result = await fetch(uploadUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': file.type },
+            body: file,
+          });
+
+          if (!result.ok) {
+            throw new Error(`Upload failed: ${result.statusText}`);
+          }
+
+          const { storageId } = await result.json();
+
+          // 3. Save the storage ID to the database (this will be done after Komoditas creation)
+          // We'll store the storageId in a state variable for now
+          setUploadedStorageId(storageId); // Use setUploadedStorageId
+
+          toast({
+            title: t('commodities.uploadSuccessTitle'),
+            description: t('commodities.uploadSuccessDesc'),
+          });
+        } catch (error) {
+          console.error('Upload failed:', error);
+          toast({
+            title: t('commodities.error'),
+            description: error instanceof Error ? error.message : t('commodities.uploadFailed'),
+            variant: 'destructive',
+          });
+          setSelectedFile(null); // Clear selected file on error
+          setUploadedStorageId(null); // Clear uploaded storage ID on error
+        } finally {
+          setUploading(false);
+        }
+      }
+    },
+    [generateUploadUrl, toast, t]
+  );
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { 'image/*': [] },
+  }); // Accept only images
 
   const handleAddKomoditas = async () => {
     try {
@@ -134,15 +201,17 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
         // ...(formData.pricePerUnit && { pricePerUnit: parseFloat(formData.pricePerUnit) }),
         ...(formData.basePrice && { pricePerUnit: parseFloat(formData.basePrice) }), // Use basePrice for pricePerUnit
         ...(formData.stock && { stock: parseFloat(formData.stock) }),
-        ...(formData.imageUrl && { imageUrl: formData.imageUrl }),
+        ...(uploadedStorageId && { imageUrl: uploadedStorageId }), // Use uploadedStorageId
         ...(formData.harvestDate && { harvestDate: formData.harvestDate.toDateString() }),
         ...(formData.grade && { grade: formData.grade }),
       };
 
       // ACTIVATE THIS AFTER 🔥🔥🔥🔥
-      await createKomoditasMutation(komoditasData).then((createdKomoditasId) => {
+      await createKomoditasMutation(komoditasData).then(async (createdKomoditasId) => {
+        // Added async here
         // ADD BULK
-        bulkPrices.forEach(async (value) => {
+        for (const value of bulkPrices) {
+          // Changed to for...of for async
           const komoditasBulkData = {
             commodityId: createdKomoditasId,
             ...(value.minQuantity && { minQuantity: value.minQuantity.toString() }),
@@ -150,7 +219,14 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
           };
 
           await createKomoditasBulkMutation(komoditasBulkData);
-        });
+        }
+        // Call saveImage mutation after Komoditas is created and we have the ID
+        if (uploadedStorageId) {
+          await saveImageMutation({
+            storageId: uploadedStorageId,
+            komoditasId: createdKomoditasId,
+          }); // Pass uploadedStorageId
+        }
       }); // Use the mutation
 
       toast({
@@ -169,11 +245,14 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
         // pricePerUnit: '',
         grade: '',
         stock: '',
-        imageUrl: '',
+        // imageUrl: '', // Removed imageUrl from reset
         basePrice: '',
         harvestDate: undefined,
       });
       setDisplayPrice(''); // Reset display price
+      setSelectedFile(null); // Reset selected file
+      setUploadedStorageId(null); // Reset uploaded storage ID
+      setBulkPrices([]); // Reset bulk prices
 
       onOpenChange(false);
     } catch (error) {
@@ -313,17 +392,55 @@ export const AddKomoditasDialog = ({ open, onOpenChange, onSuccess }: AddKomodit
                   </SelectContent>
                 </Select>
               </div>
+              {/* Image Upload Section */}
               <div className="space-y-2">
                 <Label htmlFor="imageUrl" className="text-earth-dark-green">
                   {t('commodities.imageUrl')}
                 </Label>
-                <Input
-                  id="imageUrl"
-                  placeholder={t('commodities.imageUrlPlaceholder')}
-                  value={formData.imageUrl}
-                  onChange={(e) => handleInputChange('imageUrl', e.target.value)}
-                  className="border-earth-medium-green focus:border-earth-dark-green"
-                />
+                {uploadedImageUrl ? ( // Show preview if URL is available
+                  <div className="space-y-2">
+                    <img
+                      src={uploadedImageUrl}
+                      alt="Uploaded preview"
+                      className="h-32 w-auto rounded-md object-cover"
+                    />
+                    <p className="break-all text-sm text-earth-dark-green">{uploadedImageUrl}</p>{' '}
+                    {/* Display URL */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedFile(null);
+                        setUploadedStorageId(null);
+                      }}
+                      className="border-earth-light-green text-earth-dark-green hover:bg-earth-light-green/20"
+                    >
+                      {t('action.remove')}
+                    </Button>
+                  </div>
+                ) : (
+                  <div
+                    {...getRootProps()}
+                    className={`flex cursor-pointer items-center justify-center rounded-md border-2 border-dashed p-6 text-center transition-colors ${
+                      isDragActive
+                        ? 'border-earth-dark-green bg-earth-light-green/20'
+                        : 'border-earth-medium-green hover:border-earth-dark-green'
+                    }`}
+                  >
+                    <input {...getInputProps()} />
+                    {uploading ? (
+                      <p>{t('commodities.uploading')}</p>
+                    ) : selectedFile ? (
+                      <p>
+                        {t('commodities.selectedFile')}: {selectedFile.name}
+                      </p>
+                    ) : isDragActive ? (
+                      <p>{t('commodities.dropHere')}</p>
+                    ) : (
+                      <p>{t('commodities.dragDropOrClick')}</p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
