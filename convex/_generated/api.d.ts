@@ -27,6 +27,7 @@ import type * as orderbook_mutations from "../orderbook_mutations.js";
 import type * as orderbook_queries from "../orderbook_queries.js";
 import type * as transaction_mutations from "../transaction_mutations.js";
 import type * as transaction_queries from "../transaction_queries.js";
+import type * as upload_mutations from "../upload_mutations.js";
 import type * as users from "../users.js";
 import type * as users_mutations from "../users_mutations.js";
 import type * as users_queries from "../users_queries.js";
@@ -54,6 +55,7 @@ declare const fullApi: ApiFromModules<{
   orderbook_queries: typeof orderbook_queries;
   transaction_mutations: typeof transaction_mutations;
   transaction_queries: typeof transaction_queries;
+  upload_mutations: typeof upload_mutations;
   users: typeof users;
   users_mutations: typeof users_mutations;
   users_queries: typeof users_queries;
