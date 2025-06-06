@@ -54,7 +54,7 @@ export const KomoditasRow = ({
   const { t } = useLanguage();
 
   return (
-    <TableRow className="hover:bg-earth-pale-green">
+    <TableRow className="hover:bg-earth-pale-green cursor-pointer" onClick={() => onViewDetail(item.id)}>
       <TableCell>
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded bg-earth-light-green/20">
