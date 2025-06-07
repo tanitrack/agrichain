@@ -11,14 +11,20 @@ export const get = query({
 
   handler: async (ctx, args) => {
     const komoditas = await ctx.db.get(args.id);
-    if (komoditas?.imageStorageId) {
-      const publicImageUrl: string | null = await ctx.runQuery(api.upload_mutations.getImageUrl, {
-        storageId: komoditas.imageStorageId,
-      });
-      const imageUrl = (publicImageUrl ?? komoditas.imageUrl) as string;
-      return { ...komoditas, imageUrl };
+    let publicImageUrl: string | undefined | null = komoditas?.imageUrl;
+
+    try {
+      if (komoditas?.imageStorageId) {
+        publicImageUrl = await ctx.runQuery(api.upload_mutations.getImageUrl, {
+          storageId: komoditas.imageStorageId,
+        });
+        const imageUrl = (publicImageUrl ?? komoditas.imageUrl) as string;
+        return { ...komoditas, imageUrl };
+      }
+    } catch (error) {
+      console.error('Error fetching image URL:', error);
+      return komoditas;
     }
-    return komoditas;
   },
 });
 
