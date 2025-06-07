@@ -3,30 +3,7 @@ import { query } from './_generated/server';
 import { v } from 'convex/values';
 import { api } from './_generated/api';
 
-import { Id } from './_generated/dataModel';
-
 // Using DataModel to prevent auto-formatting issues: type _ = DataModel;
-
-interface KomoditasWithImageUrl {
-  _id: Id<'komoditas'>;
-  _creationTime: number;
-  name: string;
-  description?: string;
-  category: string;
-  unit: string;
-  pricePerUnit: number;
-  stock: number;
-  grade?: string;
-  harvestDate?: string;
-  farmersName?: string;
-  address?: string;
-  imageUrl?: string;
-  imageStorageId?: Id<'_storage'>;
-  createdBy: Id<'users'>;
-  sellerSolanaPublicKey: string;
-  updatedAt: number;
-  publicImageUrl?: string | null;
-}
 
 // Get a single komoditas by ID
 export const get = query({
@@ -34,7 +11,20 @@ export const get = query({
 
   handler: async (ctx, args) => {
     const komoditas = await ctx.db.get(args.id);
-    return komoditas;
+    let publicImageUrl: string | undefined | null = komoditas?.imageUrl;
+
+    try {
+      if (komoditas?.imageStorageId) {
+        publicImageUrl = await ctx.runQuery(api.upload_mutations.getImageUrl, {
+          storageId: komoditas.imageStorageId,
+        });
+        const imageUrl = (publicImageUrl ?? komoditas.imageUrl) as string;
+        return { ...komoditas, imageUrl };
+      }
+    } catch (error) {
+      console.error('Error fetching image URL:', error);
+      return komoditas;
+    }
   },
 });
 
@@ -224,13 +214,14 @@ export const list = query({
     // Apply pagination or return all results
     if (args.paginationOpts) {
       const paginatedResults = await orderedQuery.paginate(args.paginationOpts);
-      const komoditasWithImages: KomoditasWithImageUrl[] = await Promise.all(
+      const komoditasWithImages = await Promise.all(
         paginatedResults.page.map(async (komoditas) => {
           if (komoditas.imageStorageId) {
             const publicImageUrl = await ctx.runQuery(api.upload_mutations.getImageUrl, {
               storageId: komoditas.imageStorageId,
             });
-            return { ...komoditas, imageUrl: publicImageUrl ?? komoditas.imageUrl };
+            const imageUrl = (publicImageUrl ?? komoditas.imageUrl) as string;
+            return { ...komoditas, imageUrl };
           }
           return komoditas;
         })
@@ -239,13 +230,17 @@ export const list = query({
     }
 
     const results = await orderedQuery.collect();
-    const komoditasWithImages: KomoditasWithImageUrl[] = await Promise.all(
+    const komoditasWithImages = await Promise.all(
       results.map(async (komoditas) => {
         if (komoditas.imageStorageId) {
-          const publicImageUrl = await ctx.runQuery(api.upload_mutations.getImageUrl, {
-            storageId: komoditas.imageStorageId,
-          });
-          return { ...komoditas, imageUrl: publicImageUrl ?? komoditas.imageUrl };
+          const publicImageUrl: string | null = await ctx.runQuery(
+            api.upload_mutations.getImageUrl,
+            {
+              storageId: komoditas.imageStorageId,
+            }
+          );
+          const imageUrl = (publicImageUrl ?? komoditas.imageUrl) as string;
+          return { ...komoditas, imageUrl };
         }
         return komoditas;
       })
