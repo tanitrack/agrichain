@@ -50,3 +50,44 @@ export const create = mutation({
     return komoditasBulkId;
   },
 });
+
+export const update = mutation({
+  args: {
+    _id: v.id('komoditas_bulk'),
+    minQuantity: v.optional(v.string()),
+    price: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error('Unauthorized: User must be logged in to update a commodity bulk price.');
+    }
+
+    // Optional: Add checks to ensure the user is authorized to update this specific bulk price
+    // e.g., check if the createdBy or sellerSolanaPublicKey matches the current user.
+
+    const { _id, ...updates } = args;
+
+    await ctx.db.patch(_id, {
+      ...updates,
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+export const deleteKomoditasBulk = mutation({
+  args: {
+    id: v.id('komoditas_bulk'),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error('Unauthorized: User must be logged in to delete a commodity bulk price.');
+    }
+
+    // Optional: Add checks to ensure the user is authorized to delete this specific bulk price
+    // e.g., check if the createdBy or sellerSolanaPublicKey matches the current user.
+
+    await ctx.db.delete(args.id);
+  },
+});

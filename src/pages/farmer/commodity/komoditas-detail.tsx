@@ -5,22 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import {
-  ArrowLeft,
-  QrCode,
-  Edit,
-  Trash2,
-  Scale,
-  Calendar,
-  PackageOpen,
-  MapPin,
-} from 'lucide-react';
+import { ArrowLeft, QrCode, Trash2, Scale, Calendar, PackageOpen, MapPin } from 'lucide-react';
 import { useLanguage } from '@/contexts/language-context';
 import { formatDate } from '@/lib/utils';
 import { useQuery } from 'convex/react';
 import { api } from '@/lib/convex';
 import { Id } from 'convex/_generated/dataModel';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { EditKomoditasButton } from '@/components/komoditas/edit-komoditas-button';
 
 const KomoditasDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -116,13 +108,7 @@ const KomoditasDetail = () => {
           <p className="text-earth-medium-green">{komoditas._id}</p>
         </div>
         <div className="mt-4 flex space-x-2 md:mt-0">
-          <Button
-            variant="outline"
-            className="gap-2 border-earth-medium-green text-earth-dark-green hover:bg-earth-light-green/20"
-          >
-            <Edit className="h-4 w-4" />
-            {t('action.edit')}
-          </Button>
+          <EditKomoditasButton komoditasId={komoditas._id} />
           <Button variant="outline" className="gap-2 border-red-200 text-red-600 hover:bg-red-50">
             <Trash2 className="h-4 w-4" />
             {t('action.delete')}
