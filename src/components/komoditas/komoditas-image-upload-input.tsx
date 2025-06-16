@@ -12,6 +12,7 @@ interface KomoditasImageUploadInputProps {
   onUploadSuccess: (storageId: Id<'_storage'>) => void;
   onRemove: () => void;
   uploadedStorageId: Id<'_storage'> | null;
+  initialImageUrl?: string | null; // Add initialImageUrl prop
 }
 
 export const KomoditasImageUploadInput = ({

@@ -75,6 +75,8 @@ export const update = mutation({
     pricePerUnit: v.optional(v.number()),
     stock: v.optional(v.number()),
     imageUrl: v.optional(v.string()),
+    grade: v.optional(v.string()),
+    harvestDate: v.optional(v.string()),
   },
   returns: v.id('komoditas'),
   handler: async (ctx, args) => {
