@@ -10,7 +10,12 @@ export const get = query({
   args: { id: v.id('komoditas') },
 
   handler: async (ctx, args) => {
-    const komoditas = await ctx.db.get(args.id);
+    let komoditas = null;
+    try {
+      komoditas = await ctx.db.get(args.id);
+    } catch (error) {
+      console.error('Error fetching komoditas:', error);
+    }
     let publicImageUrl: string | undefined | null = komoditas?.imageUrl;
 
     try {
@@ -23,8 +28,9 @@ export const get = query({
       }
     } catch (error) {
       console.error('Error fetching image URL:', error);
-      return komoditas;
     }
+
+    return komoditas;
   },
 });
 
